@@ -123,38 +123,46 @@ const CollectionProducts = () => {
                             key={product.id}
                             className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full"
                         >
-                            <div className="w-full h-36 mb-2 relative">
-                                {/* Skeleton */}
-                                {!loadedMap[product.id] && (
-                                    <div className="absolute inset-0 rounded-lg bg-gray-300 animate-pulse" />
-                                )}
 
-                                {/* Actual image */}
-                                <img
-                                    src={product.images[0]}
-                                    alt={product.name}
-                                    className={`w-full h-full object-cover rounded-lg ${loadedMap[product.id] ? "block" : "hidden"
-                                        }`}
-                                    onLoad={() => setLoadedMap(prev => ({ ...prev, [product.id]: true }))}
-                                    onError={() => setLoadedMap(prev => ({ ...prev, [product.id]: true }))}
-                                />
-                            </div>
+                            <Link
+                                href={{
+                                    pathname: "/product_view",
+                                    query: { id: product.id }, // pass product ID as query param
+                                }}
+                            >
+                                <div className="w-full h-36 mb-2 relative">
+                                    {/* Skeleton */}
+                                    {!loadedMap[product.id] && (
+                                        <div className="absolute inset-0 rounded-lg bg-gray-300 animate-pulse" />
+                                    )}
 
-                            {/* Product Info */}
-                            <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                            <p className="text-sm text-gray-600 flex-1">
-                                {product.description}
-                            </p>
+                                    {/* Actual image */}
+                                    <img
+                                        src={product.images[0]}
+                                        alt={product.name}
+                                        className={`w-full h-full object-cover rounded-lg ${loadedMap[product.id] ? "block" : "hidden"
+                                            }`}
+                                        onLoad={() => setLoadedMap(prev => ({ ...prev, [product.id]: true }))}
+                                        onError={() => setLoadedMap(prev => ({ ...prev, [product.id]: true }))}
+                                    />
+                                </div>
 
-                            {/* Price */}
-                            <div className="mt-2">
-                                <span className="font-semibold">{product.final_price}₹</span>
-                                {product.discount > 0 && (
-                                    <span className="text-gray-400 line-through ml-2">
-                                        {product.price}₹
-                                    </span>
-                                )}
-                            </div>
+                                {/* Product Info */}
+                                <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+                                <p className="text-sm text-gray-600 flex-1">
+                                    {product.description}
+                                </p>
+
+                                {/* Price */}
+                                <div className="mt-2">
+                                    <span className="font-semibold">{product.final_price}₹</span>
+                                    {product.discount > 0 && (
+                                        <span className="text-gray-400 line-through ml-2">
+                                            {product.price}₹
+                                        </span>
+                                    )}
+                                </div>
+                            </Link>
 
                             {/* Buttons at bottom */}
                             <div className="mt-auto flex gap-2 pt-3">
@@ -174,10 +182,11 @@ const CollectionProducts = () => {
                                 </button>
                             </div>
                         </div>);
-})}
+                    })}
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 
 }

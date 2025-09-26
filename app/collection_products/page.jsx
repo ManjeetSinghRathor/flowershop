@@ -3,7 +3,7 @@ import CollectionProducts from "@/components/CollectionProucts";
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="flex w-full justify-center py-2">Loading...</div>}>
       <CollectionProducts />
     </Suspense>
   );
