@@ -2,239 +2,133 @@
 import { useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import Slider from "react-slick";
+import { Products } from "@/public/products";
+import Link from "next/link";
 
 const collectionList = {
   "By Occasion": [
-    { collection: "Birthday Flowers", image: "./birthday_flowers.png" },
-    { collection: "Anniversary Flowers", image: "./anniversary_flowers.png" },
-    { collection: "Wedding Flowers", image: "./wedding_flowers.png" },
-    { collection: "Get Well Soon", image: "./get_well_soon.png" },
-    { collection: "Congratulations", image: "./congratulations.png" },
-    { collection: "Love & Romance", image: "./love_romance.png" },
-    { collection: "New Baby", image: "./new_baby.png" },
-    { collection: "Sympathy & Funeral", image: "./sympathy_funeral.png" },
-    { collection: "Thank You", image: "./thank_you.png" },
-    { collection: "Housewarming", image: "./housewarming.png" },
+    { id:"A001", collection: "Birthday Flowers", image: "./birthday_flowers.png" },
+    { id:"A002", collection: "Anniversary Flowers", image: "./anniversary_flowers.png" },
+    { id:"A003", collection: "Wedding Flowers", image: "./wedding_flowers.png" },
+    { id:"A004", collection: "Get Well Soon", image: "./get_well_soon.png" },
+    { id:"A005", collection: "Congratulations", image: "./congratulations.png" },
+    { id:"A006", collection: "Love & Romance", image: "./love_romance.png" },
+    { id:"A007", collection: "New Baby", image: "./new_baby.png" },
+    { id:"A008", collection: "Sympathy & Funeral", image: "./sympathy_funeral.png" },
+    { id:"A009", collection: "Thank You", image: "./thank_you.png" },
+    { id:"A010", collection: "Housewarming", image: "./housewarming.png" },
   ],
 
   "By Flower Type": [
-    { collection: "Roses", image: "./roses.png" },
-    { collection: "Lilies", image: "./lilies.png" },
-    { collection: "Orchids", image: "./orchids.png" },
-    { collection: "Carnations", image: "./carnations.png" },
-    { collection: "Tulips", image: "./tulips.png" },
-    { collection: "Gerberas", image: "./gerberas.png" },
-    { collection: "Mixed Flowers", image: "./mixed_flowers.png" },
-    { collection: "Seasonal Flowers", image: "./seasonal_flowers.png" },
+    { id:"B001", collection: "Roses", image: "./roses.png" },
+    { id:"B002", collection: "Lilies", image: "./lilies.png" },
+    { id:"B003", collection: "Orchids", image: "./orchids.png" },
+    { id:"B004", collection: "Carnations", image: "./carnations.png" },
+    { id:"B005", collection: "Tulips", image: "./tulips.png" },
+    { id:"B006", collection: "Gerberas", image: "./gerberas.png" },
+    { id:"B007", collection: "Mixed Flowers", image: "./mixed_flowers.png" },
+    { id:"B008", collection: "Seasonal Flowers", image: "./seasonal_flowers.png" },
   ],
 
   "By Arrangement Style": [
-    { collection: "Bouquets", image: "./bouquets.png" },
-    { collection: "Flower Baskets", image: "./flower_baskets.png" },
-    { collection: "Flower Boxes / Hampers", image: "./flower_boxes.png" },
-    { collection: "Vase Arrangements", image: "./vase_arrangements.png" },
+    { id:"C001", collection: "Bouquets", image: "./bouquets.png" },
+    { id:"C002", collection: "Flower Baskets", image: "./flower_baskets.png" },
+    { id:"C003", collection: "Flower Boxes / Hampers", image: "./flower_boxes.png" },
+    { id:"C004", collection: "Vase Arrangements", image: "./vase_arrangements.png" },
     {
-      collection: "Exotic / Premium Arrangements",
+      id:"C005", collection: "Premium Arrangements",
       image: "./exotic_premium.png",
     },
-    { collection: "Single Stem Flowers", image: "./single_stem.png" },
+    { id:"C006", collection: "Single Stem Flowers", image: "./single_stem.png" },
   ],
 
   "By Color Theme": [
-    { collection: "Red Flowers", image: "./red_flowers.png" },
-    { collection: "White Flowers", image: "./white_flowers.png" },
-    { collection: "Pink Flowers", image: "./pink_flowers.png" },
-    { collection: "Yellow Flowers", image: "./yellow_flowers.png" },
-    { collection: "Mixed Colors", image: "./mixed_colors.png" },
+    { id:"D001", collection: "Red Flowers", image: "./red_flowers.png" },
+    { id:"D002", collection: "White Flowers", image: "./white_flowers.png" },
+    { id:"D003", collection: "Pink Flowers", image: "./pink_flowers.png" },
+    { id:"D004", collection: "Yellow Flowers", image: "./yellow_flowers.png" },
+    { id:"D005", collection: "Mixed Colors", image: "./mixed_colors.png" },
   ],
 
-  "Gift Type": [
-    { collection: "Chocolates & Sweets", image: "./chocolates_sweets.png" },
-    { collection: "Cakes & Cupcakes", image: "./cakes_cupcakes.png" },
-    { collection: "Teddy Bears / Soft Toys", image: "./teddy_softtoys.png" },
-    { collection: "Greeting Cards", image: "./greeting_cards.png" },
-    { collection: "Perfumes", image: "./perfumes.png" },
-    { collection: "Jewelry & Accessories", image: "./jewelry_accessories.png" },
-    { collection: "Personalized Gifts", image: "./personalized_gifts.png" },
-    { collection: "Plants", image: "./plants.png" },
-  ],
+  // "Gift Type": [
+  //   { collection: "Chocolates & Sweets", image: "./chocolates_sweets.png" },
+  //   { collection: "Cakes & Cupcakes", image: "./cakes_cupcakes.png" },
+  //   { collection: "Teddy Bears / Soft Toys", image: "./teddy_softtoys.png" },
+  //   { collection: "Greeting Cards", image: "./greeting_cards.png" },
+  //   { collection: "Perfumes", image: "./perfumes.png" },
+  //   { collection: "Jewelry & Accessories", image: "./jewelry_accessories.png" },
+  //   { collection: "Personalized Gifts", image: "./personalized_gifts.png" },
+  //   { collection: "Plants", image: "./plants.png" },
+  // ],
 
-  "Combo Collections": [
-    { collection: "Flowers + Chocolates", image: "./flowers_chocolates.png" },
-    { collection: "Flowers + Cake", image: "./flowers_cake.png" },
-    { collection: "Flowers + Teddy", image: "./flowers_teddy.png" },
-    { collection: "Flowers + Greeting Card", image: "./flowers_card.png" },
-    { collection: "Premium Hampers", image: "./premium_hampers.png" },
-  ],
+  // "Combo Collections": [
+  //   { collection: "Flowers + Chocolates", image: "./flowers_chocolates.png" },
+  //   { collection: "Flowers + Cake", image: "./flowers_cake.png" },
+  //   { collection: "Flowers + Teddy", image: "./flowers_teddy.png" },
+  //   { collection: "Flowers + Greeting Card", image: "./flowers_card.png" },
+  //   { collection: "Premium Hampers", image: "./premium_hampers.png" },
+  // ],
 
-  "Special Collections": [
-    { collection: "Same Day Delivery", image: "./same_day.png" },
-    { collection: "Midnight Delivery Gifts", image: "./midnight_delivery.png" },
-    {
-      collection: "Luxury / Premium",
-      image: "./luxury_premium.png",
-    },
-    { collection: "Seasonal Specials", image: "./seasonal_specials.png" },
-    { collection: "Corporate Gifting", image: "./corporate_gifting.png" },
-    { collection: "Budget-Friendly Options", image: "./budget_friendly.png" },
-  ],
+  // "Special Collections": [
+  //   { collection: "Same Day Delivery", image: "./same_day.png" },
+  //   { collection: "Midnight Delivery Gifts", image: "./midnight_delivery.png" },
+  //   {
+  //     collection: "Luxury / Premium",
+  //     image: "./luxury_premium.png",
+  //   },
+  //   { collection: "Seasonal Specials", image: "./seasonal_specials.png" },
+  //   { collection: "Corporate Gifting", image: "./corporate_gifting.png" },
+  //   { collection: "Budget-Friendly Options", image: "./budget_friendly.png" },
+  // ],
 };
 
-const trendingProducts = [
-  {
-    id: "F001",
-    name: "Red Rose Bouquet",
-    type: "Flower Bouquet",
-    flowers: ["Rose"],
-    description:
-      "A classic bouquet of 12 fresh red roses, perfect for expressing love and romance.",
-    price: 799,
-    discount: 10,
-    final_price: 719,
-    currency: "INR",
-    stock: 25,
-    images: [
-      "https://example.com/images/rose_bouquet_1.jpg",
-      "https://example.com/images/rose_bouquet_2.jpg",
-    ],
-    occasions: ["Valentine's Day", "Anniversaries", "Weddings"],
-    delivery_time: "1-2 Days",
-  },
-  {
-    id: "F002",
-    name: "Spring Tulip Bouquet",
-    type: "Flower Bouquet",
-    flowers: ["Tulip"],
-    description:
-      "Bright and colorful tulips hand-arranged in a cheerful bouquet, ideal for spring celebrations.",
-    price: 699,
-    discount: 5,
-    final_price: 664,
-    currency: "INR",
-    stock: 30,
-    images: [
-      "https://example.com/images/tulip_bouquet_1.jpg",
-      "https://example.com/images/tulip_bouquet_2.jpg",
-    ],
-    occasions: ["Easter", "Mother's Day"],
-    delivery_time: "1-2 Days",
-  },
-  {
-    id: "F003",
-    name: "Elegant Lily Arrangement",
-    type: "Flower Arrangement",
-    flowers: ["Lily"],
-    description:
-      "A sophisticated bouquet of white lilies in a premium vase, symbolizing purity and elegance.",
-    price: 1199,
-    discount: 15,
-    final_price: 1019,
-    currency: "INR",
-    stock: 20,
-    images: [
-      "https://example.com/images/lily_arrangement_1.jpg",
-      "https://example.com/images/lily_arrangement_2.jpg",
-    ],
-    occasions: ["Weddings", "Funerals"],
-    delivery_time: "1-3 Days",
-  },
-  {
-    id: "F004",
-    name: "Peony Romance Bouquet",
-    type: "Flower Bouquet",
-    flowers: ["Peony"],
-    description:
-      "Soft and fragrant peonies arranged elegantly for weddings and anniversaries.",
-    price: 1599,
-    discount: 10,
-    final_price: 1439,
-    currency: "INR",
-    stock: 15,
-    images: [
-      "https://example.com/images/peony_bouquet_1.jpg",
-      "https://example.com/images/peony_bouquet_2.jpg",
-    ],
-    occasions: ["Weddings", "Anniversaries"],
-    delivery_time: "1-3 Days",
-  },
-  {
-    id: "F005",
-    name: "Sunshine Sunflower Vase",
-    type: "Flower Arrangement",
-    flowers: ["Sunflower"],
-    description:
-      "A bright sunflower bouquet in a glass vase to add cheer and positivity to any room.",
-    price: 499,
-    discount: 0,
-    final_price: 499,
-    currency: "INR",
-    stock: 40,
-    images: [
-      "https://example.com/images/sunflower_vase_1.jpg",
-      "https://example.com/images/sunflower_vase_2.jpg",
-    ],
-    occasions: ["Friendship", "Summer Events"],
-    delivery_time: "1-2 Days",
-  },
-  {
-    id: "B001",
-    name: "Romantic Mixed Flower Basket",
-    type: "Flower Basket",
-    flowers: ["Rose", "Lily", "Carnation"],
-    description:
-      "A charming basket of mixed roses, lilies, and carnations for birthdays or romantic gestures.",
-    price: 1499,
-    discount: 20,
-    final_price: 1199,
-    currency: "INR",
-    stock: 10,
-    images: [
-      "https://example.com/images/mixed_basket_1.jpg",
-      "https://example.com/images/mixed_basket_2.jpg",
-    ],
-    occasions: ["Birthdays", "Anniversaries", "Valentine's Day"],
-    delivery_time: "1-3 Days",
-  },
-  {
-    id: "B002",
-    name: "Luxury Orchid Basket",
-    type: "Flower Basket",
-    flowers: ["Orchid"],
-    description:
-      "Exquisite orchids arranged in a decorative basket, perfect for gifting on special occasions.",
-    price: 2499,
-    discount: 15,
-    final_price: 2124,
-    currency: "INR",
-    stock: 8,
-    images: [
-      "https://example.com/images/orchid_basket_1.jpg",
-      "https://example.com/images/orchid_basket_2.jpg",
-    ],
-    occasions: ["Special Occasions", "Home Decor"],
-    delivery_time: "2-4 Days",
-  },
-];
+const trendingProductsID = ["F001", "F002", "F003", "F004", "F005", "F006"];
 
 const slides = [
-  { id: 1, image: "https://source.unsplash.com/800x400/?flower1", link: "/product/1" },
-  { id: 2, image: "https://source.unsplash.com/800x400/?flower2", link: "/product/2" },
-  { id: 3, image: "https://source.unsplash.com/800x400/?flower3", link: "/product/3" },
-  { id: 4, image: "https://source.unsplash.com/800x400/?flower4", link: "/product/4" },
-  { id: 5, image: "https://source.unsplash.com/800x400/?flower5", link: "/product/5" },
-  { id: 6, image: "https://source.unsplash.com/800x400/?flower6", link: "/product/6" },
+  {
+    id: 1,
+    image: "https://source.unsplash.com/800x400/?flower1",
+    link: "/product/1",
+  },
+  {
+    id: 2,
+    image: "https://source.unsplash.com/800x400/?flower2",
+    link: "/product/2",
+  },
+  {
+    id: 3,
+    image: "https://source.unsplash.com/800x400/?flower3",
+    link: "/product/3",
+  },
+  {
+    id: 4,
+    image: "https://source.unsplash.com/800x400/?flower4",
+    link: "/product/4",
+  },
+  {
+    id: 5,
+    image: "https://source.unsplash.com/800x400/?flower5",
+    link: "/product/5",
+  },
+  {
+    id: 6,
+    image: "https://source.unsplash.com/800x400/?flower6",
+    link: "/product/6",
+  },
 ];
 
 const shopImages = [
-  { id: 1, image: "https://source.unsplash.com/400x400/?bouquet"},
-  { id: 2, image: "https://source.unsplash.com/400x400/?roses" },
-  { id: 3, image: "https://source.unsplash.com/400x400/?lilies" },
-  { id: 4, image: "https://source.unsplash.com/400x400/?tulips" },
-]
-
+  { id: "A1", image: "https://source.unsplash.com/400x400/?bouquet" },
+  { id: "A2", image: "https://source.unsplash.com/400x400/?roses" },
+  { id: "A3", image: "https://source.unsplash.com/400x400/?lilies" },
+  { id: "A4", image: "https://source.unsplash.com/400x400/?tulips" },
+];
 
 export default function Home() {
-  const [loaded, setLoaded] = useState(false);
+  const [categoryLoaded, setCategoryLoaded] = useState({});
+  const [productsImgloaded, setProductsImgLoaded] = useState({});
+  const [shopImgLoaded, setShopImgLoaded] = useState({});
+
   const settings = {
     dots: true,
     infinite: true,
@@ -254,36 +148,38 @@ export default function Home() {
     ),
     customPaging: () => (
       <div className="w-8 h-1 bg-gray-400 rounded-full"></div>
-    )
+    ),
   };
 
+  const trendingProducts = trendingProductsID.map((id) =>
+    Products.find((product) => product.id === id)
+  );
 
   return (
     <div className="font-sans items-center w-full px-2 sm:px-8 lg:px-24">
-
       {/* <div className="fixed bottom-4 right-4 z-50">
         <button className="bg-white text-green-500 hover:bg-green-600 rounded-full text-5xl">
           <FaWhatsapp />
         </button>
       </div> */}
 
-    <div className="flex w-full justify-center">
-      <div className="relative w-full max-w-4xl overflow-hidden rounded-lg py-6 px-2">
-      <Slider {...settings}>
-        {slides.map((slide) => (
-          <div key={slide.id}>
-            <a href={slide.link}>
-              <img
-                src={slide.image}
-                alt={`Slide ${slide.id}`}
-                className="w-full min-h-[160px] sm:min-h-[200px] object-cover cursor-pointer"
-              />
-            </a>
-          </div>
-        ))}
-      </Slider>
-    </div>
-    </div>
+      <div className="flex w-full justify-center">
+        <div className="relative w-full max-w-4xl overflow-hidden rounded-lg py-6 px-2">
+          <Slider {...settings}>
+            {slides.map((slide) => (
+              <div key={slide.id}>
+                <a href={slide.link}>
+                  <img
+                    src={slide.image}
+                    alt={`Slide ${slide.id}`}
+                    className="w-full min-h-[160px] sm:min-h-[200px] object-cover cursor-pointer"
+                  />
+                </a>
+              </div>
+            ))}
+          </Slider>
+        </div>
+      </div>
 
       {/* Collection List */}
       <div className="flex flex-col w-full gap-3 py-6 px-2">
@@ -302,28 +198,41 @@ export default function Home() {
               {items.map((item, index) => (
                 <div
                   key={index}
-                  className="flex gap-2 px-2 whitespace-nowrap snap-start snap-always"
+                  className="flex gap-2 px-2 snap-start snap-always"
                 >
-                  <div className="flex flex-col items-center gap-1">
+                  <Link
+                    href={{
+                      pathname: "/collection_products",
+                      query: { category: item.collection }, // pass subcategory as query param
+                    }}
+                    className="flex flex-col items-center gap-1 cursor-pointer"
+                  >
                     <div className="w-28 h-28 relative">
                       {/* Skeleton */}
-                      {!loaded && (
+                      {!categoryLoaded[item.id] && (
                         <div className="absolute inset-0 rounded-full bg-gray-300 animate-pulse" />
                       )}
 
                       {/* Actual image */}
                       <img
                         className={`w-28 h-28 rounded-full object-cover object-center border border-gray-400 ${
-                          loaded ? "block" : "hidden"
+                          categoryLoaded[item.id] ? "block" : "hidden"
                         }`}
                         src={item.image}
                         alt={item.collection}
-                        onLoad={() => setLoaded(true)}
-                        onError={() => setLoaded(true)}
+                        onLoad={() => setCategoryLoaded(prev => ({ ...prev, [item.id]: true }))}
+                        onError={() => setCategoryLoaded(prev => ({ ...prev, [item.id]: true }))}
                       />
                     </div>
-                    {item.collection}
-                  </div>
+                    <div className="text-center text-sm">
+                      {item.collection.split(" ").map((word, index) => (
+                        <span key={index}>
+                          {word}
+                          {(index + 1) % 2 === 0 ? <br /> : " "}
+                        </span>
+                      ))}
+                    </div>
+                  </Link>
                 </div>
               ))}
             </div>
@@ -333,29 +242,38 @@ export default function Home() {
 
       {/* tranding products */}
       <div className="flex flex-col w-full gap-3 py-6 px-2">
-        <h2 className="flex font-mono text-2xl justify-center sm:text-3xl">Trending Now</h2>
+        <h2 className="flex font-mono text-2xl justify-center sm:text-3xl">
+          Trending Now
+        </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 py-4">
           {/* Example Product Cards */}
           {trendingProducts.map((product) => (
             <div
               key={product.id}
-              className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full"
+              className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full cursor-pointer hover:shadow-lg transition"
             >
+            
+            <Link 
+            href={{
+                pathname: "/product_view",
+                query: { id: product.id }, // pass product ID as query param
+              }}
+              >
               <div className="w-full h-36 mb-2 relative">
                 {/* Skeleton */}
-                {!loaded && (
+                {!productsImgloaded[product.id] && (
                   <div className="absolute inset-0 rounded-lg bg-gray-300 animate-pulse" />
                 )}
 
                 {/* Actual image */}
                 <img
                   src={product.images[0]}
-                alt={product.name}
+                  alt={product.name}
                   className={`w-full h-full object-cover rounded-lg ${
-                    loaded ? "block" : "hidden"
+                    productsImgloaded[product.id] ? "block" : "hidden"
                   }`}
-                  onLoad={() => setLoaded(true)}
-                  onError={() => setLoaded(true)}
+                  onLoad={() => setProductsImgLoaded(prev => ({ ...prev, [product.id]: true }))}
+                  onError={() => setProductsImgLoaded(prev => ({ ...prev, [product.id]: true }))}
                 />
               </div>
 
@@ -374,6 +292,8 @@ export default function Home() {
                   </span>
                 )}
               </div>
+
+              </Link>
 
               {/* Buttons at bottom */}
               <div className="mt-auto flex gap-2 pt-3">
@@ -399,19 +319,28 @@ export default function Home() {
         <div className="flex justify-center">
           <button className="flex items-center gap-1 bg-gray-900 text-white py-1 px-4 rounded">
             <span>View All</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-4 h-4 text-white" viewBox="0 0 640 640"><path d="M342.6 534.6C330.1 547.1 309.8 547.1 297.3 534.6L137.3 374.6C124.8 362.1 124.8 341.8 137.3 329.3C149.8 316.8 170.1 316.8 182.6 329.3L320 466.7L457.4 329.4C469.9 316.9 490.2 316.9 502.7 329.4C515.2 341.9 515.2 362.2 502.7 374.7L342.7 534.7zM502.6 182.6L342.6 342.6C330.1 355.1 309.8 355.1 297.3 342.6L137.3 182.6C124.8 170.1 124.8 149.8 137.3 137.3C149.8 124.8 170.1 124.8 182.6 137.3L320 274.7L457.4 137.4C469.9 124.9 490.2 124.9 502.7 137.4C515.2 149.9 515.2 170.2 502.7 182.7z"/></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              className="w-4 h-4 text-white"
+              viewBox="0 0 640 640"
+            >
+              <path d="M342.6 534.6C330.1 547.1 309.8 547.1 297.3 534.6L137.3 374.6C124.8 362.1 124.8 341.8 137.3 329.3C149.8 316.8 170.1 316.8 182.6 329.3L320 466.7L457.4 329.4C469.9 316.9 490.2 316.9 502.7 329.4C515.2 341.9 515.2 362.2 502.7 374.7L342.7 534.7zM502.6 182.6L342.6 342.6C330.1 355.1 309.8 355.1 297.3 342.6L137.3 182.6C124.8 170.1 124.8 149.8 137.3 137.3C149.8 124.8 170.1 124.8 182.6 137.3L320 274.7L457.4 137.4C469.9 124.9 490.2 124.9 502.7 137.4C515.2 149.9 515.2 170.2 502.7 182.7z" />
+            </svg>
           </button>
         </div>
       </div>
 
       {/* More About Us */}
       <div className="flex flex-col w-full gap-3 py-6 px-2">
-        <h2 className="flex font-mono text-2xl justify-center pb-2 sm:text-3xl">More About Us</h2>
+        <h2 className="flex font-mono text-2xl justify-center pb-2 sm:text-3xl">
+          More About Us
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 py-4">
           {shopImages.map((item) => (
             <div key={item.id} className="w-full min-h-64 relative">
               {/* Skeleton */}
-              {!loaded && (
+              {!shopImgLoaded[item.id] && (
                 <div className="absolute inset-0 bg-gray-300 animate-pulse" />
               )}
 
@@ -420,19 +349,17 @@ export default function Home() {
                 src={item.image}
                 alt={`Shop Image ${item.id}`}
                 className={`w-full h-full object-cover border-1 border-gray-300 ${
-                  loaded ? "block" : "hidden"
+                  shopImgLoaded[item.id] ? "block" : "hidden"
                 }`}
-                onLoad={() => setLoaded(true)}
-                onError={() => setLoaded(true)}
+                onLoad={() => setShopImgLoaded(prev => ({ ...prev, [item.id]: true }))}
+                onError={() => setShopImgLoaded(prev => ({ ...prev, [item.id]: true }))}
               />
             </div>
           ))}
         </div>
       </div>
-      
+
       {/* Footer */}
-
-
     </div>
   );
 }

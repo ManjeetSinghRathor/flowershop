@@ -22,6 +22,7 @@ const Footer = () => {
   return (
     <div className="list-layout flex flex-col w-full items-center gap-6">
       <footer className="w-full bg-primary py-8 px-4">
+        <hr className='w-full h-[1px] bg-gray-600 px-4 mb-8'/>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {/* Brand Info */}
           <div className="flex flex-col items-start gap-2">
