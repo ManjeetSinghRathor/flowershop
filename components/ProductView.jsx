@@ -71,7 +71,7 @@ const ProductView = () => {
 
             <div className="flex flex-col gap-4 mt-2">
 
-                <div className='flex flex-col gap-1 py-2'>
+                <div className='flex flex-col gap-2 py-2'>
                     {/* Stock */}
                     <p className="text-sm text-gray-500">
                         {productDetails.stock > 0
@@ -125,7 +125,6 @@ const ProductView = () => {
                     </p>
                     
                     <div>
-                        <h2 className="font-semibold mb-1">Description:</h2>
                         <p className="text-gray-600">{productDetails.description}</p>
                     </div>
 

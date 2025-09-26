@@ -60,8 +60,8 @@ const CollectionProducts = () => {
     }, [productIds]);
 
     return (
-        <div className="px-2 sm:px-8 lg:px-24 min-h-screen">
-            <div className='flex flex-col w-full bg-white sticky top-14 z-[5] shadow-md'>
+        <div className="min-h-screen">
+            <div className='flex flex-col w-full bg-white sticky top-14 z-[50] shadow-md'>
                 <h1 className="flex w-full justify-start items-center font-mono sm:text-lg px-2 py-4">
                     <Link href="/" className="hover:underline font-light">
                         Home
@@ -113,11 +113,11 @@ const CollectionProducts = () => {
             </div>
 
             {collection_products.length === 0 ? (
-                <div className='flex w-full items-center py-4'>
+                <div className='flex w-full px-2 sm:px-8 lg:px-24 items-center py-4'>
                     <img className='object-cover object-center' src="./no_product.png" alt="No Product Available" />
                 </div>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 py-4">
+                <div className="px-2 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 py-4">
                     {collection_products.map((product) => {
                         return (<div
                             key={product.id}
