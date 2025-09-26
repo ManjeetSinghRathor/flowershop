@@ -1,7 +1,7 @@
 export const Products = [
   {
     id: "F001",
-    name: "Red Rose Bouquet",
+    name: "Red Rose(Gulab) Bouquet",
     type: "Flower Bouquet",
     flowers: ["Rose"],
     description:
@@ -16,7 +16,7 @@ export const Products = [
       "https://example.com/images/rose_bouquet_1.jpg",
       "https://example.com/images/rose_bouquet_2.jpg",
     ],
-    occasions: ["Valentine's Day", "Anniversaries", "Weddings"],
+    occasions: ["Valentine's Day", "Anniversaries", "Weddings","Engagements","Baby Showers", "Housewarmings"],
     delivery_time: "1-2 Days",
   },
   {

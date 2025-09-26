@@ -70,7 +70,7 @@ export default function Home() {
       </div>
     ),
     customPaging: () => (
-      <div className="w-8 h-1 bg-gray-400 rounded-full"></div>
+      <div className="w-8 h-1 bg-white border-[1px] border-[rgb(146,145,145)] rounded-full"></div>
     ),
   };
 
@@ -85,7 +85,7 @@ export default function Home() {
           <FaWhatsapp />
         </button>
       </div> */}
-
+      
       <div className="flex w-full justify-center">
         <div className="relative w-full max-w-4xl overflow-hidden rounded-lg py-6 px-2">
           <Slider {...settings}>
@@ -143,8 +143,18 @@ export default function Home() {
                         }`}
                         src={item.image}
                         alt={item.collection}
-                        onLoad={() => setCategoryLoaded(prev => ({ ...prev, [item.id]: true }))}
-                        onError={() => setCategoryLoaded(prev => ({ ...prev, [item.id]: true }))}
+                        onLoad={() =>
+                          setCategoryLoaded((prev) => ({
+                            ...prev,
+                            [item.id]: true,
+                          }))
+                        }
+                        onError={() =>
+                          setCategoryLoaded((prev) => ({
+                            ...prev,
+                            [item.id]: true,
+                          }))
+                        }
                       />
                     </div>
                     <div className="text-center text-sm">
@@ -175,47 +185,55 @@ export default function Home() {
               key={product.id}
               className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full cursor-pointer hover:shadow-lg transition"
             >
-            
-            <Link 
-            href={{
-                pathname: "/product_view",
-                query: { id: product.id }, // pass product ID as query param
-              }}
+              <Link
+                href={{
+                  pathname: "/product_view",
+                  query: { id: product.id }, // pass product ID as query param
+                }}
               >
-              <div className="w-full h-36 mb-2 relative">
-                {/* Skeleton */}
-                {!productsImgloaded[product.id] && (
-                  <div className="absolute inset-0 rounded-lg bg-gray-300 animate-pulse" />
-                )}
+                <div className="w-full h-36 mb-2 relative">
+                  {/* Skeleton */}
+                  {!productsImgloaded[product.id] && (
+                    <div className="absolute inset-0 rounded-lg bg-gray-300 animate-pulse" />
+                  )}
 
-                {/* Actual image */}
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  className={`w-full h-full object-cover rounded-lg ${
-                    productsImgloaded[product.id] ? "block" : "hidden"
-                  }`}
-                  onLoad={() => setProductsImgLoaded(prev => ({ ...prev, [product.id]: true }))}
-                  onError={() => setProductsImgLoaded(prev => ({ ...prev, [product.id]: true }))}
-                />
-              </div>
+                  {/* Actual image */}
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    className={`w-full h-full object-cover rounded-lg ${
+                      productsImgloaded[product.id] ? "block" : "hidden"
+                    }`}
+                    onLoad={() =>
+                      setProductsImgLoaded((prev) => ({
+                        ...prev,
+                        [product.id]: true,
+                      }))
+                    }
+                    onError={() =>
+                      setProductsImgLoaded((prev) => ({
+                        ...prev,
+                        [product.id]: true,
+                      }))
+                    }
+                  />
+                </div>
 
-              {/* Product Info */}
-              <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-              <p className="text-sm text-gray-600 flex-1">
-                {product.description}
-              </p>
+                {/* Product Info */}
+                <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+                <p className="text-sm text-gray-600 flex-1">
+                  {product.description}
+                </p>
 
-              {/* Price */}
-              <div className="mt-2">
-                <span className="font-semibold">{product.final_price}₹</span>
-                {product.discount > 0 && (
-                  <span className="text-gray-400 line-through ml-2">
-                    {product.price}₹
-                  </span>
-                )}
-              </div>
-
+                {/* Price */}
+                <div className="mt-2">
+                  <span className="font-semibold">{product.final_price}₹</span>
+                  {product.discount > 0 && (
+                    <span className="text-gray-400 line-through ml-2">
+                      {product.price}₹
+                    </span>
+                  )}
+                </div>
               </Link>
 
               {/* Buttons at bottom */}
@@ -274,8 +292,12 @@ export default function Home() {
                 className={`w-full h-full object-cover border-1 border-gray-300 ${
                   shopImgLoaded[item.id] ? "block" : "hidden"
                 }`}
-                onLoad={() => setShopImgLoaded(prev => ({ ...prev, [item.id]: true }))}
-                onError={() => setShopImgLoaded(prev => ({ ...prev, [item.id]: true }))}
+                onLoad={() =>
+                  setShopImgLoaded((prev) => ({ ...prev, [item.id]: true }))
+                }
+                onError={() =>
+                  setShopImgLoaded((prev) => ({ ...prev, [item.id]: true }))
+                }
               />
             </div>
           ))}

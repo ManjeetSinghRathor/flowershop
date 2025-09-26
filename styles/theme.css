@@ -11,6 +11,6 @@
 
 /* Active slick dot */
 .slick-dots li.slick-active div {
-  background-color: #ffffff; /* Tailwind emerald-500 equivalent */
+  background-color: #424242; /* Tailwind emerald-500 equivalent */
   border: 1px solid rgb(146, 145, 145); /* Tailwind emerald-700 equivalent */
 }

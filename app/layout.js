@@ -83,10 +83,16 @@ export default function RootLayout({ children }) {
           }}
         />
 
-        <p className="font-serif flex flex-wrap w-full justify-center items-center text-center text-xs sm:text-sm px-4 pt-4 pb-2 sm:pb-4">
-          *Use Code &quot;Welcome5&quot; to avail 5% discount on a minimum
-          purchase of Rs 2,000/-
+        <p className="font-serif flex flex-col w-full justify-center items-center text-center text-xs sm:text-sm px-4 py-4 pb-3 sm:pb-4">
+          <span>
+            *Use Code <strong>Welcome5</strong> to avail 5% discount on a
+            minimum purchase of Rs 2,000/-
+          </span>
+          <span className="text-red-600 font-semibold mt-1">
+            🚚 We currently deliver only across Bangalore 🌸
+          </span>
         </p>
+
         {/* <ReduxProvider> */}
         <GoogleOAuthProvider
           clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
