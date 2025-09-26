@@ -1,47 +1,38 @@
 "use client";
 
-import Link from "next/link";
 // import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { GoogleLogin } from '@react-oauth/google';
 // import { useSelector, useDispatch } from "react-redux";
-import Image from "next/image";
+import { updatedCollectionList } from "@/public/products";
+import Link from "next/link";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa"; // ✅ react-icons
+
 
 export default function Overlays({ setIsOpen, isOpen = false }) {
-    // const user = useSelector((state) => state.user);
     const menuRef = useRef(null);
+    const swipeRef = useRef(null);
+    const [categoryLoaded, setCategoryLoaded] = useState({});    
 
-    // const menuLinks = useMemo(() => {
-    //     const baseLinks = [
-    //         { href: "/profile", label: "My Profile" },
-    //         { href: "/quiz", label: "Quizzes" },
-    //         { href: "/notes", label: "Notes" },
-    //         { href: "/practice", label: "Practice" },
-    //         { href: "/lectures", label: "Lectures" },
-    //         { href: "/reports", label: "Reports" },
-    //         { href: "/about", label: "About" },
-    //         { href: "/contact", label: "Contact" },
-    //         { href: "/", label: "Home" },
-    //     ];
+    const handleGoogleLogin = async (response) => {
+        try {
+            const { credential } = response;
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google-login`, { token: credential }, { withCredentials: true });
 
-    //     if (!user.data) return baseLinks;
+            if (res.data.success) {
+                const userRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`, { withCredentials: true });
+                // dispatch(setUser({ user: userRes.data }));
 
-    //     const extraLinks = [];
+                // if (!userRes.data?.status?.isSuspended) {
+                //     router.push("/profile");
+                // }
+            }
 
-    //     if (user?.data?.role === "admin") {
-    //         extraLinks.push(
-    //             { href: "/addQuiz", label: "Add Quiz" }
-    //         );
-    //         extraLinks.push({ href: "/contentAccess", label: "Handle Content" });
-    //         extraLinks.push(
-    //             { href: "/userAccess", label: "All Users" }
-    //         );
-    //     }
+        } catch (err) {
+            console.error("Google login failed", err);
+        }
+    };
 
-    //     return [...baseLinks, ...extraLinks];
-    // }, [user]);
-
-    // const pathname = usePathname();
-    // const isActive = (href) => pathname === href;
 
     useEffect(() => {
         if (isOpen) {
@@ -73,42 +64,47 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
     }, []);
 
     const touchStartX = useRef(0);
-  const touchEndX = useRef(0);
+    const touchEndX = useRef(0);
 
-  // Track touch start
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.changedTouches[0].clientX;
-  };
-
-  // Track touch end
-  const handleTouchEnd = (e) => {
-    touchEndX.current = e.changedTouches[0].clientX;
-    handleSwipe();
-  };
-
-  // Detect swipe
-  const handleSwipe = () => {
-    const diff = touchStartX.current - touchEndX.current;
-
-    if (diff > 50) {
-      // Swipe left detected
-      setIsOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    const menuEl = menuRef.current;
-    if (!menuEl) return;
-
-    menuEl.addEventListener("touchstart", handleTouchStart);
-    menuEl.addEventListener("touchend", handleTouchEnd);
-
-    return () => {
-      menuEl.removeEventListener("touchstart", handleTouchStart);
-      menuEl.removeEventListener("touchend", handleTouchEnd);
+    // Track touch start
+    const handleTouchStart = (e) => {
+        touchStartX.current = e.changedTouches[0].clientX;
     };
-  }, []);
 
+    // Track touch end
+    const handleTouchEnd = (e) => {
+        touchEndX.current = e.changedTouches[0].clientX;
+        handleSwipe();
+    };
+
+    // Detect swipe
+    const handleSwipe = () => {
+        const diff = touchStartX.current - touchEndX.current;
+
+        if (diff > 50) {
+            // Swipe left detected
+            setIsOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        const menuEl = swipeRef.current;
+        if (!menuEl) return;
+
+        menuEl.addEventListener("touchstart", handleTouchStart);
+        menuEl.addEventListener("touchend", handleTouchEnd);
+
+        return () => {
+            menuEl.removeEventListener("touchstart", handleTouchStart);
+            menuEl.removeEventListener("touchend", handleTouchEnd);
+        };
+    }, []);
+
+    const [openCategory, setOpenCategory] = useState(null);
+
+    const toggleCategory = (category) => {
+        setOpenCategory(openCategory === category ? null : category);
+    };
 
     return (
         <aside
@@ -118,42 +114,83 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           sm:hidden overflow-y-auto overscroll-contain
         `}
+            ref={swipeRef}
         >
-            <div className="flex h-full w-56 bg-white" ref={menuRef}>
+            <div className="flex flex-col h-full w-56 bg-white" ref={menuRef}>
+                <div className="flex h-[84vh] w-56 bg-white overflow-y-auto">
+                    <div className="w-full max-w-md mx-auto p-4">
+                        {Object.entries(updatedCollectionList).map(([category, items]) => (
+                            <div key={category} className="mb-2 border rounded-lg overflow-hidden">
+                                {/* Category header */}
+                                <button
+                                    className="w-full flex justify-between items-center py-3 px-1 bg-gray-100 hover:bg-gray-200"
+                                    onClick={() => toggleCategory(category)}
+                                >
+                                    <span className="font-serif text-gray-800">{category}</span>
+                                    {openCategory === category ? (
+                                        <FaChevronUp className="w-5 h-5 text-gray-600" />
+                                    ) : (
+                                        <FaChevronDown className="w-5 h-5 text-gray-600" />
+                                    )}
+                                </button>
 
+                                {/* Collapsible content */}
+                                {openCategory === category && (
+                                    <div className="grid grid-cols-2 gap-3 p-3 bg-white">
+                                        {items.map((item) => (
+                                            <Link
+                                                key={item.id}
+                                                href={{
+                                                    pathname: "/collection_products",
+                                                    query: { category: item.collection }, // pass subcategory as query param
+                                                }}
+                                                className="flex flex-col items-center text-center cursor-pointer"
+                                                onClick={() => setTimeout(()=>{
+                                                    setIsOpen(false)
+                                                },300)}
+                                            >
+                                                <div className="w-16 h-16 relative">
+                                                    {/* Skeleton */}
+                                                    {!categoryLoaded[item.id] && (
+                                                        <div className="absolute inset-0 rounded-full bg-gray-300 animate-pulse" />
+                                                    )}
+
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.collection}
+                                                        className={`w-16 h-16 rounded-full border object-cover ${categoryLoaded[item.id] ? "block" : "hidden"}`}
+                                                        onLoad={() => setCategoryLoaded(prev => ({ ...prev, [item.id]: true }))}
+                                                        onError={() => setCategoryLoaded(prev => ({ ...prev, [item.id]: true }))}
+                                                    />
+                                                </div>
+                                                <span className="mt-1 text-sm text-gray-700">
+                                                    {item.collection}
+                                                </span>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex flex-col items-center justify-center h-[16vh] w-56 py-1">
+                    {/* Google Login */}
+                    <div className="flex w-full h-[8vh] items-center justify-center text-center text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-5 h-5 text-gray-700 mb-[3px]" viewBox="0 0 640 640"><path d="M128 252.6C128 148.4 214 64 320 64C426 64 512 148.4 512 252.6C512 371.9 391.8 514.9 341.6 569.4C329.8 582.2 310.1 582.2 298.3 569.4C248.1 514.9 127.9 371.9 127.9 252.6zM320 320C355.3 320 384 291.3 384 256C384 220.7 355.3 192 320 192C284.7 192 256 220.7 256 256C256 291.3 284.7 320 320 320z"/></svg>
+                        <span className="leading-tight">
+                            Track Your Order
+                        </span>
+                    </div>
+                    <div className='flex w-full h-full justify-center items-center bg-gray-800'>
+                        <GoogleLogin
+                            onSuccess={handleGoogleLogin}
+                            onError={() => setError("Google login failed")}
+                        />
+                    </div>
+                </div>
             </div>
-            {/* <div className="logo-spot flex flex-col gap-2 w-full h-[100px] items-center justify-center pt-6">
-                <h2 className="rounded-[100%] bg-white text-white">
-                    <img
-                        src={`${user?.data?.profile?.avatarUrl || "/cat.png"}`}
-                        alt="GM"
-                        className="w-10 h-10 rounded-full object-cover"
-                    />
-                </h2>
-                {!user ? <h3 className="text-white">xoxo</h3> : <h3 className="text-white">{user?.data?.name}</h3>}
-            </div> */}
-
-            {/* <nav className="flex flex-col gap-4 px-2 pt-6 pb-20">
-                {menuLinks.map(({ href, label }) => (
-                    <Link
-                        key={href}
-                        href={href}
-                        className={`block px-4 py-2 rounded-md hover:bg-[rgba(255,255,255,0.1)] ${isActive(href) ? "bg-[rgba(255,255,255,0.1)]" : ""
-                            }`}
-                        onClick={() => setIsOpen(false)}
-                    >
-                        {label}
-                    </Link>
-                ))}
-
-                <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-200"
-                >
-                    Logout
-                </button>
-
-            </nav> */}
 
         </aside>
     );

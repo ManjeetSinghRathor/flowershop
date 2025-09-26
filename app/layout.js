@@ -87,13 +87,11 @@ export default function RootLayout({ children }) {
           *Use Code &quot;Welcome5&quot; to avail 5% discount on a minimum
           purchase of Rs 2,000/-
         </p>
-
-        <Navbar />
-
         {/* <ReduxProvider> */}
         <GoogleOAuthProvider
           clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
         >
+          <Navbar />
           {children}
         </GoogleOAuthProvider>
         {/* </ReduxProvider> */}

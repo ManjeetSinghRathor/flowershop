@@ -2,85 +2,8 @@
 import { useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import Slider from "react-slick";
-import { Products } from "@/public/products";
+import { Products, collectionList } from "@/public/products";
 import Link from "next/link";
-
-const collectionList = {
-  "By Occasion": [
-    { id:"A001", collection: "Birthday Flowers", image: "./birthday_flowers.png" },
-    { id:"A002", collection: "Anniversary Flowers", image: "./anniversary_flowers.png" },
-    { id:"A003", collection: "Wedding Flowers", image: "./wedding_flowers.png" },
-    { id:"A004", collection: "Get Well Soon", image: "./get_well_soon.png" },
-    { id:"A005", collection: "Congratulations", image: "./congratulations.png" },
-    { id:"A006", collection: "Love & Romance", image: "./love_romance.png" },
-    { id:"A007", collection: "New Baby", image: "./new_baby.png" },
-    { id:"A008", collection: "Sympathy & Funeral", image: "./sympathy_funeral.png" },
-    { id:"A009", collection: "Thank You", image: "./thank_you.png" },
-    { id:"A010", collection: "Housewarming", image: "./housewarming.png" },
-  ],
-
-  "By Flower Type": [
-    { id:"B001", collection: "Roses", image: "./roses.png" },
-    { id:"B002", collection: "Lilies", image: "./lilies.png" },
-    { id:"B003", collection: "Orchids", image: "./orchids.png" },
-    { id:"B004", collection: "Carnations", image: "./carnations.png" },
-    { id:"B005", collection: "Tulips", image: "./tulips.png" },
-    { id:"B006", collection: "Gerberas", image: "./gerberas.png" },
-    { id:"B007", collection: "Mixed Flowers", image: "./mixed_flowers.png" },
-    { id:"B008", collection: "Seasonal Flowers", image: "./seasonal_flowers.png" },
-  ],
-
-  "By Arrangement Style": [
-    { id:"C001", collection: "Bouquets", image: "./bouquets.png" },
-    { id:"C002", collection: "Flower Baskets", image: "./flower_baskets.png" },
-    { id:"C003", collection: "Flower Boxes / Hampers", image: "./flower_boxes.png" },
-    { id:"C004", collection: "Vase Arrangements", image: "./vase_arrangements.png" },
-    {
-      id:"C005", collection: "Premium Arrangements",
-      image: "./exotic_premium.png",
-    },
-    { id:"C006", collection: "Single Stem Flowers", image: "./single_stem.png" },
-  ],
-
-  "By Color Theme": [
-    { id:"D001", collection: "Red Flowers", image: "./red_flowers.png" },
-    { id:"D002", collection: "White Flowers", image: "./white_flowers.png" },
-    { id:"D003", collection: "Pink Flowers", image: "./pink_flowers.png" },
-    { id:"D004", collection: "Yellow Flowers", image: "./yellow_flowers.png" },
-    { id:"D005", collection: "Mixed Colors", image: "./mixed_colors.png" },
-  ],
-
-  // "Gift Type": [
-  //   { collection: "Chocolates & Sweets", image: "./chocolates_sweets.png" },
-  //   { collection: "Cakes & Cupcakes", image: "./cakes_cupcakes.png" },
-  //   { collection: "Teddy Bears / Soft Toys", image: "./teddy_softtoys.png" },
-  //   { collection: "Greeting Cards", image: "./greeting_cards.png" },
-  //   { collection: "Perfumes", image: "./perfumes.png" },
-  //   { collection: "Jewelry & Accessories", image: "./jewelry_accessories.png" },
-  //   { collection: "Personalized Gifts", image: "./personalized_gifts.png" },
-  //   { collection: "Plants", image: "./plants.png" },
-  // ],
-
-  // "Combo Collections": [
-  //   { collection: "Flowers + Chocolates", image: "./flowers_chocolates.png" },
-  //   { collection: "Flowers + Cake", image: "./flowers_cake.png" },
-  //   { collection: "Flowers + Teddy", image: "./flowers_teddy.png" },
-  //   { collection: "Flowers + Greeting Card", image: "./flowers_card.png" },
-  //   { collection: "Premium Hampers", image: "./premium_hampers.png" },
-  // ],
-
-  // "Special Collections": [
-  //   { collection: "Same Day Delivery", image: "./same_day.png" },
-  //   { collection: "Midnight Delivery Gifts", image: "./midnight_delivery.png" },
-  //   {
-  //     collection: "Luxury / Premium",
-  //     image: "./luxury_premium.png",
-  //   },
-  //   { collection: "Seasonal Specials", image: "./seasonal_specials.png" },
-  //   { collection: "Corporate Gifting", image: "./corporate_gifting.png" },
-  //   { collection: "Budget-Friendly Options", image: "./budget_friendly.png" },
-  // ],
-};
 
 const trendingProductsID = ["F001", "F002", "F003", "F004", "F005", "F006"];
 

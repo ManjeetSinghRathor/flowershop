@@ -1,48 +1,10 @@
 "use client";
 
 import React, { useState, useMemo } from 'react'
-import { Products } from '@/public/products';
+import { Products, collection_products_ids } from '@/public/products';
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-const collection_products_ids = {
-    // By Occasion
-    "Birthday Flowers": ["B001", "F002"],
-    "Anniversary Flowers": ["F001", "F004", "B001"],
-    "Wedding Flowers": ["F003", "F004"],
-    "Get Well Soon": ["F005"],
-    Congratulations: ["B002", "F005"],
-    "Love & Romance": ["F001", "F004", "B001"],
-    "New Baby": ["F002", "F005"],
-    "Sympathy & Funeral": ["F003"],
-    "Thank You": ["F005", "B002"],
-    Housewarming: ["B002", "F005"],
-
-    // By Flower Type
-    Roses: ["F001", "B001"],
-    Lilies: ["F003", "B001"],
-    Orchids: ["B002"],
-    Carnations: ["B001"],
-    Tulips: ["F002"],
-    Gerberas: [],
-    "Mixed Flowers": ["B001"],
-    "Seasonal Flowers": ["F005", "F004"],
-
-    // By Arrangement Style
-    Bouquets: ["F001", "F002", "F004"],
-    "Flower Baskets": ["B001", "B002"],
-    "Flower Boxes / Hampers": [],
-    "Vase Arrangements": ["F003", "F005"],
-    "Exotic / Premium Arrangements": ["F003", "B002", "F004"],
-    "Single Stem Flowers": [],
-
-    // By Color Theme
-    "Red Flowers": ["F001"],
-    "White Flowers": ["F003"],
-    "Pink Flowers": ["F004"],
-    "Yellow Flowers": ["F005"],
-    "Mixed Colors": ["B001", "B002", "F002"],
-};
 
 const CollectionProducts = () => {
 
@@ -53,15 +15,20 @@ const CollectionProducts = () => {
 
     // Get product IDs for the category
     const productIds = collection_products_ids[category] || [];
+    
 
+    
     // Get full product objects
-    const collection_products = useMemo(() => {
-        return Products.filter((p) => productIds.includes(p.id));
-    }, [productIds]);
+        const collection_products = useMemo(() => {
+            if (category === "All Products") {
+                return Products; // return everything
+            }
+            return Products.filter((p) => productIds.includes(p.id));
+        }, [category, productIds, Products]);
 
     return (
         <div className="min-h-screen">
-            <div className='flex flex-col w-full bg-white sticky top-14 z-[50] shadow-md'>
+            <div className='flex flex-col w-full bg-white sticky top-14 z-[45] shadow-md'>
                 <h1 className="flex w-full justify-start items-center font-mono sm:text-lg px-2 py-4">
                     <Link href="/" className="hover:underline font-light">
                         Home

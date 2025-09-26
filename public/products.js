@@ -281,3 +281,125 @@ export const Products = [
     delivery_time: "Same Day",
   }
 ];
+
+
+export const collectionList = {
+  "By Occasion": [
+    { id:"A001", collection: "Birthday Flowers", image: "./birthday_flowers.png" },
+    { id:"A002", collection: "Anniversary Flowers", image: "./anniversary_flowers.png" },
+    { id:"A003", collection: "Wedding Flowers", image: "./wedding_flowers.png" },
+    { id:"A004", collection: "Get Well Soon", image: "./get_well_soon.png" },
+    { id:"A005", collection: "Congratulations", image: "./congratulations.png" },
+    { id:"A006", collection: "Love & Romance", image: "./love_romance.png" },
+    { id:"A007", collection: "New Baby", image: "./new_baby.png" },
+    { id:"A008", collection: "Sympathy & Funeral", image: "./sympathy_funeral.png" },
+    { id:"A009", collection: "Thank You", image: "./thank_you.png" },
+    { id:"A010", collection: "Housewarming", image: "./housewarming.png" },
+  ],
+
+  "By Flower Type": [
+    { id:"B001", collection: "Roses", image: "./roses.png" },
+    { id:"B002", collection: "Lilies", image: "./lilies.png" },
+    { id:"B003", collection: "Orchids", image: "./orchids.png" },
+    { id:"B004", collection: "Carnations", image: "./carnations.png" },
+    { id:"B005", collection: "Tulips", image: "./tulips.png" },
+    { id:"B006", collection: "Gerberas", image: "./gerberas.png" },
+    { id:"B007", collection: "Mixed Flowers", image: "./mixed_flowers.png" },
+    { id:"B008", collection: "Seasonal Flowers", image: "./seasonal_flowers.png" },
+  ],
+
+  "By Arrangement Style": [
+    { id:"C001", collection: "Bouquets", image: "./bouquets.png" },
+    { id:"C002", collection: "Flower Baskets", image: "./flower_baskets.png" },
+    { id:"C003", collection: "Flower Boxes / Hampers", image: "./flower_boxes.png" },
+    { id:"C004", collection: "Vase Arrangements", image: "./vase_arrangements.png" },
+    {
+      id:"C005", collection: "Premium Arrangements",
+      image: "./exotic_premium.png",
+    },
+    { id:"C006", collection: "Single Stem Flowers", image: "./single_stem.png" },
+  ],
+
+  "By Color Theme": [
+    { id:"D001", collection: "Red Flowers", image: "./red_flowers.png" },
+    { id:"D002", collection: "White Flowers", image: "./white_flowers.png" },
+    { id:"D003", collection: "Pink Flowers", image: "./pink_flowers.png" },
+    { id:"D004", collection: "Yellow Flowers", image: "./yellow_flowers.png" },
+    { id:"D005", collection: "Mixed Colors", image: "./mixed_colors.png" },
+  ],
+
+  // "Gift Type": [
+  //   { collection: "Chocolates & Sweets", image: "./chocolates_sweets.png" },
+  //   { collection: "Cakes & Cupcakes", image: "./cakes_cupcakes.png" },
+  //   { collection: "Teddy Bears / Soft Toys", image: "./teddy_softtoys.png" },
+  //   { collection: "Greeting Cards", image: "./greeting_cards.png" },
+  //   { collection: "Perfumes", image: "./perfumes.png" },
+  //   { collection: "Jewelry & Accessories", image: "./jewelry_accessories.png" },
+  //   { collection: "Personalized Gifts", image: "./personalized_gifts.png" },
+  //   { collection: "Plants", image: "./plants.png" },
+  // ],
+
+  // "Combo Collections": [
+  //   { collection: "Flowers + Chocolates", image: "./flowers_chocolates.png" },
+  //   { collection: "Flowers + Cake", image: "./flowers_cake.png" },
+  //   { collection: "Flowers + Teddy", image: "./flowers_teddy.png" },
+  //   { collection: "Flowers + Greeting Card", image: "./flowers_card.png" },
+  //   { collection: "Premium Hampers", image: "./premium_hampers.png" },
+  // ],
+
+  // "Special Collections": [
+  //   { collection: "Same Day Delivery", image: "./same_day.png" },
+  //   { collection: "Midnight Delivery Gifts", image: "./midnight_delivery.png" },
+  //   {
+  //     collection: "Luxury / Premium",
+  //     image: "./luxury_premium.png",
+  //   },
+  //   { collection: "Seasonal Specials", image: "./seasonal_specials.png" },
+  //   { collection: "Corporate Gifting", image: "./corporate_gifting.png" },
+  //   { collection: "Budget-Friendly Options", image: "./budget_friendly.png" },
+  // ],
+};
+
+export const collection_products_ids = {
+    // By Occasion
+    "Birthday Flowers": ["B001", "F002"],
+    "Anniversary Flowers": ["F001", "F004", "B001"],
+    "Wedding Flowers": ["F003", "F004"],
+    "Get Well Soon": ["F005"],
+    Congratulations: ["B002", "F005"],
+    "Love & Romance": ["F001", "F004", "B001"],
+    "New Baby": ["F002", "F005"],
+    "Sympathy & Funeral": ["F003"],
+    "Thank You": ["F005", "B002"],
+    Housewarming: ["B002", "F005"],
+
+    // By Flower Type
+    Roses: ["F001", "B001"],
+    Lilies: ["F003", "B001"],
+    Orchids: ["B002"],
+    Carnations: ["B001"],
+    Tulips: ["F002"],
+    Gerberas: [],
+    "Mixed Flowers": ["B001"],
+    "Seasonal Flowers": ["F005", "F004"],
+
+    // By Arrangement Style
+    Bouquets: ["F001", "F002", "F004"],
+    "Flower Baskets": ["B001", "B002"],
+    "Flower Boxes / Hampers": [],
+    "Vase Arrangements": ["F003", "F005"],
+    "Exotic / Premium Arrangements": ["F003", "B002", "F004"],
+    "Single Stem Flowers": [],
+
+    // By Color Theme
+    "Red Flowers": ["F001"],
+    "White Flowers": ["F003"],
+    "Pink Flowers": ["F004"],
+    "Yellow Flowers": ["F005"],
+    "Mixed Colors": ["B001", "B002", "F002"],
+};
+
+export const updatedCollectionList = {
+        "All Products": [{ id: "ALL001", collection: "All Products", image: "./all_products.png" }],
+        ...collectionList,
+    };
