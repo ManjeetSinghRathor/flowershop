@@ -59,13 +59,31 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
 
     const limitedResults = results.slice(0, 4); // show only 3-4 results
 
+      useEffect(() => {
+    const handlePopState = () => {
+      // Just close on back button
+      if (isSearchOpen) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    if (isSearchOpen) {
+      // Add history entry when modal opens
+      window.history.pushState({ modalOpen: true }, "");
+      window.addEventListener("popstate", handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [isSearchOpen]);
+
     return (
         <div
             className={`
           fixed top-0 left-0 z-[1000] h-screen w-full bg-[rgba(0,0,0,0.95)] text-white shadow-lg
           transition-transform duration-300 ease-in-out
-          ${isSearchOpen ? "-translate-y-0" : "translate-y-full"}
-          sm:hidden overflow-y-auto overscroll-contain
+          ${isSearchOpen ? "-translate-y-0" : "translate-y-full"} overflow-y-auto overscroll-contain
         `}
         >
             <div className="flex flex-col h-full w-full gap-2 p-2">

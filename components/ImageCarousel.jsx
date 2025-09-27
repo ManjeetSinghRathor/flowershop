@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 export default function ImageCarousel({ images }) {
   const [current, setCurrent] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
+  const minSwipeDistance = 50; // minimum swipe length (px)
 
   const prevImage = () => {
     setCurrent((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -19,15 +22,43 @@ export default function ImageCarousel({ images }) {
     setCurrent(index);
   };
 
+  const onTouchStart = (e) => {
+    setTouchEnd(null); // reset
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+
+    if (distance > minSwipeDistance) {
+      // swipe left
+      nextImage();
+    }
+
+    if (distance < -minSwipeDistance) {
+      // swipe right
+      prevImage();
+    }
+  };
+
   return (
     <div className="w-full h-fit max-w-2xl mx-auto lg:sticky top-0 z-10">
       {/* Main Carousel */}
-      <div className="relative w-full aspect-[1] max-h-[40vh] md:max-h-[50vh] rounded-xl overflow-hidden shadow-lg border-1 backdrop-blur-md p-4">
+      <div
+        className="relative w-full aspect-[1] max-h-[40vh] md:max-h-[50vh] rounded-xl overflow-hidden shadow-lg border-1 backdrop-blur-md p-4"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         <img
           src={images[current]}
           alt={`Image ${current + 1}`}
           className="w-full h-full object-contain transition-all duration-300"
         />
+
         {/* Left Arrow */}
         {/* <button
           onClick={prevImage}
@@ -50,8 +81,9 @@ export default function ImageCarousel({ images }) {
           <button
             key={index}
             onClick={() => goToImage(index)}
-            className={`h-16 w-auto rounded-lg overflow-hidden border-1 ${current === index ? "border-gray-400" : "border-transparent"
-              } transition-all duration-200`}
+            className={`h-16 w-auto rounded-lg overflow-hidden border-1 ${
+              current === index ? "border-gray-400" : "border-transparent"
+            } transition-all duration-200`}
           >
             <img
               src={img}

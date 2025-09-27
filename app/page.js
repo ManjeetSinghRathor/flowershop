@@ -4,6 +4,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import Slider from "react-slick";
 import { Products, collectionList } from "@/public/products";
 import Link from "next/link";
+import { useSelector, useDispatch } from "react-redux";
 
 const trendingProductsID = ["F001", "F002", "F003", "F004", "F005", "F006"];
 
@@ -85,7 +86,7 @@ export default function Home() {
           <FaWhatsapp />
         </button>
       </div> */}
-      
+
       <div className="flex w-full justify-center">
         <div className="relative w-full max-w-4xl overflow-hidden rounded-lg py-6 px-2">
           <Slider {...settings}>

@@ -4,7 +4,7 @@ import "slick-carousel/slick/slick-theme.css";
 import "./globals.css";
 // import "../styles/animation.css";
 import "../styles/theme.css";
-// import ReduxProvider from '../store/ReduxProvider.js';
+import ReduxProvider from "./store/ReduxProvider";
 import Navbar from "../components/navbar.jsx";
 import NextTopLoader from "nextjs-toploader";
 import { GoogleOAuthProvider } from "@react-oauth/google";
@@ -93,14 +93,14 @@ export default function RootLayout({ children }) {
           </span>
         </p>
 
-        {/* <ReduxProvider> */}
+        <ReduxProvider>
         <GoogleOAuthProvider
           clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
         >
           <Navbar />
           {children}
         </GoogleOAuthProvider>
-        {/* </ReduxProvider> */}
+        </ReduxProvider>
 
         <Footer />
       </body>

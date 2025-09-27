@@ -43,7 +43,7 @@ const Star = ({ filled = 0, className = "w-6 h-6" }) => {
                             : "white" // empty bg
                 }
                 stroke="black"
-                strokeWidth="0.2"
+                strokeWidth="0.3"
             />
         </svg>
     );
