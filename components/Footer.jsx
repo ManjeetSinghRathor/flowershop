@@ -51,7 +51,7 @@ const Footer = () => {
               Email:{" "}
               <a
                 // href="mailto:support@flowershop.com"
-                className="anchor-tag text-gray-700 hover:text-white"
+                className="anchor-tag text-gray-700"
               >
                 support@flowershop.com
               </a>
@@ -61,7 +61,7 @@ const Footer = () => {
               Phone:{" "}
               <a
                 href="tel:+91XXXXXXXXXX"
-                className="anchor-tag text-gray-700 hover:text-white"
+                className="anchor-tag text-gray-700"
               >
                 +91 xxx xxxx xxx
               </a>
@@ -71,7 +71,7 @@ const Footer = () => {
               Location:{" "}
               <a
                 href="https://www.google.com/maps/place/Your+Location"
-                className="anchor-tag text-gray-700 hover:text-white"
+                className="anchor-tag text-gray-700"
               >
                 Your Address Here
               </a>

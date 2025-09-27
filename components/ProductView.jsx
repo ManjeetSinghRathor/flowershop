@@ -172,7 +172,7 @@ const ProductView = () => {
                             type="number"
                             min="1"
                             defaultValue="1"
-                            className="w-14 text-center border-x border-gray-400 focus:outline-none"
+                            className="flex justify-center w-14 text-center border-x border-gray-400 focus:outline-none"
                         />
 
                         {/* Plus Button */}

@@ -32,11 +32,15 @@ const CartProducts = () => {
     };
 
     return (
-        <div className='flex flex-col gap-2 min-h-[50vh] w-full px-2 sm:px-8 lg:px-24 py-4'>
-            <div className='flex w-full items-center justify-between border-t border-b border-gray-300 py-2'>
+        <div className='flex flex-col gap-2 min-h-[50vh] w-full px-2 sm:px-8 lg:px-24 pt-4'>
+            <div className='flex w-full items-center justify-between border-t border-b border-gray-300 py-2 sticky top-14 z-[45] bg-white'>
                 <div className='flex flex-col'>
                     <h1 className='font-serif text-2xl font-bold leading-tight'>YOUR CART</h1>
-                    {cart_products.length > 0 && <p><span className='font-mono'>Subtotal:</span>{" "}₹<span>1499.00</span></p>}
+                    {cart_products.length > 0 && <div className='flex gap-2'><span className='font-mono'>Subtotal:</span>
+                        <p className='flex font-mono gap-[2px]'>
+                            <span>₹</span><span>{cart_products.reduce((sum, item) => sum + ((item.final_price) * (item.quantity) || 0), 0)}.00</span>
+                        </p>
+                        </div>}
                 </div>
                 {cart_products.length > 0 && <button
                     disabled={cart_product_ids.length === 0}
@@ -130,7 +134,7 @@ const CartProducts = () => {
                                                 min="1"
                                                 value={product.quantity}
                                                 readOnly
-                                                className="w-14 text-center border-x border-gray-400 focus:outline-none"
+                                                className="flex justify-center w-14 text-center border-x border-gray-400 focus:outline-none"
                                             />
 
                                             {/* Plus Button */}
@@ -161,14 +165,14 @@ const CartProducts = () => {
                         ))}
 
                         <div className='flex flex-col border-t border-gray-300 w-full gap-2 py-4'>
-                            <div className='flex justify-between font-mono text-xl'>
+                            <div className='flex justify-between font-mono text-xl sm:text-2xl font-semibold'>
                                 <span>Subtotal</span>
-                                <p className='flex text-lg font-mono gap-[2px]'>
+                                <p className='flex font-mono gap-[2px]'>
                                     <span>₹</span><span>{cart_products.reduce((sum, item) => sum + ((item.final_price) * (item.quantity) || 0), 0)}.00</span>
                                 </p>
                             </div>
                             <p className='text-sm text-gray-600'>
-                                Tax included. <span className='text-blue-800 underline'>Shipping</span> calculated at checkout.
+                                Tax included. <span className='text-blue-800 underline hover:cursor-default'>Shipping</span> calculated at checkout.
                             </p>
                             <button
                                 disabled={cart_product_ids.length === 0}
@@ -180,14 +184,14 @@ const CartProducts = () => {
                                 Check out
                             </button>
                             <Link
-                            href={{
-                                pathname: "/collection_products",
-                                query: { category: "All Products" }, // pass subcategory as query param
-                            }}
-                            className='flex w-full justify-center text-sm items-center p-1 text-blue-600'
-                        >
-                            Continue shopping {">"}
-                        </Link>
+                                href={{
+                                    pathname: "/collection_products",
+                                    query: { category: "All Products" }, // pass subcategory as query param
+                                }}
+                                className='flex w-full justify-center text-sm items-center p-1 text-blue-600'
+                            >
+                                Continue shopping {">"}
+                            </Link>
                         </div>
                     </>
                 ) : (

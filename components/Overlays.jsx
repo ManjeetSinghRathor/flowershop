@@ -134,8 +134,8 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
         `}
             ref={swipeRef}
         >
-            <div className="flex flex-col h-full grow justify-between w-56 bg-white" ref={menuRef}>
-                <div className="flex w-56 bg-white overflow-y-auto">
+            <div className="flex flex-col h-full grow justify-between w-56 sm:w-64 bg-white" ref={menuRef}>
+                <div className="flex w-56 sm:w-64 bg-white overflow-y-auto">
                     <div className="w-full max-w-md mx-auto p-4">
                         {Object.entries(updatedCollectionList).map(([category, items]) => (
                             <div key={category} className="mb-2 border rounded-lg overflow-hidden">
@@ -144,7 +144,7 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                                     className="w-full flex justify-between items-center py-3 px-2 bg-gray-100 hover:bg-gray-200"
                                     onClick={() => toggleCategory(category)}
                                 >
-                                    <span className="font-serif text-gray-800 text-[15px]">{category}</span>
+                                    <span className="font-serif text-gray-800 text-[15px] sm:text-[18px]">{category}</span>
                                     {openCategory === category ? (
                                         <FaChevronUp className="w-5 h-5 text-gray-600" />
                                     ) : (
@@ -193,7 +193,7 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                     </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center h-[85px] w-56">
+                <div className="flex flex-col items-center justify-center h-[85px] w-56 sm:w-64">
                     {/* Google Login */}
                     <div className="flex w-full h-[8vh] items-center justify-center text-center text-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-5 h-5 text-gray-700 mb-[3px]" viewBox="0 0 640 640"><path d="M128 252.6C128 148.4 214 64 320 64C426 64 512 148.4 512 252.6C512 371.9 391.8 514.9 341.6 569.4C329.8 582.2 310.1 582.2 298.3 569.4C248.1 514.9 127.9 371.9 127.9 252.6zM320 320C355.3 320 384 291.3 384 256C384 220.7 355.3 192 320 192C284.7 192 256 220.7 256 256C256 291.3 284.7 320 320 320z"/></svg>
