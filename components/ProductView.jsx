@@ -70,7 +70,7 @@ const ProductView = () => {
     const [productsImgloaded, setProductsImgLoaded] = useState({});
 
     return (
-        <div className="w-full px-2 sm:px-8 lg:px-24 min-h-screen">
+        <div className="w-full px-2 sm:px-8 lg:px-24 min-h-[50vh]">
             <div className="flex flex-col w-full gap-1 pb-2">
                 <h1 className="flex w-full justify-start items-center font-mono sm:text-lg pt-4">
                     <Link href="/" className="hover:underline font-light">

@@ -2,7 +2,7 @@ import React from 'react'
 
 const TrackOrder = () => {
   return (
-    <div>TrackOrder</div>
+    <div className='flex w-full items-center justify-center min-h-[50vh]'>TrackOrder</div>
   )
 }
 

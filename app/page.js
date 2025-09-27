@@ -6,7 +6,7 @@ import { Products, collectionList } from "@/public/products";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { AddProduct } from "./store/CartProductsSlice";
-
+import toast from "react-hot-toast";
 
 const trendingProductsID = ["F001", "F002", "F003", "F004", "F005", "F006"];
 
@@ -51,8 +51,8 @@ const shopImages = [
 ];
 
 export default function Home() {
-
   const dispatch = useDispatch();
+  const saved_cart_products = useSelector((state) => state.CartProducts);
 
   const [categoryLoaded, setCategoryLoaded] = useState({});
   const [productsImgloaded, setProductsImgLoaded] = useState({});
@@ -83,6 +83,11 @@ export default function Home() {
   const trendingProducts = trendingProductsID.map((id) =>
     Products.find((product) => product.id === id)
   );
+
+  const handleAddToCart = (id) => {
+    dispatch(AddProduct({ id, q: 1 }));
+    toast.success("Item Added to Cart");
+  };
 
   return (
     <div className="font-sans items-center w-full px-2 sm:px-8 lg:px-24">
@@ -247,9 +252,9 @@ export default function Home() {
                 <button className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded">
                   Buy
                 </button>
-                <button 
-                onClick={() => dispatch(AddProduct({ id: product.id, q: 1 }))} 
-                className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded"
+                <button
+                  onClick={() => handleAddToCart(product.id)}
+                  className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded"
                 >
                   <span className="text-lg">+</span>{" "}
                   <svg
