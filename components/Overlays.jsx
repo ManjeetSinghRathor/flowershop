@@ -128,7 +128,7 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
     return (
         <aside
             className={`
-          fixed top-0 left-0 z-[1000] h-screen w-full bg-[rgba(0,0,0,0.95)] text-white shadow-lg
+          fixed top-0 left-0 z-[1000] w-full h-full bg-[rgba(0,0,0,0.95)] text-white shadow-lg
           transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"} overflow-y-auto overscroll-contain
         `}

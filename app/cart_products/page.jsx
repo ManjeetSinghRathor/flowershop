@@ -1,9 +1,10 @@
-import React from 'react'
+import { Suspense } from "react";
+import CartProducts from "@/components/CartProducts";
 
-const CartProducts = () => {
+export default function Page() {
   return (
-    <div>CartProducts</div>
-  )
+    <Suspense fallback={<div className="flex h-screen w-full justify-center py-2">Loading...</div>}>
+      <CartProducts />
+    </Suspense>
+  );
 }
-
-export default CartProducts;

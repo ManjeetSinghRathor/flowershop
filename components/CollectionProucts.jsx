@@ -28,7 +28,7 @@ const CollectionProducts = () => {
 
     return (
         <div className="min-h-screen">
-            <div className='flex flex-col w-full bg-white sticky top-14 z-[45] shadow-md'>
+            <div className='flex flex-col w-full bg-white sticky top-14 z-[45] shadow-md sm:px-8 lg:px-24'>
                 <h1 className="flex w-full justify-start items-center font-mono sm:text-lg px-2 py-4">
                     <Link href="/" className="hover:underline font-light">
                         Home
@@ -80,7 +80,7 @@ const CollectionProducts = () => {
             </div>
 
             {collection_products.length === 0 ? (
-                <div className='flex w-full px-2 sm:px-8 lg:px-24 items-center py-4'>
+                <div className='flex w-full px-2 sm:px-8 lg:px-24 items-center justify-center py-4'>
                     <img className='object-cover object-center' src="./no_product.png" alt="No Product Available" />
                 </div>
             ) : (

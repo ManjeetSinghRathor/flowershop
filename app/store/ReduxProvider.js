@@ -4,20 +4,18 @@ import { useEffect } from "react";
 import { Provider } from "react-redux";
 import store, { markHydrated } from ".";
 import { loadState } from "../utils/localStorage";
-import { closeOverlays, closeSearchModal, openOverlays, openSearchModal } from "./ModalStateSlice";
-
+import { AddProduct } from "./CartProductsSlice";
 
 export default function ReduxProvider({ children }) {
   useEffect(() => {
-    
-    const ModalState = loadState("ModalState");
-    if(ModalState?.overlays === false) store.dispatch(closeOverlays());
-    else if(ModalState?.overlays === true) store.dispatch(openOverlays());
+    const savedCart = loadState("CartProducts"); // always an array now
 
-    if(ModalState?.searchModal === false) store.dispatch(closeSearchModal());
-    else if(ModalState?.searchModal === true) store.dispatch(openSearchModal());
-    
-    
+    if (savedCart) {
+      savedCart.forEach((item) => {
+        store.dispatch(AddProduct({ id: item.id, q: item.q }));
+      });
+    }
+
     // ✅ Allow saving after hydration
     markHydrated();
   }, []);

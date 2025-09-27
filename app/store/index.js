@@ -1,11 +1,11 @@
 // src/store/index.js
-import { configureStore, current } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 import { saveState } from "../utils/localStorage";
-import ModalStateReducer from './ModalStateSlice';
+import CartProductsReducer from './CartProductsSlice';
 
 const store = configureStore({
   reducer: {
-    ModalState: ModalStateReducer,
+    CartProducts: CartProductsReducer,
   },
 });
 
@@ -18,7 +18,7 @@ store.subscribe(() => {
 
   const state = store.getState();
 
-  saveState("ModalState", state.ModalState)
+  saveState("CartProducts", state.CartProducts)
 });
 
 export const markHydrated = () => {

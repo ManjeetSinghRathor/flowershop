@@ -62,7 +62,7 @@ export default function RootLayout({ children }) {
               color: "#fff",
               border: "1px solid #334155", // slate-700
               borderRadius: "10px",
-              padding: "8px 20px",
+              padding: "4px 20px",
             },
 
             // Success toast styles

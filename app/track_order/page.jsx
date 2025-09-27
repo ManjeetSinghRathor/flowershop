@@ -1,9 +1,10 @@
-import React from 'react'
+import { Suspense } from "react";
+import TrackOrder from "@/components/TrackOrder";
 
-const TrackOrder = () => {
+export default function Page() {
   return (
-    <div>TrackOrder</div>
-  )
+    <Suspense fallback={<div className="flex h-screen w-full justify-center py-2">Loading...</div>}>
+      <TrackOrder />
+    </Suspense>
+  );
 }
-
-export default TrackOrder;

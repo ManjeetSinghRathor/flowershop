@@ -5,6 +5,8 @@ import Slider from "react-slick";
 import { Products, collectionList } from "@/public/products";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
+import { AddProduct } from "./store/CartProductsSlice";
+
 
 const trendingProductsID = ["F001", "F002", "F003", "F004", "F005", "F006"];
 
@@ -49,6 +51,9 @@ const shopImages = [
 ];
 
 export default function Home() {
+
+  const dispatch = useDispatch();
+
   const [categoryLoaded, setCategoryLoaded] = useState({});
   const [productsImgloaded, setProductsImgLoaded] = useState({});
   const [shopImgLoaded, setShopImgLoaded] = useState({});
@@ -242,7 +247,10 @@ export default function Home() {
                 <button className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded">
                   Buy
                 </button>
-                <button className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded">
+                <button 
+                onClick={() => dispatch(AddProduct({ id: product.id, q: 1 }))} 
+                className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded"
+                >
                   <span className="text-lg">+</span>{" "}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
