@@ -2,10 +2,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { saveState } from "../utils/localStorage";
 import CartProductsReducer from './CartProductsSlice';
+import userReducer from './userSlice.js';
 
 const store = configureStore({
   reducer: {
     CartProducts: CartProductsReducer,
+    user: userReducer,
   },
 });
 

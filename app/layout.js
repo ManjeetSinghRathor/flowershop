@@ -47,7 +47,7 @@ export const metadata = {
   openGraph: {
     title: "Bloom's Heaven - Premium Flower Shop in Bangalore",
     description:
-      "Discover Bloom's Heaven – luxury flowers, roses, and gifts. Perfect bouquets for weddings, birthdays, and special occasions.",
+      "Discover Bloom's Heaven – luxury flowers, bouquets, and gifts. Perfect bouquets for weddings, birthdays, and special occasions.",
     url: "https://bloomsheaven.com",
     siteName: "Bloom's Heaven",
     images: [
@@ -86,7 +86,7 @@ export default function RootLayout({ children }) {
           initialPosition={0.1}
           crawl={true}
           crawlSpeed={100}
-          height={2}
+          height={4}
           showSpinner={false}
           easing="cubic-bezier(0.4, 0, 0.2, 1)"
           speed={400}

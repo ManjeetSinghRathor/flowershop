@@ -129,9 +129,10 @@ const ProductView = () => {
                     </div>
                 </div>
 
-                {/* Delivery */}
-                <div className="flex items-center justify-between w-full py-2 border-t border-b border-gray-300 text-sm">
-                    <label htmlFor="deliveryTime" className="font-medium text-gray-800">
+                <div className="border-t border-b border-gray-300 sm:grid sm:grid-cols-2 sm:gap-4">
+                    {/* Delivery */}
+                <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
+                    <label htmlFor="deliveryTime" className="font-mono font-semibold text-gray-800">
                         Delivery Time
                     </label>
 
@@ -148,6 +149,28 @@ const ProductView = () => {
                             </option>
                         ))}
                     </select>
+                </div>
+
+                {/* Size */}
+                <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
+                    <label htmlFor="Size" className="font-mono font-semibold text-gray-800">
+                        Size
+                    </label>
+
+                    <select
+                        id="Size"
+                        name="Size"
+                        className="border border-gray-300 rounded-md px-2 py-1 text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800"
+                        defaultValue={productDetails.delivery_time}
+                    >
+                        {/* productDetails.delivery_options */}
+                        {["4 flowers bouquet", "8 flowers bouquet", "12 flowers bouquet"].map((option, index) => (
+                            <option key={index} value={option}>
+                                {option}
+                            </option>
+                        ))}
+                    </select>
+                </div>
                 </div>
 
                 {/* Quantity + Add to Cart row */}

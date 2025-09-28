@@ -13,7 +13,7 @@ const CartProducts = () => {
     const [productsImgloaded, setProductsImgLoaded] = useState({});
 
     // Merge products with cart quantities
-    const cart_products = cart_product_ids.map((cartItem) => {
+    const cart_products = cart_product_ids?.map((cartItem) => {
         const product = Products.find((p) => p.id === cartItem?.id);
         return {
             ...product,              // full product details
@@ -54,7 +54,7 @@ const CartProducts = () => {
             </div>
 
             <div className='flex flex-col w-full gap-3 pt-2 px-2 sm:px-8 lg:px-24'>
-                {cart_products.length > 0 ? (
+                {cart_products?.length > 0 ? (
                     <>
                         {cart_products.map((product) => (
                             <div
