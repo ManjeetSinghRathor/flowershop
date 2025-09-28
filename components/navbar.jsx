@@ -24,7 +24,7 @@ const Navbar = () => {
                     </button>
                 </div>
                 <div className='flex justify-center grow flex-1 text-xl sm:text-2xl font-bold text-center'>
-                    <h1>FLOWERSHOP.COM</h1>
+                    <h1 className="mr-5"><img className="h-10 w-auto" src="./favicon.png" alt="" /></h1>
                 </div>
                 <div>
                     <Link href={"/cart_products"} className='flex bg-none outline-none p-1 items-center justify-center relative'>

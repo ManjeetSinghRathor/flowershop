@@ -26,7 +26,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {/* Brand Info */}
           <div className="flex flex-col items-start gap-2">
-            <h1 className='flex w-full justify-center text-xl sm:text-2xl font-bold text-center'>FLOWERSHOP.COM</h1>
+            <h1 className='flex w-full justify-center text-xl sm:text-2xl font-bold text-center'><img className="h-14 w-auto" src="./favicon.png" alt="" /></h1>
             <p className='text-sm text-gray-500 pl-2 text-center'>Express love, gratitude, and happiness effortlessly with our fresh hand-picked flowers for every occasion.</p>
           </div>
 
