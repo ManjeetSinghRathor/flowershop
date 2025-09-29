@@ -37,7 +37,7 @@ export const Products = [
       "https://example.com/images/tulip_bouquet_2.jpg",
     ],
     occasions: ["Easter", "Mother's Day"],
-    delivery_time: "1-2 Days",
+    delivery_time: ["Same day delivery","1-2 Days"],
   },
   {
     id: "F003",
@@ -362,7 +362,7 @@ export const collectionList = {
 
 export const collection_products_ids = {
     // By Occasion
-    "Birthday Flowers": ["B001", "F002"],
+    "Valentines Day": ["B001", "F002"],
     "Anniversary Flowers": ["F001", "F004", "B001"],
     "Wedding Flowers": ["F003", "F004"],
     "Get Well Soon": ["F005"],

@@ -1,49 +1,145 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import Link from "next/link";
+import { supabase } from "@/app/utils/supabase";
+import toast from "react-hot-toast";
 
 const AddProduct = () => {
+    // --- State: Product details ---
     const [product, setProduct] = useState({
-        productCode: "",
-        name: "",
-        description: "",
-        currency: "INR",
-        stock: 0,
-        deliveryTime: "",
-        flowers: [],
-        packContains: [],
-        colors: [],
-        occasions: [],
-        tags: [],
-        sizes: [],
-        images: [],
-        videos: [],
+        productCode: "",      // Unique product identifier
+        name: "",             // Product name
+        description: "",      // Product description
+        currency: "INR",      // Default currency
+        stock: 0,             // Available stock
+        deliveryTime: [],     // Delivery time info
+        flowers: [],          // Array of flower types
+        packContains: [],     // Array of items in pack
+        colors: [],           // Array of colors
+        occasions: [],        // Array of occasions
+        tags: [],             // Array of tags
+        sizes: [],            // Array of size objects
+        images: [],           // Array of image objects (preview, URL, default)
+        videos: [],           // Array of video URLs
     });
 
-    const fileInputRef = useRef(null);
+    // --- Refs ---
+    const fileInputRef = useRef(null);       // File input reference for triggering upload
+
+    // --- State: Uploaded Image URLs (for cleanup if unsaved) ---
+    const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
+
+    // --- State: Current array input values for flowers, colors, etc. ---
     const [currentArrayInput, setCurrentArrayInput] = useState({
         flowers: "",
         packContains: "",
         colors: "",
         occasions: "",
         tags: "",
+        deliveryTime: "",
     });
 
-    // --- Image handlers ---
-    const handleFileChange = (e) => {
+    // -------------------------
+    // --- IMAGE HANDLERS ------
+    // -------------------------
+
+    // Handle file selection and upload to Supabase
+    const handleFileChange = async (e) => {
         const files = Array.from(e.target.files);
-        const newImages = files.map((file) => ({
-            file,
-            preview: URL.createObjectURL(file),
-            isDefault: false,
-        }));
-        setProduct((prev) => ({ ...prev, images: [...prev.images, ...newImages] }));
+
+        for (let file of files) {
+            // 1. Create temporary preview object
+            const tempId = Date.now() + "_" + file.name;
+            const newImage = {
+                tempId,
+                preview: URL.createObjectURL(file),
+                isDefault: false,
+                imgUrl: null,
+            };
+
+            // Add preview immediately to state
+            setProduct((prev) => ({
+                ...prev,
+                images: [...prev.images, newImage],
+            }));
+
+            // 2. Upload file to Supabase storage
+            const fileName = `products/${tempId}`;
+            const { error } = await supabase.storage.from("products").upload(fileName, file);
+
+            if (error) {
+                console.error("Supabase upload error:", error);
+                continue;
+            }
+
+            // 3. Get public URL
+            const { data: publicData } = supabase.storage
+                .from("products")
+                .getPublicUrl(fileName);
+
+            // 4. Update state with uploaded image URL
+            setProduct((prev) => ({
+                ...prev,
+                images: prev.images.map((img) =>
+                    img.tempId === tempId ? { ...img, imgUrl: publicData.publicUrl } : img
+                ),
+            }));
+
+            // Track uploaded URLs for potential cleanup
+            setUploadedImageUrls((prev) => [...prev, publicData.publicUrl]);
+        }
     };
 
+    // Cleanup unsaved images on page unload
+    useEffect(() => {
+        const handleBeforeUnload = async (e) => {
+            if (uploadedImageUrls.length > 0) {
+                e.preventDefault();
+                e.returnValue =
+                    "You have uploaded images that aren’t saved yet. If you leave, they will be deleted.";
+
+                // Delete uploaded images from Supabase if not saved
+                for (let url of uploadedImageUrls) {
+                    try {
+                        const urlParts = url.split("/object/public/");
+                        if (urlParts.length < 2) throw new Error("Invalid Supabase URL");
+
+                        let filePath = decodeURIComponent(urlParts[1]);
+                        if (filePath.startsWith("products/")) {
+                            filePath = filePath.replace(/^products\//, "");
+                        }
+
+                        await supabase.storage.from("products").remove([filePath]);
+
+                    } catch (err) {
+                        console.error("Cleanup error:", err);
+                    }
+                }
+
+                // Reset local image state
+                setProduct((prev) => ({
+                    ...prev,
+                    images: [],
+                }));
+                setUploadedImageUrls([]);
+            }
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [uploadedImageUrls]);
+
+    // Trigger file picker
     const openFilePicker = () => {
         fileInputRef.current.click();
     };
 
+    // Set selected image as main/default
     const handleMainImage = (index) => {
         setProduct((prev) => ({
             ...prev,
@@ -54,14 +150,39 @@ const AddProduct = () => {
         }));
     };
 
-    const removeImage = (index) => {
+    // Remove image from state & Supabase
+    const removeImage = async (index) => {
+        const imgToRemove = product.images[index];
+
+        if (imgToRemove?.imgUrl) {
+            try {
+                const urlParts = imgToRemove.imgUrl.split("/object/public/");
+                if (urlParts.length < 2) throw new Error("Invalid Supabase URL");
+
+                let filePath = decodeURIComponent(urlParts[1]);
+                if (filePath.startsWith("products/")) {
+                    filePath = filePath.replace(/^products\//, "");
+                }
+
+                const { error } = await supabase.storage.from("products").remove([filePath]);
+                if (error) throw error;
+                console.log("Deleted from Supabase:", filePath);
+            } catch (err) {
+                console.error("Supabase delete error:", err.message || err);
+            }
+        }
+
         setProduct((prev) => ({
             ...prev,
             images: prev.images.filter((_, i) => i !== index),
         }));
     };
 
-    // --- Array handlers ---
+    // -------------------------
+    // --- ARRAY HANDLERS -----
+    // -------------------------
+
+    // Add item to any array (flowers, colors, tags, etc.)
     const handleArrayAdd = (field) => {
         if (!currentArrayInput[field]) return;
         setProduct((prev) => ({
@@ -71,6 +192,7 @@ const AddProduct = () => {
         setCurrentArrayInput((prev) => ({ ...prev, [field]: "" }));
     };
 
+    // Remove item from any array
     const handleArrayRemove = (field, index) => {
         setProduct((prev) => ({
             ...prev,
@@ -78,18 +200,22 @@ const AddProduct = () => {
         }));
     };
 
-    // Add size
+    // -------------------------
+    // --- SIZE HANDLERS ------
+    // -------------------------
+
+    // Add a new size option
     const addSize = () => {
         setProduct((prev) => ({
             ...prev,
             sizes: [
                 ...prev.sizes,
-                { sizeName: "", price: 0, finalPrice: 0, discountPercent: 0, isDefault: false },
+                { sizeName: "", price: 0, finalPrice: 0, discount: 0, isDefault: false },
             ],
         }));
     };
 
-    // Update size
+    // Update a size's value and recalculate discount
     const updateSize = (index, field, value) => {
         const newSizes = [...product.sizes];
         if (field === "price" || field === "finalPrice") {
@@ -97,18 +223,18 @@ const AddProduct = () => {
         }
         newSizes[index][field] = value;
 
-        // Calculate discount %
+        // Recalculate discount %
         if (newSizes[index].price > 0 && newSizes[index].finalPrice >= 0) {
             const discount = ((newSizes[index].price - newSizes[index].finalPrice) / newSizes[index].price) * 100;
-            newSizes[index].discountPercent = Math.round(discount);
+            newSizes[index].discount = Math.round(discount);
         } else {
-            newSizes[index].discountPercent = 0;
+            newSizes[index].discount = 0;
         }
 
         setProduct((prev) => ({ ...prev, sizes: newSizes }));
     };
 
-    // Set default size
+    // Mark a size as default
     const setDefaultSize = (index) => {
         setProduct((prev) => ({
             ...prev,
@@ -116,7 +242,7 @@ const AddProduct = () => {
         }));
     };
 
-    // Remove size
+    // Remove a size
     const removeSize = (index) => {
         setProduct((prev) => ({
             ...prev,
@@ -124,15 +250,67 @@ const AddProduct = () => {
         }));
     };
 
+    // -------------------------
+    // --- FORM SUBMISSION -----
+    // -------------------------
 
-    // --- Form submission ---
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Product Data:", product);
-        // call your API to save the product here
+
+        try {
+            // Ensure at least one image is default
+            const hasDefault = product.images.some((img) => img.isDefault);
+            const images = product.images.map((img, i) => ({
+                imgUrl: img.imgUrl || (typeof img === "string" ? img : ""),
+                isDefault: hasDefault ? img.isDefault : i === 0,
+            }));
+
+            const payload = {
+                ...product,
+                images,
+            };
+
+            // Send POST request to backend
+            const res = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/add`,
+                payload,
+                {
+                    headers: { "Content-Type": "application/json" },
+                    withCredentials: true,
+                }
+            );
+
+            if (res.data.success) {
+                toast.success("Product added successfully!");
+
+                // Reset form
+                setProduct({
+                    productCode: "",
+                    name: "",
+                    description: "",
+                    currency: "INR",
+                    stock: 0,
+                    deliveryTime: [],
+                    flowers: [],
+                    packContains: [],
+                    colors: [],
+                    occasions: [],
+                    tags: [],
+                    sizes: [],
+                    images: [],
+                    videos: [],
+                });
+                setUploadedImageUrls([]);
+            } else {
+                toast.error("Failed: " + res.data.message);
+            }
+        } catch (err) {
+            console.error("Add Product failed", err.message);
+            alert(err.message);
+        }
     };
 
-    // --- Render ---
+    // Render input with add/remove functionality for array fields
     const renderArrayInput = (field, placeholder) => (
         <div className="mb-4">
             <label className="font-semibold">{placeholder}</label>
@@ -167,7 +345,9 @@ const AddProduct = () => {
                             onClick={() => handleArrayRemove(field, index)}
                             className="text-red-500 font-bold"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-6 sm:h-6' viewBox="0 0 640 640"><path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-6 sm:h-6' viewBox="0 0 640 640">
+                                <path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" />
+                            </svg>
                         </button>
                     </div>
                 ))}
@@ -175,18 +355,41 @@ const AddProduct = () => {
         </div>
     );
 
-    return (
-        <div className="min-h-screen bg-gray-100 p-4 md:p-8">
-            <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">
-                Add New Product
-            </h1>
+    // -------------------------
+    // --- JSX RENDERING -------
+    // -------------------------
 
-            <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded shadow-md">
+    return (
+        <div className="min-h-screen bg-gray-100 px-2 sm:px-8 lg:px-24 py-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center w-full px-2 pb-4 gap-1">
+                <h1 className="hidden sm:flex text-xl md:text-2xl font-bold text-center">
+                    Add New Product
+                </h1>
+                <Link
+                    href={"/handle_products"}
+                    className="flex w-fit text-sm px-2 sm:text-md sm:px-4 py-2 bg-black rounded-md text-white"
+                >
+                    Handle Products
+                </Link>
+                <h1 className="sm:hidden text-xl md:text-2xl font-bold text-center pt-2">
+                    Add New Product
+                </h1>
+            </div>
+
+            <form
+                onSubmit={handleSubmit}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+                        e.preventDefault();
+                    }
+                }}
+                className="space-y-4 bg-white py-6 px-4 rounded shadow-md"
+            >
                 {/* Basic Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
                         type="text"
-                        placeholder="Product Code"
+                        placeholder="Product Code (Unique)"
                         className="border p-2 rounded"
                         value={product.productCode}
                         onChange={(e) => setProduct({ ...product, productCode: e.target.value })}
@@ -209,12 +412,16 @@ const AddProduct = () => {
                     onChange={(e) => setProduct({ ...product, description: e.target.value })}
                 />
 
-                {/* Arrays */}
-                {renderArrayInput("flowers", "Flowers")}
-                {renderArrayInput("packContains", "Pack Contains")}
-                {renderArrayInput("colors", "Colors")}
-                {renderArrayInput("occasions", "Occasions")}
-                {renderArrayInput("tags", "Tags")}
+                <div className="grid grid-cols-1 md:grid-cols-2 sm:gap-4">
+                    {/* Arrays */}
+                    {renderArrayInput("flowers", "Flowers")}
+                    {renderArrayInput("packContains", "Pack Contains")}
+                    {renderArrayInput("colors", "Colors")}
+                    {renderArrayInput("occasions", "Occasions")}
+                    {renderArrayInput("deliveryTime", "Delivery Time")}
+                    {renderArrayInput("tags", "Tags")}
+                </div>
+
 
                 {/* Sizes */}
                 <div className="mb-4">
@@ -235,17 +442,19 @@ const AddProduct = () => {
                                 type="number"
                                 placeholder="Price"
                                 className="border p-1 rounded w-20"
-                                value={size.price}
-                                onChange={(e) => updateSize(index, "price", e.target.value)}
+                                value={size.price === 0 ? "" : size.price}   // ✅ show empty instead of 0
+                                onChange={(e) => updateSize(index, "price", e.target.value === "" ? "" : Number(e.target.value))}
                             />
+
                             <input
                                 type="number"
                                 placeholder="Final Price"
                                 className="border p-1 rounded w-20"
-                                value={size.finalPrice}
-                                onChange={(e) => updateSize(index, "finalPrice", e.target.value)}
+                                value={size.finalPrice === 0 ? "" : size.finalPrice}   // ✅ show empty instead of 0
+                                onChange={(e) => updateSize(index, "finalPrice", e.target.value === "" ? "" : Number(e.target.value))}
                             />
-                            <span className="w-20">Discount: {size.discountPercent}%</span>
+
+                            <span className="w-20">Discount: {size.discount}%</span>
 
                             <button
                                 type="button"
@@ -261,7 +470,6 @@ const AddProduct = () => {
                             </button>
                         </div>
                     ))}
-
                 </div>
 
                 {/* Images */}
@@ -278,8 +486,7 @@ const AddProduct = () => {
                                 <button
                                     type="button"
                                     onClick={() => handleMainImage(index)}
-                                    className={`absolute bottom-1 left-1 px-2 py-1 text-xs rounded ${img.isDefault ? "bg-green-500 text-white" : "bg-gray-200"
-                                        }`}
+                                    className={`absolute bottom-1 left-1 px-2 py-1 text-xs rounded ${img.isDefault ? "bg-green-500 text-white" : "bg-gray-200"}`}
                                 >
                                     {img.isDefault ? "Main" : "Set Main"}
                                 </button>
@@ -288,7 +495,8 @@ const AddProduct = () => {
                                     onClick={() => removeImage(index)}
                                     className="absolute top-1 right-1 text-red-500 font-bold bg-white rounded-full"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-6 sm:h-6' viewBox="0 0 640 640"><path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-6 sm:h-6' viewBox="0 0 640 640">
+                                        <path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg>
                                 </button>
                             </div>
                         ))}
@@ -311,6 +519,7 @@ const AddProduct = () => {
                     </div>
                 </div>
 
+                {/* Submit */}
                 <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded mt-4">
                     Save Product
                 </button>

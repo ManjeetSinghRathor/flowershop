@@ -39,7 +39,6 @@ export const metadata = {
     "wedding flowers",
     "birthday gifts",
   ],
-  manifest: "/manifest.json",
   icons: {
     icon: "./favicon.png",
     apple: "./favicon.png",

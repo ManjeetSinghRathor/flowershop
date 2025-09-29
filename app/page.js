@@ -1,47 +1,48 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import Slider from "react-slick";
-import { Products, collectionList } from "@/public/products";
+import { Products } from "@/public/products";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { AddProduct } from "./store/CartProductsSlice";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 const trendingProductsID = ["F001", "F002", "F003", "F004", "F005", "F006"];
 
-const slides = [
-  {
-    id: 1,
-    image: "https://source.unsplash.com/800x400/?flower1",
-    link: "/product/1",
-  },
-  {
-    id: 2,
-    image: "https://source.unsplash.com/800x400/?flower2",
-    link: "/product/2",
-  },
-  {
-    id: 3,
-    image: "https://source.unsplash.com/800x400/?flower3",
-    link: "/product/3",
-  },
-  {
-    id: 4,
-    image: "https://source.unsplash.com/800x400/?flower4",
-    link: "/product/4",
-  },
-  {
-    id: 5,
-    image: "https://source.unsplash.com/800x400/?flower5",
-    link: "/product/5",
-  },
-  {
-    id: 6,
-    image: "https://source.unsplash.com/800x400/?flower6",
-    link: "/product/6",
-  },
-];
+// const slides = [
+//   {
+//     id: 1,
+//     image: "https://source.unsplash.com/800x400/?flower1",
+//     link: "/product/1",
+//   },
+//   {
+//     id: 2,
+//     image: "https://source.unsplash.com/800x400/?flower2",
+//     link: "/product/2",
+//   },
+//   {
+//     id: 3,
+//     image: "https://source.unsplash.com/800x400/?flower3",
+//     link: "/product/3",
+//   },
+//   {
+//     id: 4,
+//     image: "https://source.unsplash.com/800x400/?flower4",
+//     link: "/product/4",
+//   },
+//   {
+//     id: 5,
+//     image: "https://source.unsplash.com/800x400/?flower5",
+//     link: "/product/5",
+//   },
+//   {
+//     id: 6,
+//     image: "https://source.unsplash.com/800x400/?flower6",
+//     link: "/product/6",
+//   },
+// ];
 
 const shopImages = [
   { id: "A1", image: "https://source.unsplash.com/400x400/?bouquet" },
@@ -54,7 +55,12 @@ export default function Home() {
   const dispatch = useDispatch();
   const saved_cart_products = useSelector((state) => state.CartProducts);
 
+  const [slides, setSlides] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [collectionList, setCollectionList] = useState({});
+
   const [categoryLoaded, setCategoryLoaded] = useState({});
+  const [catLoaded, setCatLoaded] = useState(true);
   const [productsImgloaded, setProductsImgLoaded] = useState({});
   const [shopImgLoaded, setShopImgLoaded] = useState({});
 
@@ -70,13 +76,13 @@ export default function Home() {
     arrows: false,
     appendDots: (dots) => (
       <div>
-        <ul className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-1">
+        <ul className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex gap-1">
           {dots}
         </ul>
       </div>
     ),
     customPaging: () => (
-      <div className="w-8 h-1 bg-white border-[1px] border-[rgb(146,145,145)] rounded-full"></div>
+      <div className="w-7 h-1 bg-white border-[1px] border-[rgb(146,145,145)] rounded-full"></div>
     ),
   };
 
@@ -89,6 +95,66 @@ export default function Home() {
     toast.success("Item Added to Cart");
   };
 
+  const fetchSlides = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/slider/`
+      );
+
+      if (res.data.success) {
+        setSlides(res.data.data); // assuming your state is const [slides, setSlides] = useState([]);
+      } else {
+        console.error("Failed to fetch slides:", res.data.message);
+        toast.error(res.data.message || "Failed to fetch slides");
+      }
+    } catch (err) {
+      console.error("Error fetching slides:", err);
+      toast.error("Error fetching slides");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/category`
+      );
+      if (!res.data.success) throw new Error("Failed to fetch categories");
+
+      const categories = res.data.data; // Array of categories from backend
+
+      // Convert to frontend structure
+      const collectionListTemp = {};
+
+      categories.forEach((cat) => {
+        const categoryName = cat.name; // e.g. "By Occasion"
+        if (!collectionListTemp[categoryName])
+          collectionListTemp[categoryName] = [];
+
+        cat?.collections.forEach((col) => {
+          collectionListTemp[categoryName].push({
+            id: col.collectionCode, // or col._id if you prefer
+            collection: col.collectionName,
+            image: col.collectionImg,
+          });
+        });
+      });
+
+      setCollectionList(collectionListTemp);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      return {};
+    } finally {
+      setCatLoaded(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSlides();
+    fetchCategories();
+  }, []);
+
   return (
     <div className="font-sans items-center w-full px-2 sm:px-8 lg:px-24">
       {/* <div className="fixed bottom-4 right-4 z-50">
@@ -98,90 +164,127 @@ export default function Home() {
       </div> */}
 
       <div className="flex w-full justify-center">
-        <div className="relative w-full max-w-4xl overflow-hidden rounded-lg py-6 px-2">
-          <Slider {...settings}>
-            {slides.map((slide) => (
-              <div key={slide.id}>
-                <a href={slide.link}>
-                  <img
-                    src={slide.image}
-                    alt={`Slide ${slide.id}`}
-                    className="w-full min-h-[160px] sm:min-h-[200px] object-cover cursor-pointer"
+        <div className="relative w-full max-w-4xl overflow-hidden rounded-lg py-6">
+          <div className="w-full">
+            {loading ? (
+              <div className="flex justify-center gap-4">
+                {/* Skeleton slides */}
+                {[...Array(1)].map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="w-full max-w-4xl h-[120px] sm:h-[200px] bg-gray-300 animate-pulse rounded-md"
                   />
-                </a>
+                ))}
               </div>
-            ))}
-          </Slider>
+            ) : (
+              <Slider {...settings}>
+                {slides.map((slide, idx) => (
+                  <div
+                    key={slide._id}
+                    className="w-full aspect-[7/3] max-h-[240px]"
+                  >
+                    <Link href={slide.link || "#"}>
+                      <img
+                        src={slide.image}
+                        alt={`Slide ${idx}`}
+                        className="w-full h-full object-cover rounded-md cursor-pointer"
+                      />
+                    </Link>
+                  </div>
+                ))}
+              </Slider>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Collection List */}
       <div className="flex flex-col w-full gap-3 py-6 px-2">
-        <h2 className="flex font-mono text-2xl justify-center sm:text-3xl">
+        <h2 className="flex font-mono text-2xl justify-center sm:text-3xl leading-tight">
           Collection List
         </h2>
-        {Object.entries(collectionList).map(([category, items]) => (
-          <div
-            key={category}
-            className="flex flex-col gap-4 w-full overflow-hidden py-4"
-          >
-            <h3 className="font-serif font-semibold text-xl sm:text-2xl mb-1 text-gray-800">
-              {category}
-            </h3>
-            <div className="flex w-full gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
-              {items.map((item, index) => (
+        {catLoaded ? (
+          <div className="flex flex-col gap-4 w-full overflow-hidden py-4">
+             <div className="flex w-[100px] h-[36px] relative">
+                  <div className="absolute inset-0 rounded-md bg-gray-300 animate-pulse" />
+             </div>
+            {/* Row 1 */}
+            <div className="flex w-full gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
+              {[...Array(3)].map((_, idx) => (
                 <div
-                  key={index}
-                  className="flex gap-2 px-2 snap-start snap-always"
+                  key={`row1-${idx}`}
+                  className="min-w-[7rem] min-h-[7rem] flex items-center justify-center snap-start"
                 >
-                  <Link
-                    href={{
-                      pathname: "/collection_products",
-                      query: { category: item.collection }, // pass subcategory as query param
-                    }}
-                    className="flex flex-col items-center gap-1 cursor-pointer"
-                  >
-                    <div className="w-28 h-28 relative">
-                      {/* Skeleton */}
-                      {!categoryLoaded[item.id] && (
-                        <div className="absolute inset-0 rounded-full bg-gray-300 animate-pulse" />
-                      )}
-
-                      {/* Actual image */}
-                      <img
-                        className={`w-28 h-28 rounded-full object-cover object-center border border-gray-400 ${
-                          categoryLoaded[item.id] ? "block" : "hidden"
-                        }`}
-                        src={item.image}
-                        alt={item.collection}
-                        onLoad={() =>
-                          setCategoryLoaded((prev) => ({
-                            ...prev,
-                            [item.id]: true,
-                          }))
-                        }
-                        onError={() =>
-                          setCategoryLoaded((prev) => ({
-                            ...prev,
-                            [item.id]: true,
-                          }))
-                        }
-                      />
-                    </div>
-                    <div className="text-center text-sm">
-                      {item.collection.split(" ").map((word, index) => (
-                        <span key={index}>
-                          {word}
-                          {(index + 1) % 2 === 0 ? <br /> : " "}
-                        </span>
-                      ))}
-                    </div>
-                  </Link>
+                  {/* Skeleton */}
+                  <div className="w-28 h-28 rounded-full bg-gray-300 animate-pulse" />
                 </div>
               ))}
             </div>
           </div>
-        ))}
+        ) : (
+          Object.entries(collectionList).map(([category, items]) => (
+            <div
+              key={category}
+              className="flex flex-col gap-4 w-full overflow-hidden py-4"
+            >
+              <h3 className="font-serif font-semibold text-xl sm:text-2xl mb-1 text-gray-800">
+                {category}
+              </h3>
+              <div className="flex w-full gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
+                {items.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex gap-2 px-2 snap-start snap-always"
+                  >
+                    <Link
+                      href={{
+                        pathname: "/collection_products",
+                        query: { category: item.collection }, // pass subcategory as query param
+                      }}
+                      className="flex flex-col items-center gap-1 cursor-pointer"
+                    >
+                      <div className="w-28 h-28 relative">
+                        {/* Skeleton */}
+                        {!categoryLoaded[item.id] && (
+                          <div className="absolute inset-0 rounded-full bg-gray-300 animate-pulse" />
+                        )}
+
+                        {/* Actual image */}
+                        <img
+                          className={`w-28 h-28 rounded-full object-cover object-center border border-gray-400 ${
+                            categoryLoaded[item.id] ? "block" : "hidden"
+                          }`}
+                          src={item.image}
+                          alt={item.collection}
+                          onLoad={() =>
+                            setCategoryLoaded((prev) => ({
+                              ...prev,
+                              [item.id]: true,
+                            }))
+                          }
+                          onError={() =>
+                            setCategoryLoaded((prev) => ({
+                              ...prev,
+                              [item.id]: true,
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="text-center text-sm">
+                        {item.collection.split(" ").map((word, index) => (
+                          <span key={index}>
+                            {word}
+                            {(index + 1) % 2 === 0 ? <br /> : " "}
+                          </span>
+                        ))}
+                      </div>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* tranding products */}
