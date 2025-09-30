@@ -68,7 +68,7 @@ const AddCollection = () => {
 
     // ➕ Add product to collection
     const handleAddProduct = (product) => {
-        if (!collection.products.find((p) => p.id === product.id)) {
+        if (!collection.products.find((p) => p._id === product._id)) {
             setCollection({
                 ...collection,
                 products: [...collection.products, product],
@@ -82,7 +82,7 @@ const AddCollection = () => {
     const handleRemoveProduct = (productId) => {
         setCollection({
             ...collection,
-            products: collection.products.filter((p) => p.id !== productId),
+            products: collection.products.filter((p) => p._id !== productId),
         });
     };
 
@@ -172,8 +172,6 @@ const AddCollection = () => {
                 image: collection.image?.imgUrl || "", // backend expects a string
                 products: collection.products.map((p) => p._id), // only send product IDs
             };
-
-            console.log("Submitting collection:", payload);
 
             // Send POST request to backend
             const res = await axios.post(
@@ -333,7 +331,7 @@ const AddCollection = () => {
                         <ul className="flex flex-wrap gap-4 ">
                             {collection.products.map((p) => (
                                 <li
-                                    key={p.id}
+                                    key={p.productCode}
                                     className="flex w-fit gap-4 items-center border p-2 rounded"
                                 >
                                     <div className="flex items-center gap-2">

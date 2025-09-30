@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { Products } from "@/public/products";
+import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import ImageCarousel from "@/components/ImageCarousel";
 import Link from "next/link";
@@ -10,11 +9,15 @@ import {
     FaFacebook,
     FaWhatsapp,
     FaChevronDown,
-    FaChevronUp
+    FaChevronUp,
 } from "react-icons/fa";
+import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
+import { AddProduct } from "@/app/store/CartProductsSlice";
+import toast from "react-hot-toast";
 
 
-const trendingProductsID = ["F001", "F002", "F003", "F004", "F005", "F006"];
+// const trendingProductsID = ["F001", "F002", "F003", "F004", "F005", "F006"];
 
 const Star = ({ filled = 0, className = "w-6 h-6" }) => {
     // filled: 1 = full, 0.5 = half, 0 = empty
@@ -55,19 +58,83 @@ const ProductView = () => {
     const [review, setReview] = useState({
         rating: 0,
     });
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user?.data);
+    const [productDetails, setProductDetails] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [currentSizeIdx, setCurrentSizeIdx] = useState(0);
+    const [delivery_time, setDelivery_time] = useState("");
+    const [quantity, setQuantity] = useState(1);
 
-    const productDetails = Products.find(
-        (product) => product.id.toString() === productId.toString()
-    );
 
-    const trendingProducts = trendingProductsID.map((id) =>
-        Products.find((product) => product.id === id)
-    );
+    const handleAddToCart = async (id) => {
+        if (user) {
+            try {
+                const res = await axios.post(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/add-to-cart/${id}`,
+                    { quantity , sizeIdx: currentSizeIdx, deliveryTime: delivery_time },
+                    { withCredentials: true }
+                );
+                if (res.data.success) {
+                    toast.success("Item added to your cart");
+                    dispatch(AddProduct({ id, q: quantity, sizeIdx: currentSizeIdx, deliveryTime: delivery_time }));
+                    // Optional: update Redux state with res.data.cart
+                }
+            } catch (err) {
+                toast.error("Failed to add item to cart");
+                console.error(err);
+            }
+        } else {
+            dispatch(AddProduct({ id, q: quantity, sizeIdx: currentSizeIdx, deliveryTime: delivery_time })); // guest cart in redux
+            toast.success("Item added to cart (guest)");
+        }
+    };
+
+
+    useEffect(() => {
+        if (!productId) return;
+
+        const fetchProduct = async () => {
+            try {
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/${productId}`
+                );
+
+                if (res.data.success) {
+                    setProductDetails(res.data.data);
+                    const product = res.data.data;
+                    setDelivery_time(product?.deliveryTime?.[0] || "1-2 days");
+                }
+
+            } catch (err) {
+                console.error("Error fetching product:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProduct();
+    }, [productId]);
+
+
+    //   const trendingProducts = trendingProductsID.map((id) =>
+    //     Products.find((product) => product.id === id)
+    //   );
 
     const [isOpen, setIsOpen] = useState(false);
     const [isReviewsOpen, setIsReviewsOpen] = useState(false);
     const [isShareOpen, setIsShareOpen] = useState(true);
-    const [productsImgloaded, setProductsImgLoaded] = useState({});
+    //   const [productsImgloaded, setProductsImgLoaded] = useState({});
+
+    if (loading) return (<div className="flex flex-col justify-center gap-4 pt-2 px-2 sm:px-8 lg:px-24">
+        {/* Skeleton slides */}
+        {[...Array(2)].map((_, idx) => (
+            <div
+                key={idx}
+                className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
+            />
+        ))}
+    </div>);
 
     return (
         <div className="w-full px-2 sm:px-8 lg:px-24 min-h-[50vh]">
@@ -83,7 +150,7 @@ const ProductView = () => {
                 <h1 className="font-serif text-xl font-[600]">{productDetails.name}</h1>
             </div>
             <div>
-                <ImageCarousel images={productDetails.images} />
+                <ImageCarousel images={productDetails?.images} />
             </div>
 
             <div className="flex flex-col gap-4 mt-2">
@@ -115,62 +182,70 @@ const ProductView = () => {
 
                     {/* Price Section */}
                     <div className="flex items-center gap-2">
-                        {productDetails.discount > 0 && (
+                        {productDetails?.sizes[currentSizeIdx].discount > 0 && (
                             <span className="text-gray-500 line-through text-lg">
-                                {productDetails.price}₹
+                                {productDetails?.sizes[currentSizeIdx].price}₹
                             </span>
                         )}
                         <span className="font-mono text-2xl text-red-600">
-                            {productDetails.final_price}₹
+                            {productDetails?.sizes[currentSizeIdx].finalPrice}₹
                         </span>
                         <span className="px-1 leading-tight bg-green-600 text-white">
-                            Save {productDetails.discount}%
+                            Save {productDetails?.sizes[currentSizeIdx].discount}%
                         </span>
                     </div>
                 </div>
 
                 <div className="border-t border-b border-gray-300 sm:grid sm:grid-cols-2 sm:gap-4">
                     {/* Delivery */}
-                <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
-                    <label htmlFor="deliveryTime" className="font-mono font-semibold text-gray-800">
-                        Delivery Time
-                    </label>
+                    <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
+                        <label
+                            htmlFor="deliveryTime"
+                            className="font-mono font-semibold text-gray-800"
+                        >
+                            Delivery Time
+                        </label>
 
-                    <select
-                        id="deliveryTime"
-                        name="deliveryTime"
-                        className="border border-gray-300 rounded-md px-2 py-1 text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800"
-                        defaultValue={productDetails.delivery_time}
-                    >
-                        {/* productDetails.delivery_options */}
-                        {["same day delivery"].map((option, index) => (
-                            <option key={index} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                        <select
+                            id="deliveryTime"
+                            name="deliveryTime"
+                            value={delivery_time}
+                            onChange={(e) => setDelivery_time(e.target.value)}
+                            className="border border-gray-300 rounded-md px-2 py-1 text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800"
+                        >
+                            {/* productDetails.delivery_options */}
+                            {(productDetails?.deliveryTime || ["1-2 days"]).map((option, index) => (
+                                <option key={index} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-                {/* Size */}
-                <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
-                    <label htmlFor="Size" className="font-mono font-semibold text-gray-800">
-                        Size
-                    </label>
+                    {/* Size */}
+                    <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
+                        <label
+                            htmlFor="Size"
+                            className="font-mono font-semibold text-gray-800"
+                        >
+                            Size
+                        </label>
 
-                    <select
-                        id="Size"
-                        name="Size"
-                        className="border border-gray-300 rounded-md px-2 py-1 text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800"
-                        defaultValue={productDetails.delivery_time}
-                    >
-                        {/* productDetails.delivery_options */}
-                        {["4 flowers bouquet", "8 flowers bouquet", "12 flowers bouquet"].map((option, index) => (
-                            <option key={index} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                        <select
+                            id="Size"
+                            name="Size"
+                            value={currentSizeIdx}
+                            onChange={(e) => setCurrentSizeIdx(parseInt(e.target.value))}
+                            className="border border-gray-300 rounded-md px-2 py-1 text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800"
+                        >
+                            {/* productDetails.delivery_options */}
+                            {productDetails?.sizes?.map((option, index) => (
+                                <option key={index} value={index}>
+                                    {option.sizeName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
                 {/* Quantity + Add to Cart row */}
@@ -194,7 +269,8 @@ const ProductView = () => {
                             id="qtyBox"
                             type="number"
                             min="1"
-                            defaultValue="1"
+                            value={quantity} // bind state to input value
+                            onChange={(e) => setQuantity(Number(e.target.value))}
                             className="flex justify-center w-14 text-center border-x border-gray-400 focus:outline-none"
                         />
 
@@ -212,7 +288,7 @@ const ProductView = () => {
                     </div>
 
                     {/* Add to Cart button */}
-                    <button className="border border-gray-400 py-2 rounded-lg hover:bg-gray-100">
+                    <button onClick={() => handleAddToCart(productDetails._id)} className="border border-gray-400 py-2 rounded-lg hover:bg-gray-100">
                         Add to Cart
                     </button>
                 </div>
@@ -231,7 +307,7 @@ const ProductView = () => {
                     <div>
                         <h2 className="font-semibold mb-1">Package Contains:</h2>
                         <ul className="list-disc list-inside px-4 py-1 text-sm text-gray-700">
-                            {productDetails.packContains.map((item, idx) => (
+                            {productDetails?.packContains?.map((item, idx) => (
                                 <li key={idx}>{item}</li>
                             ))}
                         </ul>
@@ -241,7 +317,7 @@ const ProductView = () => {
                     <div>
                         <h2 className="font-semibold mb-1">Best For:</h2>
                         <ul className="flex flex-wrap px-4 py-1 gap-2 text-sm text-gray-700">
-                            {productDetails.occasions.map((occ, idx) => (
+                            {productDetails?.occasions?.map((occ, idx) => (
                                 <li
                                     key={idx}
                                     className="bg-gray-100 px-2 py-1 rounded-md border"
@@ -446,85 +522,81 @@ const ProductView = () => {
                 </h2>
 
                 <div className="flex flex-col gap-4 w-full overflow-hidden py-4">
-                    <div className="flex w-full gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
-                        {/* Example Product Cards */}
-                        {trendingProducts.map((product) => (
-                            <div
-                                key={product.id}
-                                className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full cursor-pointer hover:shadow-lg transition"
-                            >
-                                <Link
-                                    href={{
-                                        pathname: "/product_view",
-                                        query: { id: product.id }, // pass product ID as query param
-                                    }}
-                                >
-                                    <div className="w-36 h-36 mb-2 relative">
-                                        {/* Skeleton */}
-                                        {!productsImgloaded[product.id] && (
-                                            <div className="absolute inset-0 rounded-lg bg-gray-300 animate-pulse" />
-                                        )}
+                    {/* <div className="flex w-full gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
+            {trendingProducts.map((product) => (
+              <div
+                key={product.id}
+                className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full cursor-pointer hover:shadow-lg transition"
+              >
+                <Link
+                  href={{
+                    pathname: "/product_view",
+                    query: { id: product.id },
+                  }}
+                >
+                  <div className="w-36 h-36 mb-2 relative">
 
-                                        {/* Actual image */}
-                                        <img
-                                            src={product.images[0]}
-                                            alt={product.name}
-                                            className={`w-full h-full object-cover rounded-lg ${productsImgloaded[product.id] ? "block" : "hidden"
-                                                }`}
-                                            onLoad={() =>
-                                                setProductsImgLoaded((prev) => ({
-                                                    ...prev,
-                                                    [product.id]: true,
-                                                }))
-                                            }
-                                            onError={() =>
-                                                setProductsImgLoaded((prev) => ({
-                                                    ...prev,
-                                                    [product.id]: true,
-                                                }))
-                                            }
-                                        />
-                                    </div>
+                    {!productsImgloaded[product.id] && (
+                      <div className="absolute inset-0 rounded-lg bg-gray-300 animate-pulse" />
+                    )}
 
-                                    {/* Product Info */}
-                                    <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                                    <p className="text-sm text-gray-600 flex-1">
-                                        {product.description}
-                                    </p>
+                    <img
+                      src={product.images[0]}
+                      alt={product.name}
+                      className={`w-full h-full object-cover rounded-lg ${
+                        productsImgloaded[product.id] ? "block" : "hidden"
+                      }`}
+                      onLoad={() =>
+                        setProductsImgLoaded((prev) => ({
+                          ...prev,
+                          [product.id]: true,
+                        }))
+                      }
+                      onError={() =>
+                        setProductsImgLoaded((prev) => ({
+                          ...prev,
+                          [product.id]: true,
+                        }))
+                      }
+                    />
+                  </div>
 
-                                    {/* Price */}
-                                    <div className="mt-2">
-                                        <span className="font-semibold">
-                                            {product.final_price}₹
-                                        </span>
-                                        {product.discount > 0 && (
-                                            <span className="text-gray-400 line-through ml-2">
-                                                {product.price}₹
-                                            </span>
-                                        )}
-                                    </div>
-                                </Link>
+                  <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+                  <p className="text-sm text-gray-600 flex-1">
+                    {product.description}
+                  </p>
 
-                                {/* Buttons at bottom */}
-                                <div className="mt-auto flex gap-2 pt-3">
-                                    <button className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded">
-                                        Buy
-                                    </button>
-                                    <button className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded">
-                                        <span className="text-lg">+</span>{" "}
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="w-5 h-5 sm:w-6 sm:h-6 text-white"
-                                            fill="currentColor"
-                                            viewBox="0 0 640 640"
-                                        >
-                                            <path d="M24 48C10.7 48 0 58.7 0 72C0 85.3 10.7 96 24 96L69.3 96C73.2 96 76.5 98.8 77.2 102.6L129.3 388.9C135.5 423.1 165.3 448 200.1 448L456 448C469.3 448 480 437.3 480 424C480 410.7 469.3 400 456 400L200.1 400C188.5 400 178.6 391.7 176.5 380.3L171.4 352L475 352C505.8 352 532.2 330.1 537.9 299.8L568.9 133.9C572.6 114.2 557.5 96 537.4 96L124.7 96L124.3 94C119.5 67.4 96.3 48 69.2 48L24 48zM208 576C234.5 576 256 554.5 256 528C256 501.5 234.5 480 208 480C181.5 480 160 501.5 160 528C160 554.5 181.5 576 208 576zM432 576C458.5 576 480 554.5 480 528C480 501.5 458.5 480 432 480C405.5 480 384 501.5 384 528C384 554.5 405.5 576 432 576z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                  <div className="mt-2">
+                    <span className="font-semibold">
+                      {product.final_price}₹
+                    </span>
+                    {product.discount > 0 && (
+                      <span className="text-gray-400 line-through ml-2">
+                        {product.price}₹
+                      </span>
+                    )}
+                  </div>
+                </Link>
+
+                <div className="mt-auto flex gap-2 pt-3">
+                  <button className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded">
+                    Buy
+                  </button>
+                  <button className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded">
+                    <span className="text-lg">+</span>{" "}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 640 640"
+                    >
+                      <path d="M24 48C10.7 48 0 58.7 0 72C0 85.3 10.7 96 24 96L69.3 96C73.2 96 76.5 98.8 77.2 102.6L129.3 388.9C135.5 423.1 165.3 448 200.1 448L456 448C469.3 448 480 437.3 480 424C480 410.7 469.3 400 456 400L200.1 400C188.5 400 178.6 391.7 176.5 380.3L171.4 352L475 352C505.8 352 532.2 330.1 537.9 299.8L568.9 133.9C572.6 114.2 557.5 96 537.4 96L124.7 96L124.3 94C119.5 67.4 96.3 48 69.2 48L24 48zM208 576C234.5 576 256 554.5 256 528C256 501.5 234.5 480 208 480C181.5 480 160 501.5 160 528C160 554.5 181.5 576 208 576zM432 576C458.5 576 480 554.5 480 528C480 501.5 458.5 480 432 480C405.5 480 384 501.5 384 528C384 554.5 405.5 576 432 576z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div> */}
                 </div>
             </div>
         </div>

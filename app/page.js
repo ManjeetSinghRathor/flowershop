@@ -2,47 +2,12 @@
 import { useEffect, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import Slider from "react-slick";
-import { Products } from "@/public/products";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
-import { AddProduct } from "./store/CartProductsSlice";
+import { AddProduct, setCart } from "./store/CartProductsSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
-
-const trendingProductsID = ["F001", "F002", "F003", "F004", "F005", "F006"];
-
-// const slides = [
-//   {
-//     id: 1,
-//     image: "https://source.unsplash.com/800x400/?flower1",
-//     link: "/product/1",
-//   },
-//   {
-//     id: 2,
-//     image: "https://source.unsplash.com/800x400/?flower2",
-//     link: "/product/2",
-//   },
-//   {
-//     id: 3,
-//     image: "https://source.unsplash.com/800x400/?flower3",
-//     link: "/product/3",
-//   },
-//   {
-//     id: 4,
-//     image: "https://source.unsplash.com/800x400/?flower4",
-//     link: "/product/4",
-//   },
-//   {
-//     id: 5,
-//     image: "https://source.unsplash.com/800x400/?flower5",
-//     link: "/product/5",
-//   },
-//   {
-//     id: 6,
-//     image: "https://source.unsplash.com/800x400/?flower6",
-//     link: "/product/6",
-//   },
-// ];
+import { setUser } from "./store/userSlice";
 
 const shopImages = [
   { id: "A1", image: "https://source.unsplash.com/400x400/?bouquet" },
@@ -53,15 +18,35 @@ const shopImages = [
 
 export default function Home() {
   const dispatch = useDispatch();
-  const saved_cart_products = useSelector((state) => state.CartProducts);
+  const user = useSelector((state) => state.user?.data);
+  const colList = useSelector((state) => state.collectionList.data);
+
+  const [collectionList, setCollection_List] = useState({});
+  const [catLoaded, setCatLoaded] = useState(true);
+
+  useEffect(() => {
+    if (colList && Object.keys(colList).length > 0) {
+      const filtered = {};
+
+      Object.entries(colList).forEach(([categoryName, collections]) => {
+        if (categoryName !== "All Products") {
+          filtered[categoryName] = collections;
+        }
+      });
+
+      console.log("filtered",filtered);
+
+      setCollection_List(filtered);
+      setCatLoaded(false);
+    }
+  }, [colList]);
 
   const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [collectionList, setCollectionList] = useState({});
+  const [homepageCollections, setHomepageCollections] = useState([]);
+  const [colLoading, setColLoading] = useState(true);
 
   const [categoryLoaded, setCategoryLoaded] = useState({});
-  const [catLoaded, setCatLoaded] = useState(true);
-  const [productsImgloaded, setProductsImgLoaded] = useState({});
   const [shopImgLoaded, setShopImgLoaded] = useState({});
 
   const settings = {
@@ -86,13 +71,27 @@ export default function Home() {
     ),
   };
 
-  const trendingProducts = trendingProductsID.map((id) =>
-    Products.find((product) => product.id === id)
-  );
-
-  const handleAddToCart = (id) => {
-    dispatch(AddProduct({ id, q: 1 }));
-    toast.success("Item Added to Cart");
+  const handleAddToCart = async (id) => {
+    if (user) {
+      try {
+        const res = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/add-to-cart/${id}`,
+          {},
+          { withCredentials: true }
+        );
+        if (res.data.success) {
+          toast.success("Item added to your cart");
+          dispatch(AddProduct({ id, q: 1 }));
+          // Optional: update Redux state with res.data.cart
+        }
+      } catch (err) {
+        toast.error("Failed to add item to cart");
+        console.error(err);
+      }
+    } else {
+      dispatch(AddProduct({ id, q: 1 })); // guest cart in redux
+      toast.success("Item added to cart (guest)");
+    }
   };
 
   const fetchSlides = async () => {
@@ -115,44 +114,26 @@ export default function Home() {
     }
   };
 
-  const fetchCategories = async () => {
+  const fetchHomepageCollections = async () => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/category`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/homepage-collections`
       );
-      if (!res.data.success) throw new Error("Failed to fetch categories");
 
-      const categories = res.data.data; // Array of categories from backend
-
-      // Convert to frontend structure
-      const collectionListTemp = {};
-
-      categories.forEach((cat) => {
-        const categoryName = cat.name; // e.g. "By Occasion"
-        if (!collectionListTemp[categoryName])
-          collectionListTemp[categoryName] = [];
-
-        cat?.collections.forEach((col) => {
-          collectionListTemp[categoryName].push({
-            id: col.collectionCode, // or col._id if you prefer
-            collection: col.collectionName,
-            image: col.collectionImg,
-          });
-        });
-      });
-
-      setCollectionList(collectionListTemp);
-    } catch (err) {
-      console.error("Error fetching categories:", err);
-      return {};
+      if (res.data.success) {
+        console.log(res.data.data);
+        setHomepageCollections(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching homepage collections:", error);
     } finally {
-      setCatLoaded(false);
+      setColLoading(false);
     }
   };
 
   useEffect(() => {
     fetchSlides();
-    fetchCategories();
+    fetchHomepageCollections();
   }, []);
 
   return (
@@ -172,7 +153,7 @@ export default function Home() {
                 {[...Array(1)].map((_, idx) => (
                   <div
                     key={idx}
-                    className="w-full max-w-4xl h-[120px] sm:h-[200px] bg-gray-300 animate-pulse rounded-md"
+                    className="w-full max-w-4xl h-[144px] sm:h-[200px] bg-gray-300 animate-pulse rounded-md"
                   />
                 ))}
               </div>
@@ -205,12 +186,12 @@ export default function Home() {
         </h2>
         {catLoaded ? (
           <div className="flex flex-col gap-4 w-full overflow-hidden py-4">
-             <div className="flex w-[100px] h-[36px] relative">
-                  <div className="absolute inset-0 rounded-md bg-gray-300 animate-pulse" />
-             </div>
+            <div className="flex w-[100px] h-[36px] relative">
+              <div className="absolute inset-0 rounded-md bg-gray-300 animate-pulse" />
+            </div>
             {/* Row 1 */}
             <div className="flex w-full gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
-              {[...Array(3)].map((_, idx) => (
+              {[...Array(9)].map((_, idx) => (
                 <div
                   key={`row1-${idx}`}
                   className="min-w-[7rem] min-h-[7rem] flex items-center justify-center snap-start"
@@ -239,7 +220,7 @@ export default function Home() {
                     <Link
                       href={{
                         pathname: "/collection_products",
-                        query: { category: item.collection }, // pass subcategory as query param
+                        query: { category: item.name, id: item.collectionId }, // pass subcategory as query param
                       }}
                       className="flex flex-col items-center gap-1 cursor-pointer"
                     >
@@ -287,107 +268,127 @@ export default function Home() {
         )}
       </div>
 
-      {/* tranding products */}
-      <div className="flex flex-col w-full gap-3 py-6 px-2">
-        <h2 className="flex font-mono text-2xl justify-center sm:text-3xl">
-          Trending Now
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 py-4">
-          {/* Example Product Cards */}
-          {trendingProducts.map((product) => (
-            <div
-              key={product.id}
-              className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full cursor-pointer hover:shadow-lg transition"
-            >
+      {colLoading ? (
+        <div className="flex flex-col gap-6 w-full overflow-hidden py-4">
+          <div className="flex w-full justify-center">
+            <div className="flex w-[120px] sm:w-[160px] h-[42px] sm:h-[48px] relative">
+              <div className="absolute inset-0 rounded-md bg-gray-300 animate-pulse" />
+            </div>
+          </div>
+
+          {/* Row 1 */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 w-full px-2 gap-4">
+            {[...Array(6)].map((_, idx) => (
+              <div
+                key={`row1-${idx}`}
+                className="min-w-[7rem] min-h-[7rem] flex items-center justify-center snap-start"
+              >
+                {/* Skeleton */}
+                <div className="w-full h-56 bg-gray-300 animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        homepageCollections?.length > 0 &&
+        homepageCollections.map((col) => (
+          <div
+            key={col.collectionCode}
+            className="flex flex-col w-full gap-3 py-6 px-2"
+          >
+            <h2 className="flex font-mono text-2xl justify-center sm:text-3xl">
+              {col.name}
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 py-4">
+              {/* Example Product Cards */}
+              {col?.products?.length > 0 &&
+                col.products.map((product) => (
+                  <div
+                    key={product.productCode}
+                    className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full cursor-pointer hover:shadow-lg transition"
+                  >
+                    <Link
+                      href={{
+                        pathname: "/product_view",
+                        query: { id: product._id }, // pass product ID as query param
+                      }}
+                    >
+                      <div className="w-full h-36 mb-2 relative">
+                        {/* Actual image */}
+                        <img
+                          src={product.images[0].imgUrl}
+                          alt={product.name}
+                          className={`w-full h-full object-cover rounded-lg`}
+                        />
+                      </div>
+
+                      {/* Product Info */}
+                      <h3 className="font-semibold text-lg mb-1">
+                        {product.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 flex-1">
+                        {product.description}
+                      </p>
+
+                      {/* Price */}
+                      <div className="mt-2">
+                        <span className="font-semibold">
+                          {product.sizes[0].finalPrice}₹
+                        </span>
+                        {product.sizes[0].discount > 0 && (
+                          <span className="text-gray-400 line-through ml-2">
+                            {product.sizes[0].price}₹
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+
+                    {/* Buttons at bottom */}
+                    <div className="mt-auto flex gap-2 pt-3">
+                      <button className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded">
+                        Buy
+                      </button>
+                      <button
+                        onClick={() => handleAddToCart(product._id)}
+                        className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded"
+                      >
+                        <span className="text-lg">+</span>{" "}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                          fill="currentColor"
+                          viewBox="0 0 640 640"
+                        >
+                          <path d="M24 48C10.7 48 0 58.7 0 72C0 85.3 10.7 96 24 96L69.3 96C73.2 96 76.5 98.8 77.2 102.6L129.3 388.9C135.5 423.1 165.3 448 200.1 448L456 448C469.3 448 480 437.3 480 424C480 410.7 469.3 400 456 400L200.1 400C188.5 400 178.6 391.7 176.5 380.3L171.4 352L475 352C505.8 352 532.2 330.1 537.9 299.8L568.9 133.9C572.6 114.2 557.5 96 537.4 96L124.7 96L124.3 94C119.5 67.4 96.3 48 69.2 48L24 48zM208 576C234.5 576 256 554.5 256 528C256 501.5 234.5 480 208 480C181.5 480 160 501.5 160 528C160 554.5 181.5 576 208 576zM432 576C458.5 576 480 554.5 480 528C480 501.5 458.5 480 432 480C405.5 480 384 501.5 384 528C384 554.5 405.5 576 432 576z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+            <div className="flex justify-center">
               <Link
                 href={{
-                  pathname: "/product_view",
-                  query: { id: product.id }, // pass product ID as query param
+                  pathname: "/collection_products",
+                  query: { category: col.collection, id: col._id }, // pass product ID as query param
                 }}
+                className="flex items-center gap-1 bg-gray-900 text-white py-1 px-4 rounded"
               >
-                <div className="w-full h-36 mb-2 relative">
-                  {/* Skeleton */}
-                  {!productsImgloaded[product.id] && (
-                    <div className="absolute inset-0 rounded-lg bg-gray-300 animate-pulse" />
-                  )}
-
-                  {/* Actual image */}
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className={`w-full h-full object-cover rounded-lg ${
-                      productsImgloaded[product.id] ? "block" : "hidden"
-                    }`}
-                    onLoad={() =>
-                      setProductsImgLoaded((prev) => ({
-                        ...prev,
-                        [product.id]: true,
-                      }))
-                    }
-                    onError={() =>
-                      setProductsImgLoaded((prev) => ({
-                        ...prev,
-                        [product.id]: true,
-                      }))
-                    }
-                  />
-                </div>
-
-                {/* Product Info */}
-                <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                <p className="text-sm text-gray-600 flex-1">
-                  {product.description}
-                </p>
-
-                {/* Price */}
-                <div className="mt-2">
-                  <span className="font-semibold">{product.final_price}₹</span>
-                  {product.discount > 0 && (
-                    <span className="text-gray-400 line-through ml-2">
-                      {product.price}₹
-                    </span>
-                  )}
-                </div>
-              </Link>
-
-              {/* Buttons at bottom */}
-              <div className="mt-auto flex gap-2 pt-3">
-                <button className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded">
-                  Buy
-                </button>
-                <button
-                  onClick={() => handleAddToCart(product.id)}
-                  className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded"
+                <span>View All</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  className="w-4 h-4 text-white"
+                  viewBox="0 0 640 640"
                 >
-                  <span className="text-lg">+</span>{" "}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 640 640"
-                  >
-                    <path d="M24 48C10.7 48 0 58.7 0 72C0 85.3 10.7 96 24 96L69.3 96C73.2 96 76.5 98.8 77.2 102.6L129.3 388.9C135.5 423.1 165.3 448 200.1 448L456 448C469.3 448 480 437.3 480 424C480 410.7 469.3 400 456 400L200.1 400C188.5 400 178.6 391.7 176.5 380.3L171.4 352L475 352C505.8 352 532.2 330.1 537.9 299.8L568.9 133.9C572.6 114.2 557.5 96 537.4 96L124.7 96L124.3 94C119.5 67.4 96.3 48 69.2 48L24 48zM208 576C234.5 576 256 554.5 256 528C256 501.5 234.5 480 208 480C181.5 480 160 501.5 160 528C160 554.5 181.5 576 208 576zM432 576C458.5 576 480 554.5 480 528C480 501.5 458.5 480 432 480C405.5 480 384 501.5 384 528C384 554.5 405.5 576 432 576z" />
-                  </svg>
-                </button>
-              </div>
+                  <path d="M342.6 534.6C330.1 547.1 309.8 547.1 297.3 534.6L137.3 374.6C124.8 362.1 124.8 341.8 137.3 329.3C149.8 316.8 170.1 316.8 182.6 329.3L320 466.7L457.4 329.4C469.9 316.9 490.2 316.9 502.7 329.4C515.2 341.9 515.2 362.2 502.7 374.7L342.7 534.7zM502.6 182.6L342.6 342.6C330.1 355.1 309.8 355.1 297.3 342.6L137.3 182.6C124.8 170.1 124.8 149.8 137.3 137.3C149.8 124.8 170.1 124.8 182.6 137.3L320 274.7L457.4 137.4C469.9 124.9 490.2 124.9 502.7 137.4C515.2 149.9 515.2 170.2 502.7 182.7z" />
+                </svg>
+              </Link>
             </div>
-          ))}
-        </div>
-
-        <div className="flex justify-center">
-          <button className="flex items-center gap-1 bg-gray-900 text-white py-1 px-4 rounded">
-            <span>View All</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              className="w-4 h-4 text-white"
-              viewBox="0 0 640 640"
-            >
-              <path d="M342.6 534.6C330.1 547.1 309.8 547.1 297.3 534.6L137.3 374.6C124.8 362.1 124.8 341.8 137.3 329.3C149.8 316.8 170.1 316.8 182.6 329.3L320 466.7L457.4 329.4C469.9 316.9 490.2 316.9 502.7 329.4C515.2 341.9 515.2 362.2 502.7 374.7L342.7 534.7zM502.6 182.6L342.6 342.6C330.1 355.1 309.8 355.1 297.3 342.6L137.3 182.6C124.8 170.1 124.8 149.8 137.3 137.3C149.8 124.8 170.1 124.8 182.6 137.3L320 274.7L457.4 137.4C469.9 124.9 490.2 124.9 502.7 137.4C515.2 149.9 515.2 170.2 502.7 182.7z" />
-            </svg>
-          </button>
-        </div>
-      </div>
+          </div>
+        ))
+      )}
 
       {/* More About Us */}
       <div className="flex flex-col w-full gap-3 py-6 px-2">

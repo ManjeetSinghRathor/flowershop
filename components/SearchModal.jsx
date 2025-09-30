@@ -115,7 +115,7 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
                                         key={product.id}
                                         href={{
                                             pathname: "/product_view",
-                                            query: { id: product.id }, // pass product ID as query param
+                                            query: { id: product._id }, // pass product ID as query param
                                         }}
                                         className="flex gap-3 items-start p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition"
                                         onClick={() => setIsSearchOpen(false)}

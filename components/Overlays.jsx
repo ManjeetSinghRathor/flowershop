@@ -4,11 +4,12 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { GoogleLogin } from '@react-oauth/google';
 import { useSelector, useDispatch } from "react-redux";
-import { setUser } from "@/app/store/userSlice";
-import { updatedCollectionList } from "@/public/products";
+import { setUser, logout } from "@/app/store/userSlice";
+import { setCart } from "@/app/store/CartProductsSlice";
 import Link from "next/link";
 import { FaChevronDown, FaChevronUp, FaChevronRight } from "react-icons/fa"; // ✅ react-icons
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function Overlays({ setIsOpen, isOpen = false }) {
     const dispatch = useDispatch();
@@ -17,6 +18,24 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
     const [categoryLoaded, setCategoryLoaded] = useState({});
 
     const user = useSelector((state) => state.user?.data || null);
+    const updatedCollectionList = useSelector((state)=>state.collectionList.data);
+
+    const getUser = async () => {
+        try {
+          const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`,
+            { withCredentials: true }
+          );
+    
+          if (res?.data?.success) {
+            // setCurrentUser(res?.data);
+            dispatch(setUser(res?.data));
+            
+          }
+        } catch (err) {
+          // Not logged in
+        }
+      };
 
     const handleGoogleLogin = async (response) => {
         try {
@@ -24,19 +43,40 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
             const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google-login`, { token: credential }, { withCredentials: true });
 
             if (res.data.success) {
-                const userRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`, { withCredentials: true });
-                dispatch(setUser({ user: userRes.data }));
 
-                if (!userRes.data?.status?.isSuspended) {
+                toast.success(res.data.message);
+
+                const userRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`, { withCredentials: true });
+
+                if (userRes?.data?.success) {
+
+                    dispatch(setUser(userRes?.data));
                     // setIsOpen(false);
+
+                    const userData = userRes.data.data; // <-- the actual user object
+
+                    // Convert backend cart to Redux format, if cart exists
+                    const formattedCart = userData?.cart?.map((item) => ({
+                        id: item.productId,
+                        q: item.quantity,
+                        sizeIdx: item.sizeIdx,
+                        deliveryTime: item.deliveryTime
+                    })) || [];
+
+                    // Update Redux
+                    dispatch(setCart(formattedCart));
                 }
             }
-
         } catch (err) {
             console.error("Google login failed", err);
         }
     };
 
+    useEffect(()=>{
+        if(!user){
+            getUser();
+        }
+    },[user])
 
     useEffect(() => {
         if (isOpen) {
@@ -129,6 +169,14 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
         };
     }, [isOpen]);
 
+    const handleLogout = async () => {
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/logout`, {}, { withCredentials: true });
+
+        if (res.data?.success) {
+            dispatch(logout());
+        }
+    }
+
     return (
         <aside
             className={`
@@ -146,7 +194,7 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                                 <img
                                     src={user?.data?.profile?.avatarUrl || "/cat.png"}
                                     alt="User"
-                                    className="w-10 h-10 rounded-full object-cover bg-gray-300"
+                                    className="w-12 h-12 rounded-full object-cover bg-gray-300"
                                 />
                             </div>
                             <p className="flex text-black text-center items-center justify-center gap-2 p-1 rounded-sm bg-white">
@@ -183,7 +231,7 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                                                 key={item.id}
                                                 href={{
                                                     pathname: "/collection_products",
-                                                    query: { category: item.collection }, // pass subcategory as query param
+                                                    query: { category: item.collection, id: item.collectionId }, // pass subcategory as query param
                                                 }}
                                                 className="flex flex-col items-center text-center cursor-pointer"
                                                 onClick={() => setTimeout(() => {
@@ -237,8 +285,8 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                             onSuccess={handleGoogleLogin}
                             onError={() => setError("Google login failed")}
                         /> :
-                            <p className="flex text-black text-center items-center font-serif justify-center gap-2 py-1 px-6  rounded-sm bg-white">
-                                    <span><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-4 h-4 text-black" viewBox="0 0 640 640"><path d="M352 64C352 46.3 337.7 32 320 32C302.3 32 288 46.3 288 64L288 320C288 337.7 302.3 352 320 352C337.7 352 352 337.7 352 320L352 64zM210.3 162.4C224.8 152.3 228.3 132.3 218.2 117.8C208.1 103.3 188.1 99.8 173.6 109.9C107.4 156.1 64 233 64 320C64 461.4 178.6 576 320 576C461.4 576 576 461.4 576 320C576 233 532.6 156.1 466.3 109.9C451.8 99.8 431.9 103.3 421.7 117.8C411.5 132.3 415.1 152.2 429.6 162.4C479.4 197.2 511.9 254.8 511.9 320C511.9 426 425.9 512 319.9 512C213.9 512 128 426 128 320C128 254.8 160.5 197.1 210.3 162.4z"/></svg></span><span>Logout</span>
+                            <p className="flex text-black text-center items-center font-serif justify-center gap-2 py-1 px-6  rounded-sm bg-white" onClick={handleLogout}>
+                                <span><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-4 h-4 text-black" viewBox="0 0 640 640"><path d="M352 64C352 46.3 337.7 32 320 32C302.3 32 288 46.3 288 64L288 320C288 337.7 302.3 352 320 352C337.7 352 352 337.7 352 320L352 64zM210.3 162.4C224.8 152.3 228.3 132.3 218.2 117.8C208.1 103.3 188.1 99.8 173.6 109.9C107.4 156.1 64 233 64 320C64 461.4 178.6 576 320 576C461.4 576 576 461.4 576 320C576 233 532.6 156.1 466.3 109.9C451.8 99.8 431.9 103.3 421.7 117.8C411.5 132.3 415.1 152.2 429.6 162.4C479.4 197.2 511.9 254.8 511.9 320C511.9 426 425.9 512 319.9 512C213.9 512 128 426 128 320C128 254.8 160.5 197.1 210.3 162.4z" /></svg></span><span>Logout</span>
                             </p>
                         }
                     </div>

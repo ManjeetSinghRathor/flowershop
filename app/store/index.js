@@ -3,11 +3,13 @@ import { configureStore } from '@reduxjs/toolkit';
 import { saveState } from "../utils/localStorage";
 import CartProductsReducer from './CartProductsSlice';
 import userReducer from './userSlice.js';
+import collectionListReducer from "./collectionListSlice.js";
 
 const store = configureStore({
   reducer: {
     CartProducts: CartProductsReducer,
     user: userReducer,
+    collectionList: collectionListReducer,
   },
 });
 

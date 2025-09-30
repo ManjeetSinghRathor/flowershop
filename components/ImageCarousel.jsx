@@ -54,7 +54,7 @@ export default function ImageCarousel({ images }) {
         onTouchEnd={onTouchEnd}
       >
         <img
-          src={images[current]}
+          src={images[current].imgUrl}
           alt={`Image ${current + 1}`}
           className="w-full h-full object-contain transition-all duration-300"
         />
@@ -86,7 +86,7 @@ export default function ImageCarousel({ images }) {
             } transition-all duration-200`}
           >
             <img
-              src={img}
+              src={img.imgUrl}
               alt={`Thumb ${index + 1}`}
               className="w-full h-full object-contain"
             />

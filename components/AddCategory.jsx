@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 const AddCategory = () => {
   const [category, setCategory] = useState({
     name: "",
+    serialNo: "",
     collections: [],
   });
 
@@ -28,8 +29,6 @@ const AddCategory = () => {
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/search?search=${encodeURIComponent(searchQuery)}`
         );
 
-        console.log(res.data);
-        
         setSearchResults(res.data);
       } catch (err) {
         console.error("Error fetching collections:", err);
@@ -57,6 +56,8 @@ const AddCategory = () => {
           },
         ],
       });
+
+      // console.log(category);
       setSearchQuery("");
     }
   };
@@ -82,14 +83,15 @@ const AddCategory = () => {
       const payload = {
         name: category.name,
         collections: category.collections,
+        serialNo: category.serialNo ? Number(category.serialNo) : null,
       };
 
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/category/add`,
         payload,
-        { 
-            headers: { "Content-Type": "application/json" },
-            withCredentials: true,
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
         }
       );
 
@@ -98,7 +100,7 @@ const AddCategory = () => {
       toast.success(res.data.message);
 
       // Reset form
-      setCategory({ name: "", collections: [] });
+      setCategory({ name: "", serialNo: "", collections: [] });
       setSearchQuery("");
       setSearchResults([]);
     } catch (err) {
@@ -121,6 +123,15 @@ const AddCategory = () => {
           onChange={(e) => setCategory({ ...category, name: e.target.value })}
           className="border p-2 w-full rounded"
           required
+        />
+
+        {/* Serial No */}
+        <input
+          type="number"
+          placeholder="Serial Number"
+          value={category.serialNo}
+          onChange={(e) => setCategory({ ...category, serialNo: e.target.value })}
+          className="border p-2 w-full rounded"
         />
 
         {/* Collection Search */}
@@ -157,7 +168,7 @@ const AddCategory = () => {
                 ))}
             </div>
           ) : (searchQuery === "" || loading) ?
-            <div></div> : <div className="flex text-sm text-gray-600">No Match Found</div> 
+            <div></div> : <div className="flex text-sm text-gray-600">No Match Found</div>
           }
         </div>
 

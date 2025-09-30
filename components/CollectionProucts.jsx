@@ -1,33 +1,73 @@
 "use client";
 
-import React, { useState, useMemo } from 'react'
-import { Products, collection_products_ids } from '@/public/products';
+import React, { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-
+import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { AddProduct } from '@/app/store/CartProductsSlice';
+import toast from 'react-hot-toast';
 
 const CollectionProducts = () => {
 
     const searchParams = useSearchParams();
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user?.data);
     const category = searchParams.get("category"); // e.g. "Birthday Flowers"
-    const [loadedMap, setLoadedMap] = useState({});
+    const categoryId = searchParams.get("id");
 
+    const [collection_products, setCollection_products] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // Get product IDs for the category
-    const productIds = collection_products_ids[category] || [];
-    
-
-    
-    // Get full product objects
-        const collection_products = useMemo(() => {
-            if (category === "All Products") {
-                return Products; // return everything
+    const handleAddToCart = async (id) => {
+        if (user) {
+            try {
+                const res = await axios.post(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/add-to-cart/${id}`,
+                    {},
+                    { withCredentials: true }
+                );
+                if (res.data.success) {
+                    toast.success("Item added to your cart");
+                    dispatch(AddProduct({ id, q: 1 }));
+                    // Optional: update Redux state with res.data.cart
+                }
+            } catch (err) {
+                toast.error("Failed to add item to cart");
+                console.error(err);
             }
-            return Products.filter((p) => productIds.includes(p.id));
-        }, [category, productIds, Products]);
+        } else {
+            dispatch(AddProduct({ id, q: 1 })); // guest cart in redux
+            toast.success("Item added to cart (guest)");
+        }
+    };
+
+
+    useEffect(() => {
+        if (!categoryId) return;
+
+        const fetchCollection = async () => {
+            try {
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/products/${categoryId}`
+                );
+
+                if (res.data.success) {
+                    setCollection_products(res.data.data.products);
+                }
+            } catch (err) {
+                console.error("Failed to fetch collection", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCollection();
+    }, [categoryId]);
+
 
     return (
-        <div className="min-h-[50vh]">
+        <div className="min-h-[80vh]">
             <div className='flex flex-col w-full bg-white sticky top-14 z-[45] shadow-md sm:px-8 lg:px-24'>
                 <h1 className="flex w-full justify-start items-center font-mono sm:text-lg px-2 py-4">
                     <Link href="/" className="hover:underline font-light">
@@ -79,80 +119,87 @@ const CollectionProducts = () => {
 
             </div>
 
-            {collection_products.length === 0 ? (
-                <div className='flex w-full px-2 sm:px-8 lg:px-24 items-center justify-center py-4'>
-                    <img className='object-cover object-center' src="./no_product.png" alt="No Product Available" />
-                </div>
-            ) : (
-                <div className="px-2 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 py-4">
-                    {collection_products.map((product) => {
-                        return (<div
-                            key={product.id}
-                            className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full"
-                        >
-
-                            <Link
-                                href={{
-                                    pathname: "/product_view",
-                                    query: { id: product.id }, // pass product ID as query param
-                                }}
+            {loading ?
+                <div className="flex flex-col gap-6 w-full overflow-hidden py-4 px-2 sm:px-8 lg:px-24">
+                    {/* Row 1 */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 w-full px-2 gap-4">
+                        {[...Array(4)].map((_, idx) => (
+                            <div
+                                key={`row1-${idx}`}
+                                className="min-w-[7rem] min-h-[7rem] flex items-center justify-center snap-start"
                             >
-                                <div className="w-full h-36 mb-2 relative">
-                                    {/* Skeleton */}
-                                    {!loadedMap[product.id] && (
-                                        <div className="absolute inset-0 rounded-lg bg-gray-300 animate-pulse" />
-                                    )}
-
-                                    {/* Actual image */}
-                                    <img
-                                        src={product.images[0]}
-                                        alt={product.name}
-                                        className={`w-full h-full object-cover rounded-lg ${loadedMap[product.id] ? "block" : "hidden"
-                                            }`}
-                                        onLoad={() => setLoadedMap(prev => ({ ...prev, [product.id]: true }))}
-                                        onError={() => setLoadedMap(prev => ({ ...prev, [product.id]: true }))}
-                                    />
-                                </div>
-
-                                {/* Product Info */}
-                                <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                                <p className="text-sm text-gray-600 flex-1">
-                                    {product.description}
-                                </p>
-
-                                {/* Price */}
-                                <div className="mt-2">
-                                    <span className="font-semibold">{product.final_price}₹</span>
-                                    {product.discount > 0 && (
-                                        <span className="text-gray-400 line-through ml-2">
-                                            {product.price}₹
-                                        </span>
-                                    )}
-                                </div>
-                            </Link>
-
-                            {/* Buttons at bottom */}
-                            <div className="mt-auto flex gap-2 pt-3">
-                                <button className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded">
-                                    Buy
-                                </button>
-                                <button className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded">
-                                    <span className="text-lg">+</span>{" "}
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="w-5 h-5 sm:w-6 sm:h-6 text-white"
-                                        fill="currentColor"
-                                        viewBox="0 0 640 640"
-                                    >
-                                        <path d="M24 48C10.7 48 0 58.7 0 72C0 85.3 10.7 96 24 96L69.3 96C73.2 96 76.5 98.8 77.2 102.6L129.3 388.9C135.5 423.1 165.3 448 200.1 448L456 448C469.3 448 480 437.3 480 424C480 410.7 469.3 400 456 400L200.1 400C188.5 400 178.6 391.7 176.5 380.3L171.4 352L475 352C505.8 352 532.2 330.1 537.9 299.8L568.9 133.9C572.6 114.2 557.5 96 537.4 96L124.7 96L124.3 94C119.5 67.4 96.3 48 69.2 48L24 48zM208 576C234.5 576 256 554.5 256 528C256 501.5 234.5 480 208 480C181.5 480 160 501.5 160 528C160 554.5 181.5 576 208 576zM432 576C458.5 576 480 554.5 480 528C480 501.5 458.5 480 432 480C405.5 480 384 501.5 384 528C384 554.5 405.5 576 432 576z" />
-                                    </svg>
-                                </button>
+                                {/* Skeleton */}
+                                <div className="w-full h-56 bg-gray-300 animate-pulse" />
                             </div>
-                        </div>);
-                    })}
+                        ))}
+                    </div>
                 </div>
-            )
-            }
+                : (collection_products?.length === 0 ? (
+                    <div className='flex w-full px-2 sm:px-8 lg:px-24 items-center justify-center py-4'>
+                        <img className='object-cover object-center' src="./no_product.png" alt="No Product Available" />
+                    </div>
+                ) : (
+                    <div className="px-2 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 py-4">
+                        {collection_products?.map((product) => {
+                            return (<div
+                                key={product._id}
+                                className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full"
+                            >
+
+                                <Link
+                                    href={{
+                                        pathname: "/product_view",
+                                        query: { id: product._id }, // pass product ID as query param
+                                    }}
+                                >
+                                    <div className="w-full h-36 mb-2 relative">
+
+                                        {/* Actual image */}
+                                        <img
+                                            src={product.images[0].imgUrl}
+                                            alt={product.name}
+                                            className={`w-full h-full object-cover rounded-lg`}
+                                        />
+                                    </div>
+
+                                    {/* Product Info */}
+                                    <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+                                    <p className="text-sm text-gray-600 flex-1">
+                                        {product.description}
+                                    </p>
+
+                                    {/* Price */}
+                                    <div className="mt-2">
+                                        <span className="font-semibold">{product.sizes[0].finalPrice}₹</span>
+                                        {product.sizes[0].discount > 0 && (
+                                            <span className="text-gray-400 line-through ml-2">
+                                                {product.sizes[0].price}₹
+                                            </span>
+                                        )}
+                                    </div>
+                                </Link>
+
+                                {/* Buttons at bottom */}
+                                <div className="mt-auto flex gap-2 pt-3">
+                                    <button className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded">
+                                        Buy
+                                    </button>
+                                    <button onClick={() => handleAddToCart(product._id)} className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded">
+                                        <span className="text-lg">+</span>{" "}
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                                            fill="currentColor"
+                                            viewBox="0 0 640 640"
+                                        >
+                                            <path d="M24 48C10.7 48 0 58.7 0 72C0 85.3 10.7 96 24 96L69.3 96C73.2 96 76.5 98.8 77.2 102.6L129.3 388.9C135.5 423.1 165.3 448 200.1 448L456 448C469.3 448 480 437.3 480 424C480 410.7 469.3 400 456 400L200.1 400C188.5 400 178.6 391.7 176.5 380.3L171.4 352L475 352C505.8 352 532.2 330.1 537.9 299.8L568.9 133.9C572.6 114.2 557.5 96 537.4 96L124.7 96L124.3 94C119.5 67.4 96.3 48 69.2 48L24 48zM208 576C234.5 576 256 554.5 256 528C256 501.5 234.5 480 208 480C181.5 480 160 501.5 160 528C160 554.5 181.5 576 208 576zM432 576C458.5 576 480 554.5 480 528C480 501.5 458.5 480 432 480C405.5 480 384 501.5 384 528C384 554.5 405.5 576 432 576z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>);
+                        })}
+                    </div>
+                ))}
         </div >
     );
 

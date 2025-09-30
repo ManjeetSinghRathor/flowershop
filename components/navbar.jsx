@@ -4,11 +4,66 @@ import React, { useState, useEffect, useRef } from "react";
 import Overlays from './Overlays';
 import SearchModal from "./SearchModal";
 import Link from "next/link";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+import { setCollectionList } from "@/app/store/collectionListSlice";
 
 const Navbar = () => {
+    const dispatch = useDispatch();
     const [isOpen, setIsOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+    const collectionList = useSelector((state) => state?.collectionList?.data);
+
+    const fetchCategories = async () => {
+        try {
+            const res = await axios.get(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/category`
+            );
+            if (!res.data.success) throw new Error("Failed to fetch categories");
+
+            const categories = res.data.data; // Array of categories from backend
+
+            // Convert to frontend structure
+            const collectionListTemp = {};
+
+            categories.forEach((cat) => {
+                const categoryName = cat.name; // e.g. "By Occasion"
+
+                // If it's Homepage, store separately
+                if (categoryName === "Homepage") {
+                    return; // skip adding to collectionListTemp
+                }
+
+                // Normal categories
+                if (!collectionListTemp[categoryName]) {
+                    collectionListTemp[categoryName] = [];
+                }
+
+                cat?.collections.forEach((col) => {
+                    collectionListTemp[categoryName].push({
+                        collectionId: col.collectionId,
+                        id: col.collectionCode, // or col._id if you prefer
+                        collection: col.collectionName,
+                        image: col.collectionImg,
+                    });
+                });
+            });
+
+            console.log(collectionListTemp);
+            dispatch(setCollectionList(collectionListTemp));
+
+        } catch (err) {
+            console.error("Error fetching categories:", err);
+            return {};
+        }
+    };
+
+    useEffect(() => {
+        if (Object.keys(collectionList).length === 0) {
+            fetchCategories();
+        }
+    }, [collectionList]);
 
     const saved_cart_products = useSelector((state) => state.CartProducts);
 

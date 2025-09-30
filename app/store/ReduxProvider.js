@@ -12,11 +12,17 @@ export default function ReduxProvider({ children }) {
 
     if (savedCart) {
       savedCart.forEach((item) => {
-        store.dispatch(AddProduct({ id: item.id, q: item.q }));
+        store.dispatch(
+          AddProduct({
+            id: item.id,
+            q: item.q,
+            sizeIdx: item.sizeIdx ?? 0, // default 0
+            deliveryTime: item.deliveryTime ?? "1-2 days", // default
+          })
+        );
       });
     }
 
-    // ✅ Allow saving after hydration
     markHydrated();
   }, []);
 

@@ -1,34 +1,119 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
-import { Products } from '@/public/products';
 import Link from 'next/link';
 import { IncreaseQty, DecreaseQty, removeProduct } from '@/app/store/CartProductsSlice';
+import axios from 'axios';
+
 
 const CartProducts = () => {
 
     const dispatch = useDispatch();
+    const user = useSelector((state) => state?.user?.data);
     const cart_product_ids = useSelector((state) => state.CartProducts);
     const [productsImgloaded, setProductsImgLoaded] = useState({});
 
-    // Merge products with cart quantities
-    const cart_products = cart_product_ids?.map((cartItem) => {
-        const product = Products.find((p) => p.id === cartItem?.id);
-        return {
-            ...product,              // full product details
-            quantity: cartItem.q, // quantity from cart
-        };
-    });
+    const [loading, setLoading] = useState(true);
+    const [cart_products, setCartProducts] = useState([]);
+    const [clicked, setClicked] = useState(false);
 
-    const handleMinus = (product) => {
-        if (product.quantity > 1) {
-            dispatch(DecreaseQty(product.id));
+    const fetchLocalCart = async () => {
+        try {
+            const res = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/cart/local`,
+                { cart: cart_product_ids }
+            );
+
+            if (res.data.success) {
+                setCartProducts(res.data.cart_products);
+            }
+        } catch (error) {
+            console.error("Error fetching local cart:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handlePlus = (product) => {
-        dispatch(IncreaseQty(product.id));
+    useEffect(() => {
+        fetchLocalCart();
+    }, [cart_product_ids])
+
+
+    const handleMinus = async (product) => {
+        if (product.quantity > 1) {
+
+            if (!user) {
+                // Local cart
+                dispatch(DecreaseQty({ id: product._id, sizeIdx: product.sizeIdx, deliveryTime: product.delivery_time }));
+                return;
+            }
+
+            try {
+                setClicked(true);
+                const res = await axios.post(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/cart/decrease/${product._id}`,
+                    { sizeIdx: product.sizeIdx, deliveryTime: product.delivery_time },
+                    { withCredentials: true }
+                );
+
+                if (res.data.success) {
+                    dispatch(DecreaseQty({ id: product._id, sizeIdx: product.sizeIdx, deliveryTime: product.delivery_time }));
+                }
+            } catch (err) {
+                console.error("Failed to decrease cart item:", err);
+            } finally {
+                setClicked(false);
+            }
+        }
+    };
+
+    const handlePlus = async (product) => {
+        if (!user) {
+            dispatch(IncreaseQty({ id: product._id, sizeIdx: product.sizeIdx, deliveryTime: product.delivery_time }));
+            return;
+        }
+
+        try {
+            setClicked(true);
+            const res = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/cart/increase/${product._id}`,
+                { sizeIdx: product.sizeIdx, deliveryTime: product.delivery_time },
+                { withCredentials: true }
+            );
+
+            if (res.data.success) {
+                dispatch(IncreaseQty({ id: product._id, sizeIdx: product.sizeIdx, deliveryTime: product.delivery_time }));
+            }
+        } catch (err) {
+            console.error("Failed to increase cart item:", err);
+        } finally {
+            setClicked(false);
+        }
+    };
+
+    const handleRemoveItem = async (product) => {
+        if (!user) {
+            dispatch(removeProduct({ id: product._id, sizeIdx: product.sizeIdx, deliveryTime: product.delivery_time }));
+            return;
+        }
+
+        try {
+            setClicked(true);
+            const res = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/cart/delete`,
+                { productId: product._id, sizeIdx: product.sizeIdx, deliveryTime: product.delivery_time },
+                { withCredentials: true }
+            );
+
+            if (res.data.success) {
+                dispatch(removeProduct({ id: product._id, sizeIdx: product.sizeIdx, deliveryTime: product.delivery_time }));
+            }
+        } catch (err) {
+            console.error("Failed to remove cart item:", err);
+        } finally {
+            setClicked(false);
+        }
     };
 
     return (
@@ -36,14 +121,14 @@ const CartProducts = () => {
             <div className='flex w-full items-center justify-between border-t border-b border-gray-300 py-2 sticky top-14 z-[45] bg-white px-2 sm:px-8 lg:px-24'>
                 <div className='flex flex-col'>
                     <h1 className='font-serif text-2xl font-bold leading-tight'>YOUR CART</h1>
-                    {cart_products.length > 0 && <div className='flex gap-2'><span className='font-mono'>Subtotal:</span>
+                    {cart_products?.length > 0 && <div className='flex gap-2'><span className='font-mono'>Subtotal:</span>
                         <p className='flex font-mono gap-[2px]'>
-                            <span>₹</span><span>{cart_products.reduce((sum, item) => sum + ((item.final_price) * (item.quantity) || 0), 0)}.00</span>
+                            <span>₹</span><span>{cart_products.reduce((sum, item) => sum + ((item.sizes[0].finalPrice) * (item.quantity) || 0), 0)}.00</span>
                         </p>
-                        </div>}
+                    </div>}
                 </div>
-                {cart_products.length > 0 && <button
-                    disabled={cart_product_ids.length === 0}
+                {cart_products?.length > 0 && <button
+                    disabled={cart_product_ids?.length === 0}
                     onClick={() => {
                         console.log("click")
                     }}
@@ -53,164 +138,189 @@ const CartProducts = () => {
                 </button>}
             </div>
 
-            <div className='flex flex-col w-full gap-3 pt-2 px-2 sm:px-8 lg:px-24'>
-                {cart_products?.length > 0 ? (
-                    <>
-                        {cart_products.map((product) => (
-                            <div
-                                key={product.id}
-                                className="flex gap-3 items-start p-3"
-                            >
-
-                                {/* Image */}
-                                <Link
-                                    href={{
-                                        pathname: "/product_view",
-                                        query: { id: product.id }, // pass product ID as query param
-                                    }}
-                                    className="w-20 h-20 relative flex-shrink-0"
+            {loading ?
+                <div className="flex flex-col justify-center gap-4 pt-2 px-2 sm:px-8 lg:px-24">
+                    {/* Skeleton slides */}
+                    {[...Array(2)].map((_, idx) => (
+                        <div
+                            key={idx}
+                            className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
+                        />
+                    ))}
+                </div> :
+                <div className='flex flex-col w-full gap-3 pt-2 px-2 sm:px-8 lg:px-24'>
+                    {cart_products?.length > 0 ? (
+                        <>
+                            {cart_products.map((product,idx) => (
+                                <div
+                                    key={idx}
+                                    className="flex gap-3 items-start p-3"
                                 >
-                                    {!productsImgloaded[product.id] && (
-                                        <div className="absolute inset-0 rounded-md bg-gray-600 animate-pulse" />
-                                    )}
-                                    <img
-                                        src={product.images[0]}
-                                        alt={product.name}
-                                        className={`w-full h-full object-cover rounded-md ${productsImgloaded[product.id] ? "block" : "hidden"
-                                            }`}
-                                        onLoad={() =>
-                                            setProductsImgLoaded((prev) => ({ ...prev, [product.id]: true }))
-                                        }
-                                        onError={() =>
-                                            setProductsImgLoaded((prev) => ({ ...prev, [product.id]: true }))
-                                        }
-                                    />
-                                </Link>
 
-                                {/* Info */}
-                                <div className="flex flex-col flex-1 min-w-0">
+                                    {/* Image */}
                                     <Link
                                         href={{
                                             pathname: "/product_view",
-                                            query: { id: product.id }, // pass product ID as query param
+                                            query: { id: product._id }, // pass product ID as query param
                                         }}
+                                        className="w-20 h-20 relative flex-shrink-0"
                                     >
-                                        <h3 className="font-semibold mb-1 truncate">
-                                            {product.name}
-                                        </h3>
-
-                                        <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
-                                            {product.description}
-                                        </p>
-
-                                        {/* Price */}
-                                        <div className="mt-2 flex items-center gap-2">
-                                            <span className="font-bold text-yellow-500">
-                                                ₹{product.final_price}
-                                            </span>
-                                            {product.discount > 0 && (
-                                                <span className="text-gray-400 line-through">
-                                                    ₹{product.price}
-                                                </span>
-                                            )}
-                                        </div>
+                                        {!productsImgloaded[product._id] && (
+                                            <div className="absolute inset-0 rounded-md bg-gray-600 animate-pulse" />
+                                        )}
+                                        <img
+                                            src={product.images[0].imgUrl}
+                                            alt={product.name}
+                                            className={`w-full h-full object-cover rounded-md ${productsImgloaded[product._id] ? "block" : "hidden"
+                                                }`}
+                                            onLoad={() =>
+                                                setProductsImgLoaded((prev) => ({ ...prev, [product._id]: true }))
+                                            }
+                                            onError={() =>
+                                                setProductsImgLoaded((prev) => ({ ...prev, [product._id]: true }))
+                                            }
+                                        />
                                     </Link>
 
-                                    {/* Quantity */}
-                                    <div className='flex w-fit py-2'>
-                                        <div className="flex items-center justify-around border border-gray-400 rounded-lg w-full">
-                                            {/* Minus Button */}
-                                            <button
-                                                type="button"
-                                                className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 rounded-l-lg"
-                                                onClick={() => handleMinus(product)}
-                                            >
-                                                -
-                                            </button>
+                                    {/* Info */}
+                                    <div className="flex flex-col flex-1 min-w-0">
+                                        <Link
+                                            href={{
+                                                pathname: "/product_view",
+                                                query: { id: product._id }, // pass product ID as query param
+                                            }}
+                                        >
+                                            <h3 className="font-semibold mb-1 truncate">
+                                                {product.name}
+                                            </h3>
 
-                                            {/* Number Input */}
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                value={product.quantity}
-                                                readOnly
-                                                className="flex justify-center w-14 text-center border-x border-gray-400 focus:outline-none"
-                                            />
+                                            <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
+                                                {product.description}
+                                            </p>
 
-                                            {/* Plus Button */}
+                                        <div className='flex flex-col sm:flex-row sm:gap-6 text-xs sm:text-sm py-1 gap-[2px]'>
+                                            <div>
+                                                <p className='font-[600]'>Size</p>
+                                                <p className='text-gray-600'>{product.sizes[product.sizeIdx].sizeName}</p>
+                                            </div>
+                                            <div>
+                                                <p className='font-[600]'>Delivery Time</p>
+                                                <p className='text-gray-600'>{product.delivery_time}</p>
+                                            </div>
+                                        </div>
+
+                                            {/* Price */}
+                                            <div className="mt-2 flex items-center gap-2">
+                                                <span className="font-bold text-yellow-500">
+                                                    ₹{product.sizes[product.sizeIdx || 0].finalPrice}
+                                                </span>
+                                                {product.sizes[product.sizeIdx || 0].discount > 0 && (
+                                                    <span className="text-gray-400 line-through">
+                                                        ₹{product.sizes[product.sizeIdx].price}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </Link>
+
+                                        {/* Quantity */}
+                                        <div className='flex w-full max-w-32 py-2 '>
+                                            <div className="flex items-center justify-center border border-gray-400 rounded-lg w-fit">
+                                                {/* Minus Button */}
+                                                <button
+                                                    type="button"
+                                                    className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 rounded-l-lg"
+                                                    disabled = {clicked}
+                                                    onClick={() => handleMinus(product)}
+                                                >
+                                                    -
+                                                </button>
+
+                                                {/* Number Input */}
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    value={product.quantity}
+                                                    readOnly
+                                                    className="flex justify-center w-full text-center border-x border-gray-400 focus:outline-none"
+                                                />
+
+                                                {/* Plus Button */}
+                                                <button
+                                                    type="button"
+                                                    className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 rounded-r-lg"
+                                                    disabled = {clicked}
+                                                    onClick={() => handlePlus(product)}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className='flex justify-between gap-6 py-2'>
+                                            <p className='flex text-lg font-mono gap-[2px]'>
+                                                <span>₹</span><span>{(product.sizes[0].finalPrice) * (product.quantity)}.00</span>
+                                            </p>
                                             <button
-                                                type="button"
-                                                className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 rounded-r-lg"
-                                                onClick={() => handlePlus(product)}
+                                                onClick={() => handleRemoveItem(product)}
+                                                disabled = {clicked}
+                                                className="ml-2 rounded-full p-1 bg-gray-100"
                                             >
-                                                +
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-5 h-5 sm:w-6 sm:h-6' viewBox="0 0 640 640"><path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg>
                                             </button>
                                         </div>
                                     </div>
-
-                                    <div className='flex justify-between gap-6 py-2'>
-                                        <p className='flex text-lg font-mono gap-[2px]'>
-                                            <span>₹</span><span>{(product.final_price) * (product.quantity)}.00</span>
-                                        </p>
-                                        <button
-                                            onClick={() => dispatch(removeProduct({ id: product.id }))}
-                                            className="ml-2 rounded-full p-1 bg-gray-100"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-5 h-5 sm:w-6 sm:h-6' viewBox="0 0 640 640"><path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg>
-                                        </button>
-                                    </div>
                                 </div>
-                            </div>
 
-                        ))}
+                            ))}
 
-                        <div className='flex flex-col border-t border-gray-300 w-full gap-2 py-4'>
-                            <div className='flex justify-between font-mono text-xl sm:text-2xl font-semibold'>
-                                <span>Subtotal</span>
-                                <p className='flex font-mono gap-[2px]'>
-                                    <span>₹</span><span>{cart_products.reduce((sum, item) => sum + ((item.final_price) * (item.quantity) || 0), 0)}.00</span>
+                            <div className='flex flex-col border-t border-gray-300 w-full gap-2 py-4'>
+                                <div className='flex justify-between font-mono text-xl sm:text-2xl font-semibold'>
+                                    <span>Subtotal</span>
+                                    <p className='flex font-mono gap-[2px]'>
+                                        <span>₹</span><span>{cart_products.reduce((sum, item) => sum + ((item.sizes[0].finalPrice) * (item.quantity) || 0), 0)}.00</span>
+                                    </p>
+                                </div>
+                                <p className='text-sm text-gray-600'>
+                                    Tax included. <span className='text-blue-800 underline hover:cursor-default'>Shipping</span> calculated at checkout.
                                 </p>
+                                <button
+                                    disabled={cart_product_ids?.length === 0}
+                                    onClick={() => {
+                                        console.log("click")
+                                    }}
+                                    className='flex w-full items-center justify-center mt-4 py-2 px-4 font-semibold bg-black text-white hover:bg-gray-900 hover:cursor-pointer'
+                                >
+                                    Check out
+                                </button>
+                                <Link
+                                    href={{
+                                        pathname: "/collection_products",
+                                        query: { category: "All Products", id: "68db488464d038f4c3298faa" }, // pass subcategory as query param
+                                    }}
+                                    className='flex w-full justify-center text-sm items-center p-1 text-blue-600'
+                                >
+                                    Continue shopping {">"}
+                                </Link>
                             </div>
-                            <p className='text-sm text-gray-600'>
-                                Tax included. <span className='text-blue-800 underline hover:cursor-default'>Shipping</span> calculated at checkout.
+                        </>
+                    ) : (
+                        <div className="flex flex-col grow w-full h-full items-center justify-center text-center gap-2">
+                            <p className='flex justify-center items-center h-[120px] text-gray-400'>
+                                Your Cart is Empty
                             </p>
-                            <button
-                                disabled={cart_product_ids.length === 0}
-                                onClick={() => {
-                                    console.log("click")
-                                }}
-                                className='flex w-full items-center justify-center mt-4 py-2 px-4 font-semibold bg-black text-white hover:bg-gray-900 hover:cursor-pointer'
-                            >
-                                Check out
-                            </button>
                             <Link
                                 href={{
                                     pathname: "/collection_products",
-                                    query: { category: "All Products" }, // pass subcategory as query param
+                                    query: { category: "All Products", id: "68db488464d038f4c3298faa" }, // pass subcategory as query param
                                 }}
-                                className='flex w-full justify-center text-sm items-center p-1 text-blue-600'
+                                className='flex items-center p-1 border text-blue-400'
                             >
                                 Continue shopping {">"}
                             </Link>
                         </div>
-                    </>
-                ) : (
-                    <div className="flex flex-col grow w-full h-full items-center justify-center text-center gap-2">
-                        <p className='flex justify-center items-center h-[120px] text-gray-400'>
-                            Your Cart is Empty
-                        </p>
-                        <Link
-                            href={{
-                                pathname: "/collection_products",
-                                query: { category: "All Products" }, // pass subcategory as query param
-                            }}
-                            className='flex items-center p-1 border text-blue-400'
-                        >
-                            Continue shopping {">"}
-                        </Link>
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
+            }
         </div>
     )
 }
