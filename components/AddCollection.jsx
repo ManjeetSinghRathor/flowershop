@@ -51,7 +51,7 @@ const AddCollection = () => {
             try {
                 setLoading(true);
                 const res = await axios.get(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search?search=${encodeURIComponent(searchQuery)}`
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search/add-to-collection?search=${encodeURIComponent(searchQuery)}`
                 );
                 setSearchResults(res.data);
             } catch (err) {

@@ -48,7 +48,7 @@ export default function ImageCarousel({ images }) {
     <div className="w-full h-fit max-w-2xl mx-auto lg:sticky top-0 z-10">
       {/* Main Carousel */}
       <div
-        className="relative w-full aspect-[1] max-h-[40vh] md:max-h-[50vh] rounded-xl overflow-hidden shadow-lg border-1 backdrop-blur-md p-4"
+        className="relative w-full aspect-[1] max-h-[40vh] md:max-h-[50vh] rounded-xl overflow-hidden shadow-lg backdrop-blur-md p-4"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -60,19 +60,20 @@ export default function ImageCarousel({ images }) {
         />
 
         {/* Left Arrow */}
-        {/* <button
+        <button
           onClick={prevImage}
           className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-1 rounded-full"
         >
           <FaChevronLeft size={16} />
-        </button> */}
+        </button>
+
         {/* Right Arrow */}
-        {/* <button
+        <button
           onClick={nextImage}
           className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-1 rounded-full"
         >
           <FaChevronRight size={16} />
-        </button> */}
+        </button>
       </div>
 
       {/* Thumbnails */}
@@ -82,7 +83,7 @@ export default function ImageCarousel({ images }) {
             key={index}
             onClick={() => goToImage(index)}
             className={`h-16 w-auto rounded-lg overflow-hidden border-1 ${
-              current === index ? "border-gray-400" : "border-transparent"
+              current === index ? "border-gray-600" : "border-transparent"
             } transition-all duration-200`}
           >
             <img

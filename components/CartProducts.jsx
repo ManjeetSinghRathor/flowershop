@@ -211,14 +211,14 @@ const CartProducts = () => {
 
                                             {/* Price */}
                                             <div className="mt-2 flex items-center gap-2">
-                                                <span className="font-bold text-yellow-500">
-                                                    ₹{product.sizes[product.sizeIdx || 0].finalPrice}
-                                                </span>
                                                 {product.sizes[product.sizeIdx || 0].discount > 0 && (
                                                     <span className="text-gray-400 line-through">
                                                         ₹{product.sizes[product.sizeIdx].price}
                                                     </span>
                                                 )}
+                                                <span className="font-bold text-yellow-500">
+                                                    ₹{product.sizes[product.sizeIdx || 0].finalPrice}
+                                                </span>
                                             </div>
                                         </Link>
 

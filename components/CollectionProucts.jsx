@@ -139,7 +139,7 @@ const CollectionProducts = () => {
                         <img className='object-cover object-center' src="./no_product.png" alt="No Product Available" />
                     </div>
                 ) : (
-                    <div className="px-2 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 py-4">
+                    <div className="px-2 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 py-4">
                         {collection_products?.map((product) => {
                             return (<div
                                 key={product._id}
@@ -164,18 +164,18 @@ const CollectionProducts = () => {
 
                                     {/* Product Info */}
                                     <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                                    <p className="text-sm text-gray-600 flex-1">
+                                    <p className="text-sm text-gray-600 flex-1 line-clamp-3">
                                         {product.description}
                                     </p>
 
                                     {/* Price */}
                                     <div className="mt-2">
-                                        <span className="font-semibold">{product.sizes[0].finalPrice}₹</span>
                                         {product.sizes[0].discount > 0 && (
-                                            <span className="text-gray-400 line-through ml-2">
+                                            <span className="text-gray-400 line-through mr-2">
                                                 {product.sizes[0].price}₹
                                             </span>
                                         )}
+                                        <span className="font-semibold">{product.sizes[0].finalPrice}₹</span>
                                     </div>
                                 </Link>
 

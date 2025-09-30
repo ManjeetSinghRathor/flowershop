@@ -68,25 +68,38 @@ const ProductView = () => {
 
 
     const handleAddToCart = async (id) => {
-        if (user) {
-            try {
-                const res = await axios.post(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/add-to-cart/${id}`,
-                    { quantity , sizeIdx: currentSizeIdx, deliveryTime: delivery_time },
-                    { withCredentials: true }
-                );
-                if (res.data.success) {
-                    toast.success("Item added to your cart");
-                    dispatch(AddProduct({ id, q: quantity, sizeIdx: currentSizeIdx, deliveryTime: delivery_time }));
-                    // Optional: update Redux state with res.data.cart
+        if (quantity > 0) {
+            if (user) {
+                try {
+                    const res = await axios.post(
+                        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/add-to-cart/${id}`,
+                        { quantity, sizeIdx: currentSizeIdx, deliveryTime: delivery_time },
+                        { withCredentials: true }
+                    );
+                    if (res.data.success) {
+                        toast.success("Item added to your cart");
+                        dispatch(AddProduct({ id, q: quantity, sizeIdx: currentSizeIdx, deliveryTime: delivery_time }));
+                        // Optional: update Redux state with res.data.cart
+                    }
+                } catch (err) {
+                    toast.error("Failed to add item to cart");
+                    console.error(err);
                 }
-            } catch (err) {
-                toast.error("Failed to add item to cart");
-                console.error(err);
+            } else {
+                dispatch(AddProduct({ id, q: quantity, sizeIdx: currentSizeIdx, deliveryTime: delivery_time })); // guest cart in redux
+                toast.success("Item added to cart (guest)");
             }
         } else {
-            dispatch(AddProduct({ id, q: quantity, sizeIdx: currentSizeIdx, deliveryTime: delivery_time })); // guest cart in redux
-            toast.success("Item added to cart (guest)");
+            toast("⚠️ Please increase the quantity!", {
+                style: {
+                    border: "1px solid #facc15", // yellow
+                    background: "#fef9c3",       // light yellow
+                    color: "#713f12",            // dark amber text
+                    padding: "5px",
+                    borderRadius: "8px",
+                    fontSize: "14px"
+                },
+            });
         }
     };
 
@@ -298,9 +311,12 @@ const ProductView = () => {
                     Buy Now
                 </button>
 
-                <div className="flex flex-col gap-4 pt-4">
+                <div className="flex flex-col gap-2">
                     <div>
-                        <p className="text-gray-600">{productDetails.description}</p>
+                        <h2 className="font-semibold mb-1">Description:</h2>
+                        <p className="text-gray-700 font-serif text-base leading-relaxed tracking-wide px-4 leading-tight">
+                            {productDetails.description}
+                        </p>
                     </div>
 
                     {/* Package Details */}
@@ -376,39 +392,15 @@ const ProductView = () => {
                                     <p className="font-medium">
                                         Can I get my order delivered earlier?
                                     </p>
-                                    <p>
-                                        We ship the order within 24–48 hours after you place the
-                                        order. All our items are <b>READY IN STOCK</b>. We have more
-                                        than 2000 SKU ready to ship. The rest of the time is taken
-                                        by the courier companies. Therefore, it will take{" "}
-                                        <b>4 to 5 days</b> to get the order delivered to you.
-                                    </p>
-                                    <p>
-                                        <b>Please note:</b> In case you are in DELHI/ NCR we can try
-                                        and deliver your order <b>next day itself</b>.
-                                    </p>
                                 </div>
-
                                 <div>
                                     <p className="font-medium">
                                         What Payment methods are available?
                                     </p>
-                                    <p>
-                                        You can pay via Credit Cards, Debit Cards, Netbanking,
-                                        Mobile Wallets or Cash on Delivery.
-                                    </p>
                                 </div>
-
                                 <div>
                                     <p className="font-medium">
                                         What if I receive the product damaged?
-                                    </p>
-                                    <p>
-                                        In case you receive the product damaged, you will have to
-                                        share the photo and order ID on any of our WhatsApp numbers{" "}
-                                        <b>8800393540 / 43 / 36</b>. We will send you{" "}
-                                        <b>FREE REPLACEMENT</b> of the product.{" "}
-                                        <b>NO QUESTIONS ASKED.</b>
                                     </p>
                                 </div>
                             </div>
@@ -436,39 +428,15 @@ const ProductView = () => {
                                     <p className="font-medium">
                                         Can I get my order delivered earlier?
                                     </p>
-                                    <p>
-                                        We ship the order within 24–48 hours after you place the
-                                        order. All our items are <b>READY IN STOCK</b>. We have more
-                                        than 2000 SKU ready to ship. The rest of the time is taken
-                                        by the courier companies. Therefore, it will take{" "}
-                                        <b>4 to 5 days</b> to get the order delivered to you.
-                                    </p>
-                                    <p>
-                                        <b>Please note:</b> In case you are in DELHI/ NCR we can try
-                                        and deliver your order <b>next day itself</b>.
-                                    </p>
                                 </div>
-
                                 <div>
                                     <p className="font-medium">
                                         What Payment methods are available?
                                     </p>
-                                    <p>
-                                        You can pay via Credit Cards, Debit Cards, Netbanking,
-                                        Mobile Wallets or Cash on Delivery.
-                                    </p>
                                 </div>
-
                                 <div>
                                     <p className="font-medium">
                                         What if I receive the product damaged?
-                                    </p>
-                                    <p>
-                                        In case you receive the product damaged, you will have to
-                                        share the photo and order ID on any of our WhatsApp numbers{" "}
-                                        <b>8800393540 / 43 / 36</b>. We will send you{" "}
-                                        <b>FREE REPLACEMENT</b> of the product.{" "}
-                                        <b>NO QUESTIONS ASKED.</b>
                                     </p>
                                 </div>
                             </div>

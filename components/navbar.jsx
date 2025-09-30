@@ -50,7 +50,6 @@ const Navbar = () => {
                 });
             });
 
-            console.log(collectionListTemp);
             dispatch(setCollectionList(collectionListTemp));
 
         } catch (err) {

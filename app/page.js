@@ -7,14 +7,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { AddProduct, setCart } from "./store/CartProductsSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { setUser } from "./store/userSlice";
 
-const shopImages = [
-  { id: "A1", image: "https://source.unsplash.com/400x400/?bouquet" },
-  { id: "A2", image: "https://source.unsplash.com/400x400/?roses" },
-  { id: "A3", image: "https://source.unsplash.com/400x400/?lilies" },
-  { id: "A4", image: "https://source.unsplash.com/400x400/?tulips" },
-];
+
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -34,8 +28,6 @@ export default function Home() {
         }
       });
 
-      console.log("filtered",filtered);
-
       setCollection_List(filtered);
       setCatLoaded(false);
     }
@@ -47,7 +39,6 @@ export default function Home() {
   const [colLoading, setColLoading] = useState(true);
 
   const [categoryLoaded, setCategoryLoaded] = useState({});
-  const [shopImgLoaded, setShopImgLoaded] = useState({});
 
   const settings = {
     dots: true,
@@ -61,13 +52,13 @@ export default function Home() {
     arrows: false,
     appendDots: (dots) => (
       <div>
-        <ul className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex gap-1">
+        <ul className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex">
           {dots}
         </ul>
       </div>
     ),
     customPaging: () => (
-      <div className="w-7 h-1 bg-white border-[1px] border-[rgb(146,145,145)] rounded-full"></div>
+      <div className="w-[20px] sm:w-[25px] sm:h-[6px] h-[5px] bg-white border-[1px] border-[rgb(146,145,145)] rounded-full"></div>
     ),
   };
 
@@ -121,7 +112,6 @@ export default function Home() {
       );
 
       if (res.data.success) {
-        console.log(res.data.data);
         setHomepageCollections(res.data.data);
       }
     } catch (error) {
@@ -145,7 +135,7 @@ export default function Home() {
       </div> */}
 
       <div className="flex w-full justify-center">
-        <div className="relative w-full max-w-4xl overflow-hidden rounded-lg py-6">
+        <div className="relative w-full max-w-4xl overflow-hidden py-4">
           <div className="w-full">
             {loading ? (
               <div className="flex justify-center gap-4">
@@ -168,7 +158,7 @@ export default function Home() {
                       <img
                         src={slide.image}
                         alt={`Slide ${idx}`}
-                        className="w-full h-full object-cover rounded-md cursor-pointer"
+                        className="w-full h-full object-cover rounded-lg cursor-pointer"
                       />
                     </Link>
                   </div>
@@ -180,24 +170,38 @@ export default function Home() {
       </div>
 
       {/* Collection List */}
-      <div className="flex flex-col w-full gap-3 py-6 px-2">
+      <div className="flex flex-col w-full gap-4 sm:gap-6 px-2">
         <h2 className="flex font-mono text-2xl justify-center sm:text-3xl leading-tight">
           Collection List
         </h2>
         {catLoaded ? (
           <div className="flex flex-col gap-4 w-full overflow-hidden py-4">
-            <div className="flex w-[100px] h-[36px] relative">
+
+            {/* <div className="flex w-[100px] h-[28px] relative">
               <div className="absolute inset-0 rounded-md bg-gray-300 animate-pulse" />
-            </div>
+            </div> */}
+
             {/* Row 1 */}
-            <div className="flex w-full gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
+            <div className="flex w-full sm:gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
               {[...Array(9)].map((_, idx) => (
                 <div
                   key={`row1-${idx}`}
-                  className="min-w-[7rem] min-h-[7rem] flex items-center justify-center snap-start"
+                  className="min-w-[5rem] min-h-[5rem] sm:min-w-[7rem] sm:min-h-[7rem] flex items-center justify-center snap-start"
                 >
                   {/* Skeleton */}
-                  <div className="w-28 h-28 rounded-full bg-gray-300 animate-pulse" />
+                  <div className="w-18 h-18 sm:w-28 sm:h-28 rounded-full bg-gray-300 animate-pulse" />
+                </div>
+              ))}
+            </div>
+            {/* Row 2 */}
+            <div className="flex w-full sm:gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
+              {[...Array(9)].map((_, idx) => (
+                <div
+                  key={`row1-${idx}`}
+                  className="min-w-[5rem] min-h-[5rem] sm:min-w-[7rem] sm:min-h-[7rem] flex items-center justify-center snap-start"
+                >
+                  {/* Skeleton */}
+                  <div className="w-18 h-18 sm:w-28 sm:h-28 rounded-full bg-gray-300 animate-pulse" />
                 </div>
               ))}
             </div>
@@ -206,11 +210,11 @@ export default function Home() {
           Object.entries(collectionList).map(([category, items]) => (
             <div
               key={category}
-              className="flex flex-col gap-4 w-full overflow-hidden py-4"
+              className="flex flex-col gap-2 w-full overflow-hiddens"
             >
-              <h3 className="font-serif font-semibold text-xl sm:text-2xl mb-1 text-gray-800">
+              {/* <h3 className="font-serif font-semibold text-xl sm:text-2xl mb-1 text-gray-800">
                 {category}
-              </h3>
+              </h3> */}
               <div className="flex w-full gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
                 {items.map((item, index) => (
                   <div
@@ -220,11 +224,11 @@ export default function Home() {
                     <Link
                       href={{
                         pathname: "/collection_products",
-                        query: { category: item.name, id: item.collectionId }, // pass subcategory as query param
+                        query: { category: item.collection, id: item.collectionId }, // pass subcategory as query param
                       }}
                       className="flex flex-col items-center gap-1 cursor-pointer"
                     >
-                      <div className="w-28 h-28 relative">
+                      <div className="w-20 h-20 sm:w-28 sm:h-28 relative">
                         {/* Skeleton */}
                         {!categoryLoaded[item.id] && (
                           <div className="absolute inset-0 rounded-full bg-gray-300 animate-pulse" />
@@ -232,7 +236,7 @@ export default function Home() {
 
                         {/* Actual image */}
                         <img
-                          className={`w-28 h-28 rounded-full object-cover object-center border border-gray-400 ${
+                          className={`w-20 h-20 sm:w-28 sm:h-28 rounded-full object-cover object-center border border-gray-400 ${
                             categoryLoaded[item.id] ? "block" : "hidden"
                           }`}
                           src={item.image}
@@ -254,8 +258,8 @@ export default function Home() {
                       <div className="text-center text-sm">
                         {item.collection.split(" ").map((word, index) => (
                           <span key={index}>
-                            {word}
-                            {(index + 1) % 2 === 0 ? <br /> : " "}
+                            {word}<br />
+                            {/* {(index + 1) % 2 === 0 ? <br /> : " "} */}
                           </span>
                         ))}
                       </div>
@@ -294,12 +298,12 @@ export default function Home() {
         homepageCollections.map((col) => (
           <div
             key={col.collectionCode}
-            className="flex flex-col w-full gap-3 py-6 px-2"
+            className="flex flex-col w-full gap-3 py-4 px-2"
           >
-            <h2 className="flex font-mono text-2xl justify-center sm:text-3xl">
+            <h2 className="flex font-mono text-2xl justify-center sm:text-3xl leading-tight">
               {col.name}
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 py-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
               {/* Example Product Cards */}
               {col?.products?.length > 0 &&
                 col.products.map((product) => (
@@ -326,20 +330,20 @@ export default function Home() {
                       <h3 className="font-semibold text-lg mb-1">
                         {product.name}
                       </h3>
-                      <p className="text-sm text-gray-600 flex-1">
+                      <p className="text-sm text-gray-600 flex-1 line-clamp-3">
                         {product.description}
                       </p>
 
                       {/* Price */}
                       <div className="mt-2">
-                        <span className="font-semibold">
-                          {product.sizes[0].finalPrice}₹
-                        </span>
                         {product.sizes[0].discount > 0 && (
-                          <span className="text-gray-400 line-through ml-2">
+                          <span className="text-gray-400 line-through mr-2">
                             {product.sizes[0].price}₹
                           </span>
                         )}
+                        <span className="font-semibold">
+                          {product.sizes[0].finalPrice}₹
+                        </span>
                       </div>
                     </Link>
 
@@ -389,38 +393,6 @@ export default function Home() {
           </div>
         ))
       )}
-
-      {/* More About Us */}
-      <div className="flex flex-col w-full gap-3 py-6 px-2">
-        <h2 className="flex font-mono text-2xl justify-center pb-2 sm:text-3xl">
-          More About Us
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 py-4">
-          {shopImages.map((item) => (
-            <div key={item.id} className="w-full min-h-64 relative">
-              {/* Skeleton */}
-              {!shopImgLoaded[item.id] && (
-                <div className="absolute inset-0 bg-gray-300 animate-pulse" />
-              )}
-
-              {/* Actual image */}
-              <img
-                src={item.image}
-                alt={`Shop Image ${item.id}`}
-                className={`w-full h-full object-cover border-1 border-gray-300 ${
-                  shopImgLoaded[item.id] ? "block" : "hidden"
-                }`}
-                onLoad={() =>
-                  setShopImgLoaded((prev) => ({ ...prev, [item.id]: true }))
-                }
-                onError={() =>
-                  setShopImgLoaded((prev) => ({ ...prev, [item.id]: true }))
-                }
-              />
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Footer */}
     </div>
