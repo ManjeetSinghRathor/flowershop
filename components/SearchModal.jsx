@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import Link from "next/link";
 import { Products } from '@/public/products';
-
+import axios from 'axios';
 
 const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
 
     const [query, setQuery] = useState("");
     const [productsImgloaded, setProductsImgLoaded] = useState({});
+    const [results, setResults] = useState([]);
 
     useEffect(() => {
             if (isSearchOpen) {
@@ -37,29 +38,30 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
     }
 
 
-    // 🔍 Search logic
-    const results = useMemo(() => {
-        if (!query.trim()) return [];
+    useEffect(() => {
+    const fetchSearch = async () => {
+      if (!query.trim()) {
+        setResults([]);
+        return;
+      }
 
-        // if number -> search price ±50
-        if (!isNaN(query)) {
-            const price = Number(query);
-            return Products.filter(
-                (p) => p.price >= price - 50 && p.price <= price + 50
-            );
-        }
-
-        // text search in title + description
-        return Products.filter(
-            (p) =>
-                p.name.toLowerCase().includes(query.toLowerCase()) ||
-                p.description?.toLowerCase().includes(query.toLowerCase())
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search/query?q=${encodeURIComponent(query)}`
         );
-    }, [query]);
 
-    const limitedResults = results.slice(0, 4); // show only 3-4 results
+        if (res.data.success) {
+          setResults(res.data.results);
+        }
+      } catch (err) {
+        console.error("Search failed:", err);
+      }
+    };
 
-      useEffect(() => {
+    fetchSearch();
+  }, [query]);
+
+    useEffect(() => {
     const handlePopState = () => {
       // Just close on back button
       if (isSearchOpen) {
@@ -108,11 +110,11 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
                 {/* Results or popular searches */}
                 {query.trim() ? (
                     <div className="flex flex-col gap-3 py-2">
-                        {limitedResults.length ? (
+                        {results.length ? (
                             <>
-                                {limitedResults.map((product) => (
+                                {results.map((product) => (
                                     <Link
-                                        key={product.id}
+                                        key={product._id}
                                         href={{
                                             pathname: "/product_view",
                                             query: { id: product._id }, // pass product ID as query param
@@ -122,19 +124,19 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
                                     >
                                         {/* Image */}
                                         <div className="w-20 h-20 relative flex-shrink-0">
-                                            {!productsImgloaded[product.id] && (
+                                            {!productsImgloaded[product._id] && (
                                                 <div className="absolute inset-0 rounded-md bg-gray-600 animate-pulse" />
                                             )}
                                             <img
-                                                src={product.images[0]}
+                                                src={product.images[0].imgUrl}
                                                 alt={product.name}
-                                                className={`w-full h-full object-cover rounded-md ${productsImgloaded[product.id] ? "block" : "hidden"
+                                                className={`w-full h-full object-cover rounded-md ${productsImgloaded[product._id] ? "block" : "hidden"
                                                     }`}
                                                 onLoad={() =>
-                                                    setProductsImgLoaded((prev) => ({ ...prev, [product.id]: true }))
+                                                    setProductsImgLoaded((prev) => ({ ...prev, [product._id]: true }))
                                                 }
                                                 onError={() =>
-                                                    setProductsImgLoaded((prev) => ({ ...prev, [product.id]: true }))
+                                                    setProductsImgLoaded((prev) => ({ ...prev, [product._id]: true }))
                                                 }
                                             />
                                         </div>
@@ -152,11 +154,11 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
                                             {/* Price */}
                                             <div className="mt-2 flex items-center gap-2">
                                                 <span className="font-bold text-yellow-400 text-sm sm:text-base">
-                                                    ₹{product.final_price}
+                                                    ₹{product?.sizes[0]?.finalPrice}
                                                 </span>
-                                                {product.discount > 0 && (
+                                                {product?.sizes[0]?.discount > 0 && (
                                                     <span className="text-gray-400 line-through text-xs sm:text-sm">
-                                                        ₹{product.price}
+                                                        ₹{product?.sizes[0]?.price}
                                                     </span>
                                                 )}
                                             </div>
@@ -184,7 +186,7 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
                     <div className="flex flex-col gap-2">
                         <h3 className="text-lg font-semibold">Popular Searches</h3>
                         <div className="flex flex-wrap gap-2">
-                            {["Red Roses", "Anniversary", "Birthday", "Bouquets"].map((term) => (
+                            {["Love and Romance", "Anniversary", "Birthday", "Wedding", "Roses Bouquet"].map((term) => (
                                 <button
                                     key={term}
                                     onClick={() => setQuery(term)}
