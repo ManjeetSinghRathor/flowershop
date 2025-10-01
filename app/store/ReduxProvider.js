@@ -8,20 +8,21 @@ import { AddProduct } from "./CartProductsSlice";
 
 export default function ReduxProvider({ children }) {
   useEffect(() => {
-    const savedCart = loadState("CartProducts"); // always an array now
+    const savedCart = loadState("CartProducts") ?? [];
 
-    if (savedCart) {
-      savedCart.forEach((item) => {
-        store.dispatch(
-          AddProduct({
-            id: item.id,
-            q: item.q,
-            sizeIdx: item.sizeIdx ?? 0, // default 0
-            deliveryTime: item.deliveryTime ?? "1-2 days", // default
-          })
-        );
-      });
-    }
+    // Optional: clear stale cart
+    localStorage.removeItem("CartProducts");
+
+    savedCart.forEach((item) => {
+      store.dispatch(
+        AddProduct({
+          id: item.id,
+          q: item.q,
+          sizeIdx: item.sizeIdx ?? 0,
+          deliveryTime: item.deliveryTime ?? "1-2 days",
+        })
+      );
+    });
 
     markHydrated();
   }, []);

@@ -10,32 +10,37 @@ import Link from "next/link";
 import { FaChevronDown, FaChevronUp, FaChevronRight } from "react-icons/fa"; // ✅ react-icons
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+
 
 export default function Overlays({ setIsOpen, isOpen = false }) {
     const dispatch = useDispatch();
+    const router = useRouter();
     const menuRef = useRef(null);
     const swipeRef = useRef(null);
     const [categoryLoaded, setCategoryLoaded] = useState({});
+    const [openLoginPopup, setOpenLoginPopup] = useState(false);
 
     const user = useSelector((state) => state.user?.data || null);
-    const updatedCollectionList = useSelector((state)=>state.collectionList.data);
+    const updatedCollectionList = useSelector((state) => state.collectionList.data);
 
     const getUser = async () => {
         try {
-          const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`,
-            { withCredentials: true }
-          );
-    
-          if (res?.data?.success) {
-            // setCurrentUser(res?.data);
-            dispatch(setUser(res?.data));
-            
-          }
+            const res = await axios.get(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`,
+                { withCredentials: true }
+            );
+
+            if (res?.data?.success) {
+                // setCurrentUser(res?.data);
+                dispatch(setUser(res?.data));
+
+            }
         } catch (err) {
-          // Not logged in
+            // Not logged in
         }
-      };
+    };
 
     const handleGoogleLogin = async (response) => {
         try {
@@ -72,11 +77,11 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
         }
     };
 
-    useEffect(()=>{
-        if(!user){
+    useEffect(() => {
+        if (!user) {
             getUser();
         }
-    },[user])
+    }, [user])
 
     useEffect(() => {
         if (isOpen) {
@@ -180,7 +185,7 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
     return (
         <aside
             className={`
-          fixed top-0 left-0 z-[1000] w-full h-full bg-[rgba(0,0,0,0.95)] text-white shadow-lg
+          fixed top-0 left-0 z-[100] w-full h-full bg-[rgba(0,0,0,0.95)] text-white shadow-lg
           transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"} overflow-y-auto overscroll-contain
         `}
@@ -191,21 +196,29 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                     {user != null &&
                         <div className="flex flex-col p-2">
                             <div className="flex w-full p-1 items-center justify-center">
-                                <img
-                                    src={user?.data?.profile?.avatarUrl || "/cat.png"}
-                                    alt="User"
-                                    className="w-12 h-12 rounded-full object-cover bg-gray-300"
+                                <Image
+                                    src={user?.profile?.avatarUrl || "/cat.png"} // fallback image from public/
+                                    alt="User Avatar"
+                                    width={64} // matches Tailwind's w-16
+                                    height={64}
+                                    className={`rounded-full border object-cover`}
                                 />
                             </div>
                             <p className="flex text-black text-center items-center justify-center gap-2 p-1 rounded-sm bg-white">
                                 Hello, {user?.name.split(" ")[0]}!
                             </p>
 
-                            <button
+                            <Link
+                                href={"/profile"}
+                                onClick={() => {
+                                    setTimeout(() => {
+                                        setIsOpen(false);
+                                    }, 300)
+                                }}
                                 className="w-full flex justify-center items-center px-2 gap-2 text-blue-600 hover:text-blue-700 hover:underline"
                             >
                                 <span>Profile</span><span><FaChevronRight className="w-[14px] h-[14px] text-blue-600" /></span>
-                            </button>
+                            </Link>
                         </div>}
                     <div className="w-full max-w-md mx-auto p-4">
                         {Object.entries(updatedCollectionList).map(([category, items]) => (
@@ -292,6 +305,11 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                     </div>
                 </div>
             </div>
+
+            {
+                openLoginPopup &&
+                <LoginPopup setOpenLoginPopup={setOpenLoginPopup} />
+            }
 
         </aside>
     );
