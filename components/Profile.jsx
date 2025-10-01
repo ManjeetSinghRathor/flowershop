@@ -83,12 +83,12 @@ const Profile = () => {
                 </div>
             </div>
 
-            <div className='flex flex-col gap-4 sm:grid sm:grid-cols-2'>
+            <div className='flex flex-col gap-4 sm:grid md:grid-cols-2'>
                 {(user?.role === "admin") && <div className="flex flex-col gap-4 px-2">
                     <h2 className='text-xl sm:text-2xl font-semibold font-serif'>
                         Admin Section:
                     </h2>
-                    <div className='grid grid-cols-2 sm:flex gap-6 px-4 text-sm'>
+                    <div className='grid grid-cols-2 sm:flex sm:flex-wrap gap-6 px-4 text-sm'>
                         <Link href={"/handle_products"} className='flex flex-col items-center text-center gap-1 p-2 rounded-lg bg-gradient-to-r from-[#f6f6f6] to-[#fafafa] min-w-30'>
                             <Image
                                 src={"/product_9504576.png"}
@@ -123,7 +123,7 @@ const Profile = () => {
                                 width={48}
                                 height={48}
                             />
-                            Shipping
+                            Shipping <br />Orders
                         </Link>
                     </div>
                 </div>}
@@ -132,7 +132,7 @@ const Profile = () => {
                     <h2 className='text-xl sm:text-2xl font-semibold font-serif'>
                         User Section:
                     </h2>
-                    <div className='grid grid-cols-2 sm:flex gap-6 px-4 text-sm'>
+                    <div className='grid grid-cols-2 sm:flex sm:flex-wrap gap-6 px-4 text-sm'>
                         <Link href={"/user_orders"} className='flex flex-col items-center text-center gap-1 p-2 rounded-lg bg-gradient-to-r from-[#f6f6f6] to-[#fafafa] min-w-30'>
                             <Image
                                 src={"/free-shipping_18293534.png"}

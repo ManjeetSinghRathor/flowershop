@@ -135,7 +135,6 @@ const HandleProducts = () => {
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/all/list?page=1&limit=20`
           );
           if (res.data.success) {
-            console.log("hello")
             setProducts(res.data.products);
             setHasMore(res.data.hasMore);
             setPage(2); // ✅ next page will be 2
@@ -171,24 +170,24 @@ const HandleProducts = () => {
   };
 
   const updateStock = async (id, newStock) => {
-  try {
-    const res = await axios.patch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/${id}/stock`,
-      { stock: newStock }
-    );
-    if (res.data.success) {
-      toast.success("Stock updated");
-      setProducts((prev) =>
-        prev.map((p) =>
-          p._id === id ? { ...p, stock: newStock } : p
-        )
+    try {
+      const res = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/${id}/stock`,
+        { stock: newStock }
       );
+      if (res.data.success) {
+        toast.success("Stock updated");
+        setProducts((prev) =>
+          prev.map((p) =>
+            p._id === id ? { ...p, stock: newStock } : p
+          )
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update stock");
     }
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to update stock");
-  }
-};
+  };
 
 
   // Delete product
@@ -294,11 +293,11 @@ const HandleProducts = () => {
                       }
                     />
                   </td>
-                    <EditableCell value={product.stock} onSave={(newValue) => updateStock(product._id, newValue)}/>
+                  <EditableCell value={product.stock} onSave={(newValue) => updateStock(product._id, newValue)} />
 
                   <td className="p-2 flex gap-2">
                     <Link
-                      href={`/edit_product/${product._id}`}
+                      href={`/handle_products/edit_product?id=${product._id}`}
                       className="px-2 py-1 bg-yellow-400 rounded text-white"
                     >
                       Edit
