@@ -83,7 +83,7 @@ const Navbar = () => {
                 <div>
                     <Link href={"/cart_products"} className='flex bg-none outline-none p-1 items-center justify-center relative'>
                         {saved_cart_products?.length > 0 && (
-                            <p className="absolute top-0 right-0 w-4 h-4 bg-red-600 rounded-full flex justify-center items-center text-white text-[10px]">
+                            <p className="absolute top-0 right-0 w-4 h-4 bg-red-600 rounded-full flex justify-center items-center text-white text-[10px] pt-[3px] pr-[1px]">
                                 {saved_cart_products.reduce((sum, item) => sum + (item.q || 0), 0)}
                             </p>
                         )}

@@ -361,17 +361,8 @@ const AddProduct = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 px-2 sm:px-8 lg:px-24 py-4">
-            <div className="flex flex-col sm:flex-row justify-between items-center w-full px-2 pb-4 gap-1">
-                <h1 className="hidden sm:flex text-xl md:text-2xl font-bold text-center">
-                    Add New Product
-                </h1>
-                <Link
-                    href={"/handle_products"}
-                    className="flex w-fit text-sm px-2 sm:text-md sm:px-4 py-2 bg-black rounded-md text-white"
-                >
-                    Handle Products
-                </Link>
-                <h1 className="sm:hidden text-xl md:text-2xl font-bold text-center pt-2">
+            <div className="flex justify-center w-full px-2 pb-4 gap-1">
+                <h1 className="text-2xl font-bold text-center">
                     Add New Product
                 </h1>
             </div>

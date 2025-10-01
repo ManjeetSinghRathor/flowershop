@@ -208,21 +208,11 @@ const AddCollection = () => {
 
     return (
         <div className="p-6 max-w-3xl mx-auto">
-            <div className="flex flex-col sm:flex-row justify-between items-center w-full px-2 pb-4 gap-1">
-                <h1 className="hidden sm:flex text-xl md:text-2xl font-bold text-center">
-                    Add New Collection
-                </h1>
-                <Link
-                    href={"/handle_collections"}
-                    className="flex w-fit text-sm px-2 sm:text-md sm:px-4 py-2 bg-black rounded-md text-white"
-                >
-                    Handle Collections
-                </Link>
-                <h1 className="sm:hidden text-xl md:text-2xl font-bold text-center pt-4">
+            <div className="flex justify-center w-full px-2 pb-4 gap-1">
+                <h1 className="text-2xl font-bold text-center">
                     Add New Collection
                 </h1>
             </div>
-
             <form onSubmit={handleSubmit} className="space-y-4 py-4">
 
                 {/* Collection Image */}

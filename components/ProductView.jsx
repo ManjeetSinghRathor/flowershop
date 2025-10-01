@@ -150,23 +150,26 @@ const ProductView = () => {
     </div>);
 
     return (
-        <div className="w-full px-2 sm:px-8 lg:px-24 min-h-[50vh]">
-            <div className="flex flex-col w-full gap-1 pb-2">
-                <h1 className="flex w-full justify-start items-center font-mono sm:text-lg pt-4">
-                    <Link href="/" className="hover:underline font-light">
-                        Home
-                    </Link>
-                    <>
-                        <span className="mx-1">{">"}</span>
-                    </>
-                </h1>
-                <h1 className="font-serif text-xl font-[600]">{productDetails.name}</h1>
+        <div className="w-full min-h-[50vh]">
+            <div className="px-2 sm:px-8 lg:px-24">
+                <div className="flex flex-col w-full gap-1 pb-2">
+                    <h1 className="flex w-full justify-start items-center font-mono sm:text-lg pt-4">
+                        <Link href="/" className="hover:underline font-light">
+                            Home
+                        </Link>
+                        <>
+                            <span className="mx-1">{">"}</span>
+                        </>
+                    </h1>
+                    <h1 className="font-serif text-xl font-[600]">{productDetails.name}</h1>
+                </div>
             </div>
-            <div>
+
+            <div className="px-2 sm:px-8 lg:px-24 ">
                 <ImageCarousel images={productDetails?.images} />
             </div>
 
-            <div className="flex flex-col gap-4 mt-2">
+            <div className="flex flex-col gap-4 mt-2 px-2 sm:px-8 lg:px-24 ">
                 <div className="flex flex-col gap-2 py-2">
                     {/* Stock */}
                     <p
@@ -209,7 +212,7 @@ const ProductView = () => {
                     </div>
                 </div>
 
-                <div className="border-t border-b border-gray-300 sm:grid sm:grid-cols-2 sm:gap-4">
+                <div className="border-t border-b border-gray-300 sm:grid sm:grid-cols-2 sm:gap-6 sm:py-2">
                     {/* Delivery */}
                     <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
                         <label
@@ -264,11 +267,11 @@ const ProductView = () => {
                 {/* Quantity + Add to Cart row */}
                 <div className="grid grid-cols-2 gap-2 mb-1">
                     {/* Quantity box */}
-                    <div className="flex items-center justify-around border border-gray-400 rounded-lg w-full">
+                    <div className="grid grid-cols-3 border border-gray-400 rounded-lg w-full">
                         {/* Minus Button */}
                         <button
                             type="button"
-                            className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 rounded-l-lg"
+                            className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 border-1 rounded-l-lg"
                             onClick={() => {
                                 const input = document.getElementById("qtyBox");
                                 if (input.value > 1) input.value = parseInt(input.value) - 1;
@@ -284,13 +287,13 @@ const ProductView = () => {
                             min="1"
                             value={quantity} // bind state to input value
                             onChange={(e) => setQuantity(Number(e.target.value))}
-                            className="flex justify-center w-14 text-center border-x border-gray-400 focus:outline-none"
+                            className="flex justify-center text-center border-x border-gray-400 focus:outline-none"
                         />
 
                         {/* Plus Button */}
                         <button
                             type="button"
-                            className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 rounded-r-lg"
+                            className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 border-1 rounded-r-lg"
                             onClick={() => {
                                 const input = document.getElementById("qtyBox");
                                 input.value = parseInt(input.value) + 1;
@@ -302,7 +305,7 @@ const ProductView = () => {
 
                     {/* Add to Cart button */}
                     <button onClick={() => handleAddToCart(productDetails._id)} className="border border-gray-400 py-2 rounded-lg hover:bg-gray-100">
-                        Add to Cart
+                        + Add to Cart
                     </button>
                 </div>
 
@@ -484,7 +487,7 @@ const ProductView = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col w-full gap-3 pt-12 pb-4 px-2">
+            <div className="flex flex-col w-full gap-3 pt-12 pb-4 px-4 sm:px-10 lg:px-26 ">
                 <h2 className="flex font-mono text-xl justify-center sm:text-3xl">
                     You may also like
                 </h2>

@@ -44,7 +44,7 @@ export default function Home() {
     dots: true,
     infinite: true,
     speed: 800,
-    fade: true,
+    fade: false,
     cssEase: "linear",
     autoplay: true,
     autoplaySpeed: 4000,
@@ -143,7 +143,7 @@ export default function Home() {
                 {[...Array(1)].map((_, idx) => (
                   <div
                     key={idx}
-                    className="w-full max-w-4xl h-[144px] sm:h-[200px] bg-gray-300 animate-pulse rounded-md"
+                    className="w-full max-w-4xl h-[144px] sm:h-[200px] bg-gray-300 animate-pulse"
                   />
                 ))}
               </div>
@@ -158,7 +158,7 @@ export default function Home() {
                       <img
                         src={slide.image}
                         alt={`Slide ${idx}`}
-                        className="w-full h-full object-cover rounded-lg cursor-pointer"
+                        className="w-full h-full object-cover rounded-xl cursor-pointer p-1"
                       />
                     </Link>
                   </div>
@@ -255,13 +255,14 @@ export default function Home() {
                           }
                         />
                       </div>
-                      <div className="text-center text-sm">
-                        {item.collection.split(" ").map((word, index) => (
+                      <div className="text-center text-sm max-w-18 sm:max-w-28">
+                        {item.collection}
+                        {/* {item.collection.split(" ").map((word, index) => (
                           <span key={index}>
-                            {word}<br />
-                            {/* {(index + 1) % 2 === 0 ? <br /> : " "} */}
+                            {word}
+                            {(index + 1) % 2 === 0 ? <br /> : " "}
                           </span>
-                        ))}
+                        ))} */}
                       </div>
                     </Link>
                   </div>

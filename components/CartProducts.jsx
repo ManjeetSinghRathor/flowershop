@@ -224,11 +224,11 @@ const CartProducts = () => {
 
                                         {/* Quantity */}
                                         <div className='flex w-full max-w-32 py-2 '>
-                                            <div className="flex items-center justify-center border border-gray-400 rounded-lg w-fit">
+                                            <div className="grid grid-cols-3 border border-gray-400 rounded-lg w-fit">
                                                 {/* Minus Button */}
                                                 <button
                                                     type="button"
-                                                    className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 rounded-l-lg"
+                                                    className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 border-1 rounded-l-lg"
                                                     disabled = {clicked}
                                                     onClick={() => handleMinus(product)}
                                                 >
@@ -247,7 +247,7 @@ const CartProducts = () => {
                                                 {/* Plus Button */}
                                                 <button
                                                     type="button"
-                                                    className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 rounded-r-lg"
+                                                    className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 border-1 rounded-r-lg"
                                                     disabled = {clicked}
                                                     onClick={() => handlePlus(product)}
                                                 >
