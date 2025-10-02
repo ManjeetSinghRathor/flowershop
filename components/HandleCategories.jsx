@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Link from 'next/link';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Link from "next/link";
+import { toast } from "react-hot-toast"; // if not already imported
+import AddCollectionModal from "./AddCollectionModal";
 
 function EditableCell({ value: initialValue, onSave }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -78,18 +80,17 @@ function EditableNameCell({ value: initialValue, onNameSave }) {
           }}
         />
       ) : (
-        <h2 className='font-serif text-lg sm:text-xl rounded p-1'>
-          {value}
-        </h2>
+        <h2 className="font-serif text-lg sm:text-xl rounded p-1">{value}</h2>
       )}
     </div>
   );
 }
 
-
 const HandleCategories = () => {
   const [categoryLoaded, setCategoryLoaded] = useState({});
   const [loaded, setLoaded] = useState(true);
+  const [catId, setCatId] = useState("");
+  const [isAddColOpen, setIsAddColOpen] = useState(false);
 
   const [updatedCollectionList, setUpdatedCollection] = useState([]);
 
@@ -122,7 +123,7 @@ const HandleCategories = () => {
             id: col.collectionCode,
             collection: col.name,
             image: col.image,
-            isActive: col.isActive
+            isActive: col.isActive,
           });
         });
 
@@ -132,9 +133,7 @@ const HandleCategories = () => {
         collectionListTemp[categoryName].isActive = cat.isActive ?? true;
       });
 
-      console.log(collectionListTemp);
       setUpdatedCollection(collectionListTemp);
-
     } catch (err) {
       console.error("Error fetching categories:", err);
       return {};
@@ -143,29 +142,125 @@ const HandleCategories = () => {
     }
   };
 
-
   useEffect(() => {
     fetchCategories();
   }, []);
 
+  // ✅ Update Serial Number
   const updateSerialNo = async (id, newSerialNo) => {
     try {
       const res = await axios.patch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collections/category/${id}/stock`,
-        { serialNo: newSerialNo }
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/category/${id}/serial`,
+        { serialNo: newSerialNo },
+        { withCredentials: true }
       );
       if (res.data.success) {
-        toast.success("SerialNO. updated");
-        setUpdatedCollection((prev) =>
-          prev.map((p) =>
-            p._id === id ? { ...p, serialNo: newSerialNo } : p
-          )
-        );
+        toast.success("SerialNo updated");
+        setUpdatedCollection((prev) => ({
+          ...prev,
+          [res.data.category.name]: {
+            ...prev[res.data.category.name],
+            serialNo: newSerialNo,
+          },
+        }));
       }
     } catch (err) {
       console.error(err);
       toast.error("Failed to update serial no.");
     }
+  };
+
+  // ✅ Update Name
+  const updateCategoryName = async (id, newName) => {
+    try {
+      const res = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/category/${id}/name`,
+        { name: newName },
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        toast.success("Category name updated");
+        fetchCategories(); // reload to sync names
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update name.");
+    }
+  };
+
+  // ✅ Toggle Active
+  const toggleActive = async (id, currentActive) => {
+    try {
+      const res = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/category/${id}/toggle`,
+        {},
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        toast.success("Status updated");
+        fetchCategories(); // reload
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to toggle active");
+    }
+  };
+
+  // ✅ Delete Category
+  const deleteCategory = async (id) => {
+    if (!confirm("Are you sure you want to delete this category?")) return;
+    try {
+      const res = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/category/${id}`,
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        toast.success("Category deleted");
+        fetchCategories();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete category");
+    }
+  };
+
+  // ✅ Remove Collection from Category
+  const removeCollection = async (categoryId, collectionId) => {
+    try {
+      const res = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/category/${categoryId}/collection/${collectionId}`,
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        toast.success("Collection removed");
+        fetchCategories();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to remove collection");
+    }
+  };
+
+  const handleCollectionAdded = (col) => {
+    // append to existing collections in categoryObj
+    const newCol = {
+      collectionId: col._id,
+      id: col.collectionCode,
+      collection: col.name,
+      image: col.image,
+      isActive: col.isActive,
+    };
+
+    Object.entries(updatedCollectionList).forEach(
+      ([categoryName, categoryObj]) => {
+        if (categoryObj._id === catId) {
+          updatedCollectionList[categoryName] = {
+            ...categoryObj,
+            collections: [...categoryObj.collections, newCol],
+          };
+        }
+      }
+    );
   };
 
   if (loaded) {
@@ -209,86 +304,144 @@ const HandleCategories = () => {
       </div>
 
       <div className="w-full mx-auto py-4">
-        {Object.entries(updatedCollectionList).map(([categoryName, categoryObj]) => (
-          <div key={categoryObj._id} className="mb-2 border rounded-lg overflow-hidden">
-
-            {/* Category header */}
-            <div className="w-full flex justify-between items-center py-2 px-2 bg-gray-100 hover:bg-gray-200">
-              <div className='flex items-center gap-2'>
-                <EditableCell
-                  value={categoryObj.serialNo}
-                  onSave={(newValue) => updateSerialNo(categoryObj._id, newValue)}
-                />
-                <EditableNameCell
-                  value={categoryName}
-                  onNameSave={(newValue) => updateSerialNo(categoryObj._id, newValue)}
-                />
-              </div>
-                
-              <div className='flex items-center gap-3'>
-                
-                <input
-                  type="checkbox"
-                  checked={categoryObj.isActive}
-                  className="flex w-5 h-5"
-                  onChange={() =>
-                    toggleActive(categoryObj._id, categoryObj.isActive)
-                  }
-                />
-                <button
-                  onClick={() => {
-                    console.log("Click!")
-                  }}
-                  className="p-1 text-black rounded"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-5 h-5 text-red-600' viewBox="0 0 640 640"><path d="M232.7 69.9L224 96L128 96C110.3 96 96 110.3 96 128C96 145.7 110.3 160 128 160L512 160C529.7 160 544 145.7 544 128C544 110.3 529.7 96 512 96L416 96L407.3 69.9C402.9 56.8 390.7 48 376.9 48L263.1 48C249.3 48 237.1 56.8 232.7 69.9zM512 208L128 208L149.1 531.1C150.7 556.4 171.7 576 197 576L443 576C468.3 576 489.3 556.4 490.9 531.1L512 208z"/></svg>                </button>
-              </div>
-            </div>
-
-            {/* Collections */}
-            <div className='flex gap-4 w-full overflow-hidden bg-white'>
-              <div className="flex w-full gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth p-3">
-
-                {categoryObj.collections.map((item) => (
-                  <div key={item.id} className="flex flex-col items-center text-center cursor-pointer relative">
-                    <div className="w-20 h-20 relative">
-                      {!categoryLoaded[item.id] && (
-                        <div className="absolute inset-0 rounded-full bg-gray-300 animate-pulse" />
-                      )}
-                      <img
-                        src={item.image}
-                        alt={item.collection}
-                        className={`w-20 h-20 rounded-full border object-cover ${categoryLoaded[item.id] ? "block" : "hidden"}`}
-                        onLoad={() => setCategoryLoaded(prev => ({ ...prev, [item.id]: true }))}
-                        onError={() => setCategoryLoaded(prev => ({ ...prev, [item.id]: true }))}
-                      />
-                    </div>
-                    <span className="mt-1 text-sm text-gray-700">
-                      {item.collection.split(" ").map((text, idx) => (
-                        <React.Fragment key={idx}>{text}<br /></React.Fragment>
-                      ))}
-                    </span>
-
-                    <div className='flex w-23 items-center justify-end absolute top-[-8] z-[5]'> <button className='flex items-center justify-center p-[2px] rounded-full border-[1px] border-red-200 text-center'> <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 text-red-600' viewBox="0 0 640 640"><path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg> </button> </div>
-                  </div>
-                ))}
-
-                {/* Add new collection */}
-                <div className="flex text-center cursor-pointer relative px-3">
-                  <div className="w-20 h-20 flex items-center justify-center rounded-full border-[1px] border-gray-400 text-4xl text-gray-700">
-                    +
-                  </div>
+        {Object.entries(updatedCollectionList).map(
+          ([categoryName, categoryObj]) => (
+            <div
+              key={categoryObj._id}
+              className="mb-2 border rounded-lg overflow-hidden"
+            >
+              {/* Category header */}
+              <div className="w-full flex justify-between items-center py-2 px-2 bg-gray-100 hover:bg-gray-200">
+                <div className="flex items-center gap-2">
+                  <EditableCell
+                    value={categoryObj.serialNo}
+                    onSave={(newValue) =>
+                      updateSerialNo(categoryObj._id, newValue)
+                    }
+                  />
+                  <EditableNameCell
+                    value={categoryName}
+                    onNameSave={(newValue) =>
+                      updateCategoryName(categoryObj._id, newValue)
+                    }
+                  />
                 </div>
 
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={categoryObj.isActive}
+                    className="flex w-5 h-5"
+                    onChange={() =>
+                      toggleActive(categoryObj._id, categoryObj.isActive)
+                    }
+                  />
+                  <button
+                    onClick={() => deleteCategory(categoryObj._id)}
+                    className="p-1 text-black rounded"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      className="w-5 h-5 text-red-600"
+                      viewBox="0 0 640 640"
+                    >
+                      <path d="M232.7 69.9L224 96L128 96C110.3 96 96 110.3 96 128C96 145.7 110.3 160 128 160L512 160C529.7 160 544 145.7 544 128C544 110.3 529.7 96 512 96L416 96L407.3 69.9C402.9 56.8 390.7 48 376.9 48L263.1 48C249.3 48 237.1 56.8 232.7 69.9zM512 208L128 208L149.1 531.1C150.7 556.4 171.7 576 197 576L443 576C468.3 576 489.3 556.4 490.9 531.1L512 208z" />
+                    </svg>{" "}
+                  </button>
+                </div>
+              </div>
+
+              {/* Collections */}
+              <div className="flex gap-4 w-full overflow-hidden bg-white">
+                <div className="flex w-full gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth p-3">
+                  {categoryObj.collections.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex flex-col items-center text-center cursor-pointer relative"
+                    >
+                      <div className="w-20 h-20 relative">
+                        {!categoryLoaded[item.id] && (
+                          <div className="absolute inset-0 rounded-full bg-gray-300 animate-pulse" />
+                        )}
+                        <img
+                          src={item.image}
+                          alt={item.collection}
+                          className={`w-20 h-20 rounded-full border object-cover ${
+                            categoryLoaded[item.id] ? "block" : "hidden"
+                          }`}
+                          onLoad={() =>
+                            setCategoryLoaded((prev) => ({
+                              ...prev,
+                              [item.id]: true,
+                            }))
+                          }
+                          onError={() =>
+                            setCategoryLoaded((prev) => ({
+                              ...prev,
+                              [item.id]: true,
+                            }))
+                          }
+                        />
+                      </div>
+                      <span className="mt-1 text-sm text-gray-700">
+                        {item.collection.split(" ").map((text, idx) => (
+                          <React.Fragment key={idx}>
+                            {text}
+                            <br />
+                          </React.Fragment>
+                        ))}
+                      </span>
+
+                      <div className="flex w-23 items-center justify-end absolute top-[-8] z-[5]">
+                        <button
+                          className="flex items-center justify-center p-[2px] rounded-full border-[1px] border-red-200 text-center"
+                          onClick={() =>
+                            removeCollection(categoryObj._id, item.collectionId)
+                          }
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor"
+                            className="w-4 h-4 text-red-600"
+                            viewBox="0 0 640 640"
+                          >
+                            <path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Add new collection */}
+                  <div className="flex text-center cursor-pointer relative px-3">
+                    <div
+                      className="w-20 h-20 flex items-center justify-center rounded-full border-[1px] border-gray-400 text-4xl text-gray-700"
+                      onClick={() => {
+                        setIsAddColOpen(true);
+                        setCatId(categoryObj._id);
+                      }}
+                    >
+                      +
+                    </div>
+                  </div>
+
+                  {isAddColOpen && (
+                    <AddCollectionModal
+                      isAddColOpen={isAddColOpen}
+                      setIsAddColOpen={setIsAddColOpen}
+                      catId={catId}
+                      onCollectionAdded={handleCollectionAdded}
+                    />
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        )}
       </div>
-
-
     </div>
-  )
-}
+  );
+};
 
-export default HandleCategories
+export default HandleCategories;

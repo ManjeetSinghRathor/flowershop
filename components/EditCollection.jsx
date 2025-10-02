@@ -2,15 +2,17 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "@/app/utils/supabase";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
 
 const EditCollection = () => {
+    const router = useRouter();
     const searchParams = useSearchParams();
     const id = searchParams.get("id"); // <-- get collectionId from URL
     const fileInputRef = useRef();
-
+    const [removeImgLoaded, setRemoveImgLoaded] = useState(true);
+    const [uploadImgLoaded, setUploadedImgLoaded] = useState(true);
     const [collection, setCollection] = useState({
         collectionCode: "",
         name: "",
@@ -33,7 +35,7 @@ const EditCollection = () => {
                 );
 
                 if (!res.data.success) throw new Error("Collection not found");
-                
+
                 // prefill state with existing collection
                 setCollection({
                     collectionCode: res.data.collection.collectionCode,
@@ -98,6 +100,7 @@ const EditCollection = () => {
 
     // Upload image (same logic as AddCollection)
     const handleFileChange = async (e) => {
+        setUploadedImgLoaded(false);
         const file = e.target.files[0];
         if (!file) return;
 
@@ -109,8 +112,6 @@ const EditCollection = () => {
         };
 
         setCollection((prev) => ({ ...prev, image: newImage }));
-
-        console.log(newImage);
 
         const fileName = `collections/${tempId}`;
         const { error } = await supabase.storage.from("collections").upload(fileName, file);
@@ -126,23 +127,38 @@ const EditCollection = () => {
             ...prev,
             image: { ...newImage, imgUrl: publicData.publicUrl },
         }));
+
+        try {
+            // Save image to backend DB also
+            await axios.put(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${id}/update-image`,
+                { imgUrl: publicData.publicUrl },
+                { withCredentials: true }
+            );
+
+        } catch (err) {
+            console.error("Backend image save error:", err.response?.data || err.message);
+        } finally {
+            setUploadedImgLoaded(false);
+        }
+
     };
 
     const openFilePicker = () => fileInputRef.current.click();
 
     const removeImage = async () => {
         if (collection.image?.imgUrl) {
+            setRemoveImgLoaded(false);
             try {
-                const urlParts = collection.image.imgUrl.split("/object/public/");
-                if (urlParts.length < 2) throw new Error("Invalid Supabase URL");
-                let filePath = decodeURIComponent(urlParts[1]);
-                if (filePath.startsWith("collections/")) {
-                    filePath = filePath.replace(/^collections\//, "");
-                }
-                await supabase.storage.from("collections").remove([filePath]);
-                
+                const res = await axios.put(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${id}/remove-image`,
+                    {}, // empty body since we’re not sending extra data
+                    { withCredentials: true }
+                );
             } catch (err) {
-                console.error("Supabase delete error:", err.message || err);
+                console.error(err.response?.data?.message || err.message);
+            } finally {
+                setRemoveImgLoaded(true);
             }
         }
         setCollection((prev) => ({ ...prev, image: "" }));
@@ -169,6 +185,7 @@ const EditCollection = () => {
             if (!res.data.success) throw new Error("Failed to update collection");
 
             toast.success(res.data.message || "Collection updated!");
+            router.replace("/handle_collections");
         } catch (err) {
             console.error("Error updating collection:", err);
             toast.error("Update failed");
@@ -206,6 +223,7 @@ const EditCollection = () => {
                 {/* Image */}
                 <div className="flex w-full items-center justify-center">
                     <div className="flex items-center gap-4">
+
                         {(collection.image && collection.image !== "") ? (
                             <div className="relative">
                                 <img
@@ -218,24 +236,32 @@ const EditCollection = () => {
                                     onClick={removeImage}
                                     className="absolute top-[-4] right-[-4] text-red-500 font-bold rounded-full p-[2px] bg-white"
                                 >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4' viewBox="0 0 640 640"><path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4' viewBox="0 0 640 640"><path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg>
                                 </button>
                             </div>
-                        ) : (
-                            <div
-                                onClick={openFilePicker}
-                                className="w-32 h-32 flex items-center justify-center border-2 border-dashed border-gray-400 rounded-full cursor-pointer hover:bg-gray-200"
-                            >
-                                <span className="text-3xl font-bold text-gray-400">+</span>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    ref={fileInputRef}
-                                    onChange={handleFileChange}
+                        ) :
+                            (!removeImgLoaded) ? (
+                                <div className="relative">
+                                <div
+                                    className="w-28 h-28 bg-gray-300 animate-pulse rounded-full mx-auto"
                                 />
-                            </div>
-                        )}
+                                </div>
+                            ) :
+                                (
+                                    <div
+                                        onClick={openFilePicker}
+                                        className="w-32 h-32 flex items-center justify-center border-2 border-dashed border-gray-400 rounded-full cursor-pointer hover:bg-gray-200"
+                                    >
+                                        <span className="text-3xl font-bold text-gray-400">+</span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            ref={fileInputRef}
+                                            onChange={handleFileChange}
+                                        />
+                                    </div>
+                                )}
                     </div>
                 </div>
 
