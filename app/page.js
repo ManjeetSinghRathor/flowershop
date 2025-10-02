@@ -376,7 +376,7 @@ export default function Home() {
               <Link
                 href={{
                   pathname: "/collection_products",
-                  query: { category: col.collection, id: col._id }, // pass product ID as query param
+                  query: { category: col.name, id: col._id }, // pass product ID as query param
                 }}
                 className="flex items-center gap-1 bg-gray-900 text-white py-1 px-4 rounded"
               >

@@ -14,7 +14,6 @@ function EditableCell({ value: initialValue, onSave }) {
   const handleBlur = () => {
     setIsEditing(false);
     if (value !== initialValue && value !== "") {
-      console.log(value);
       onSave(value); // call parent function to update
     } else {
       setValue(initialValue);
@@ -65,7 +64,6 @@ const HandleProducts = () => {
       );
 
       if (res.data.success) {
-        console.log("Bonzor")
         setProducts((prev) => {
           const existingIds = new Set(prev.map((p) => p._id));
           const filtered = res.data.products.filter(

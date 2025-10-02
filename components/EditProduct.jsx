@@ -54,7 +54,6 @@ const EditProduct = () => {
                 );
 
                 if (res.data.success) {
-                    console.log(res.data.data)
                     const p = res.data.data;
                     setProduct(p);
 

@@ -14,6 +14,7 @@ const AddCategory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedCol, setSelectedCol] = useState([]);
 
   // 🔍 Search collections from backend
   useEffect(() => {
@@ -28,7 +29,7 @@ const AddCategory = () => {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/search?search=${encodeURIComponent(searchQuery)}`
         );
-
+        
         setSearchResults(res.data);
       } catch (err) {
         console.error("Error fetching collections:", err);
@@ -48,14 +49,19 @@ const AddCategory = () => {
         ...category,
         collections: [
           ...category.collections,
+            col._id,
+        ],
+      });
+
+      setSelectedCol([
+        ...selectedCol,
           {
-            collectionId: col._id,
-            collectionName: col.name,
+            _id: col._id,
+            name: col.name,
             collectionCode: col.collectionCode,
             collectionImg: col.image
           },
-        ],
-      });
+        ]);
 
       // console.log(category);
       setSearchQuery("");
@@ -65,9 +71,10 @@ const AddCategory = () => {
   // ❌ Remove collection from category
   const handleRemoveCollection = (collectionId) => {
     setCategory({
-      ...category,
-      collections: category.collections.filter((c) => c.collectionId !== collectionId),
+     ...category,
+     collections: category.collections.filter((c) => c !== collectionId)
     });
+    setSelectedCol(selectedCol.filter((c) => c._id !== collectionId))
   };
 
   // 📤 Submit category
@@ -103,6 +110,7 @@ const AddCategory = () => {
       setCategory({ name: "", serialNo: "", collections: [] });
       setSearchQuery("");
       setSearchResults([]);
+      setSelectedCol([]);
     } catch (err) {
       console.error("Error submitting category:", err);
       toast.error("Failed to create category");
@@ -173,22 +181,22 @@ const AddCategory = () => {
         </div>
 
         {/* Selected Collections */}
-        {category.collections.length > 0 && (
+        {selectedCol.length > 0 && (
           <div className="mt-4">
             <h2 className="font-semibold mb-2">Selected Collections</h2>
             <ul className="flex flex-wrap gap-4">
-              {category.collections.map((c) => (
+              {selectedCol.map((c) => (
                 <li
-                  key={c.collectionId}
+                  key={c._id}
                   className="flex w-fit gap-4 items-center border p-2 rounded"
                 >
                   <div className="flex items-center gap-2">
-                    <p className="font-medium">{c.collectionName}</p>
+                    <p className="font-medium">{c.name}</p>
                     <p className="text-sm text-gray-500">({c.collectionCode})</p>
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleRemoveCollection(c.collectionId)}
+                    onClick={() => handleRemoveCollection(c._id)}
                     className="text-red-500"
                   >
                     Remove

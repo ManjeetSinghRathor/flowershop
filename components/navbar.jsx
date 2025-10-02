@@ -42,10 +42,12 @@ const Navbar = () => {
 
                 cat?.collections.forEach((col) => {
                     collectionListTemp[categoryName].push({
-                        collectionId: col.collectionId,
+                        collectionId: col._id,
                         id: col.collectionCode, // or col._id if you prefer
-                        collection: col.collectionName,
-                        image: col.collectionImg,
+                        collection: col.name,
+                        image: col.image,
+                        isActive: col.isActive,
+                        productsN: col.products?.length,
                     });
                 });
             });

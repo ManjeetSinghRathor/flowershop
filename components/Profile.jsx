@@ -22,8 +22,6 @@ const Profile = () => {
 
     useEffect(() => {
         if (user && user !== null) {
-            console.log(user?.profile.avatarUrl);
-
             setUserImg(user?.profile.avatarUrl);
             setLoading(false);
         }
@@ -107,6 +105,16 @@ const Profile = () => {
                             />
                             Handle <br />Collections
                         </Link>
+                        
+                        <Link href={"/handle_categories"} className='flex flex-col items-center text-center gap-1 p-2 rounded-lg bg-gradient-to-r from-[#f6f6f6] to-[#fafafa] min-w-30'>
+                            <Image
+                                src={"/application_9710836.png"}
+                                alt="Categories Icon"
+                                width={48}
+                                height={48}
+                            />
+                            Handle <br />Categories
+                        </Link>
                         <Link href={"/handle_slider"} className='flex flex-col items-center text-center gap-1 p-2 rounded-lg bg-gradient-to-r from-[#f6f6f6] to-[#fafafa] min-w-30'>
                             <Image
                                 src={"/slides_8491233.png"}
@@ -115,15 +123,6 @@ const Profile = () => {
                                 height={48}
                             />
                             Handle <br />Slider
-                        </Link>
-                        <Link href={"/shipping_orders"} className='flex flex-col items-center text-center gap-1 p-2 rounded-lg bg-gradient-to-r from-[#f6f6f6] to-[#fafafa] min-w-30'>
-                            <Image
-                                src={"/cargo_3045670.png"}
-                                alt="Shipping Icon"
-                                width={48}
-                                height={48}
-                            />
-                            Shipping <br />Orders
                         </Link>
                     </div>
                 </div>}
