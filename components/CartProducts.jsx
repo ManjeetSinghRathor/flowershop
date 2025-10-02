@@ -12,7 +12,6 @@ const CartProducts = () => {
     const dispatch = useDispatch();
     const user = useSelector((state) => state?.user?.data);
     const cart_product_ids = useSelector((state) => state.CartProducts);
-    const [productsImgloaded, setProductsImgLoaded] = useState({});
 
     const [loading, setLoading] = useState(true);
     const [cart_products, setCartProducts] = useState([]);
@@ -165,20 +164,10 @@ const CartProducts = () => {
                                         }}
                                         className="w-20 h-20 relative flex-shrink-0"
                                     >
-                                        {!productsImgloaded[product._id] && (
-                                            <div className="absolute inset-0 rounded-md bg-gray-600 animate-pulse" />
-                                        )}
                                         <img
                                             src={product.images[0].imgUrl}
                                             alt={product.name}
-                                            className={`w-full h-full object-cover rounded-md ${productsImgloaded[product._id] ? "block" : "hidden"
-                                                }`}
-                                            onLoad={() =>
-                                                setProductsImgLoaded((prev) => ({ ...prev, [product._id]: true }))
-                                            }
-                                            onError={() =>
-                                                setProductsImgLoaded((prev) => ({ ...prev, [product._id]: true }))
-                                            }
+                                            className={`w-full h-full object-cover rounded-md`}
                                         />
                                     </Link>
 

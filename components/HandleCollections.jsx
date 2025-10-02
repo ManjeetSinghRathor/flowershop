@@ -3,22 +3,29 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
+import toast from "react-hot-toast";
+
 
 const HandleCollections = () => {
-  const [categoryLoaded, setCategoryLoaded] = useState({});
   const [loading, setLoading] = useState(true);
   const [collections, setCollections] = useState([]);
   const [query, setQuery] = useState("");
 
   const fetchSearch = async () => {
-    console.log("Click");
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/search?search=${encodeURIComponent(query)}`
+        );
+        
+        setCollections(res.data);
+      } catch (err) {
+        console.error("Error fetching collections:", err);
+      } finally {
+        setLoading(false);
+      }
   };
 
-  useEffect(() => {
-    if (query.trim()) {
-      fetchSearch();
-    }
-  }, [query])
 
   // Fetch all collections
   const fetchCollections = async () => {
@@ -35,9 +42,53 @@ const HandleCollections = () => {
     }
   };
 
+
   useEffect(() => {
-    fetchCollections();
-  }, []);
+    if (query.trim()) {
+      fetchSearch();
+    } else {
+      fetchCollections();
+    }
+  }, [query])
+
+  const deleteCollection = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this collection?")) return;
+
+  try {
+    const res = await axios.delete(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${id}`,
+      { withCredentials: true } // ✅ ensures auth cookies/JWT are sent
+    );
+
+    if (res.data.success) {
+      toast.success("Collection deleted successfully");
+      fetchCollections(); // 🔄 refresh list if you pass function
+    } else {
+      toast.error(res.data.message || "Failed to delete collection");
+    }
+  } catch (err) {
+    console.error("Delete collection error:", err);
+    toast.error("Error deleting collection");
+  }
+};
+
+  // Toggle isActive
+  const toggleActive = async (id, current) => {
+    try {
+      const res = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${id}/toggleActive`
+      );
+      if (res.data.success) {
+        setCollections((prev) =>
+          prev.map((p) => (p._id === id ? { ...p, isActive: !current } : p))
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update status");
+    }
+  };
+
 
   return (
     <div className="min-h-screen px-4 sm:px-8 lg:px-24 py-4 bg-gray-100">
@@ -46,10 +97,10 @@ const HandleCollections = () => {
         <h1 className="text-xl sm:text-2xl font-bold">Handle Collections</h1>
         <div className="flex w-full justify-end">
           <Link
-            href="/add_category"
+            href="/add_collection"
             className="flex w-fit bg-blue-600 text-white px-4 py-2 rounded-md"
           >
-            Add New Category
+            Add New Collection
           </Link>
         </div>
       </div>
@@ -70,7 +121,7 @@ const HandleCollections = () => {
           <input
             id="searchBox"
             type="text"
-            placeholder="Search products by name, code, tags, flowers..."
+            placeholder="Search collection by name, code..."
             className="p-2 w-full outline-none"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -121,11 +172,11 @@ const HandleCollections = () => {
                 checked={item.isActive}
                 className="w-5 h-5"
                 onChange={() =>
-                  console.log("Toggle Active:", item._id, item.isActive)
-                }
+                        toggleActive(item._id, item.isActive)
+                      }
               />
               <button
-                onClick={() => console.log("Delete:", item._id)}
+                onClick={() => deleteCollection(item._id)}
                 className="flex items-center justify-center p-1 rounded-full border-[1px] border-red-200"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 text-red-600' viewBox="0 0 640 640"><path d="M232.7 69.9L224 96L128 96C110.3 96 96 110.3 96 128C96 145.7 110.3 160 128 160L512 160C529.7 160 544 145.7 544 128C544 110.3 529.7 96 512 96L416 96L407.3 69.9C402.9 56.8 390.7 48 376.9 48L263.1 48C249.3 48 237.1 56.8 232.7 69.9zM512 208L128 208L149.1 531.1C150.7 556.4 171.7 576 197 576L443 576C468.3 576 489.3 556.4 490.9 531.1L512 208z" /></svg>
@@ -133,22 +184,12 @@ const HandleCollections = () => {
             </div>
 
             {/* Collection Image */}
-            <div className="w-24 h-24 relative">
-              {!categoryLoaded[item._id] && (
-                <div className="absolute inset-0 rounded-full bg-gray-300 animate-pulse" />
-              )}
+            <Link href={`/handle_collections/edit_collection?id=${item._id}`} className="w-24 h-24 relative">
 
               <img
-                src={item.image}
+                src={item.image || null}
                 alt={item.name}
-                className={`w-24 h-24 rounded-full border object-cover transition-opacity duration-300 ${categoryLoaded[item._id] ? "opacity-100" : "opacity-0"
-                  }`}
-                onLoad={() =>
-                  setCategoryLoaded((prev) => ({ ...prev, [item._id]: true }))
-                }
-                onError={() =>
-                  setCategoryLoaded((prev) => ({ ...prev, [item._id]: true }))
-                }
+                className={`w-24 h-24 rounded-full border object-cover`}
               />
 
               {/* Hover overlay */}
@@ -165,7 +206,7 @@ const HandleCollections = () => {
 
               <div className='flex items-center justify-center absolute inset-0 z-[5] bg-[rgba(0,0,0,0.1)] rounded-full'> <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-7 h-7 text-white' viewBox="0 0 640 640"><path d="M437.5 91.1C452.5 73.9 474.2 64 497.1 64C540.7 64 576.1 99.4 576.1 143C576.1 165.8 566.2 187.6 549 202.6L347.7 377.8L337 367L273 303L262.2 292.3L437.5 91.1zM225.1 323C226 324 252 350 303 401L316.9 414.9L299.8 489.1C295.9 506.2 282.9 519.8 266 524.5L96.2 572L188.5 479.7C189.7 479.8 190.8 479.9 192 479.9C209.7 479.9 224 465.6 224 447.9C224 430.2 209.7 415.9 192 415.9C174.3 415.9 160 430.2 160 447.9C160 449.1 160.1 450.3 160.2 451.4L67.9 543.8L115.5 374C120.2 357.1 133.8 344.1 150.9 340.2L225.1 323z" /></svg> </div>
 
-            </div>
+            </Link>
 
             {/* Collection Name */}
             <span className="mt-2 text-sm text-gray-700 font-medium">

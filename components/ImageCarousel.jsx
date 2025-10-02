@@ -56,7 +56,7 @@ export default function ImageCarousel({ images }) {
         <img
           src={images[current].imgUrl}
           alt={`Image ${current + 1}`}
-          className="w-full h-full object-contain transition-all duration-300"
+          className="w-full h-full object-contain"
         />
 
         {/* Left Arrow */}
@@ -84,7 +84,7 @@ export default function ImageCarousel({ images }) {
             onClick={() => goToImage(index)}
             className={`h-16 w-auto rounded-lg overflow-hidden border-1 ${
               current === index ? "border-gray-600" : "border-transparent"
-            } transition-all duration-200`}
+            }`}
           >
             <img
               src={img.imgUrl}

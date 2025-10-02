@@ -38,8 +38,6 @@ export default function Home() {
   const [homepageCollections, setHomepageCollections] = useState([]);
   const [colLoading, setColLoading] = useState(true);
 
-  const [categoryLoaded, setCategoryLoaded] = useState({});
-
   const settings = {
     dots: true,
     infinite: true,
@@ -229,30 +227,12 @@ export default function Home() {
                       className="flex flex-col items-center gap-1 cursor-pointer"
                     >
                       <div className="w-20 h-20 sm:w-28 sm:h-28 relative">
-                        {/* Skeleton */}
-                        {!categoryLoaded[item.id] && (
-                          <div className="absolute inset-0 rounded-full bg-gray-300 animate-pulse" />
-                        )}
 
                         {/* Actual image */}
                         <img
-                          className={`w-20 h-20 sm:w-28 sm:h-28 rounded-full object-cover object-center border border-gray-400 ${
-                            categoryLoaded[item.id] ? "block" : "hidden"
-                          }`}
+                          className={`w-20 h-20 sm:w-28 sm:h-28 rounded-full object-cover object-center border border-gray-400`}
                           src={item.image}
                           alt={item.collection}
-                          onLoad={() =>
-                            setCategoryLoaded((prev) => ({
-                              ...prev,
-                              [item.id]: true,
-                            }))
-                          }
-                          onError={() =>
-                            setCategoryLoaded((prev) => ({
-                              ...prev,
-                              [item.id]: true,
-                            }))
-                          }
                         />
                       </div>
                       <div className="text-center text-sm max-w-18 sm:max-w-28">

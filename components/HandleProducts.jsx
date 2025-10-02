@@ -236,7 +236,7 @@ const HandleProducts = () => {
           <input
             id="searchBox"
             type="text"
-            placeholder="Search products by name, code, tags, flowers..."
+            placeholder="Search products by name, code..."
             className="p-2 w-full outline-none"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
