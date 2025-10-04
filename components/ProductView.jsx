@@ -173,10 +173,10 @@ const ProductView = () => {
                 <div className="flex flex-col gap-2 py-2">
                     {/* Stock */}
                     <p
-                        className={`text-sm ${productDetails.isActive ? "text-green-600" : "text-red-600"
+                        className={`text-sm ${(productDetails.isActive && productDetails.stock > 0) ? "text-green-600" : "text-red-600"
                             }`}
                     >
-                        {productDetails.isActive ? `In Stock` : "Out of Stock"}
+                        {(productDetails.isActive && productDetails.stock > 0) ? `In Stock` : "Out of Stock"}
                     </p>
 
                     {/* Reviews */}

@@ -160,6 +160,24 @@ const CollectionProducts = () => {
                                             alt={product.name}
                                             className={`w-full h-full object-cover rounded-lg`}
                                         />
+
+                                        {
+                                            ((product.isActive && product.stock > 0) && product.sizes[0]?.discount > 0) && (
+                                                <div className="absolute z-[20] top-0 left-0 px-1 py-[2px] bg-[rgba(0,0,0,0.5)]">
+                                                    <p className="text-sm font-semibold text-white">{product.sizes[0]?.discount}% OFF</p>
+                                                </div>
+                                            )
+                                        }
+
+                                        {(!product.isActive || product.stock === 0) && (
+                                            <div className="flex items-center justify-center absolute inset-0 z-[30] bg-[rgba(0,0,0,0.3)] rounded-lg transition">
+                                                <p className="text-center font-extrabold text-xl bg-gradient-to-br from-red-200 via-red-100 to-white bg-clip-text text-transparent drop-shadow-md">
+                                                    <span>OUT</span>
+                                                    <br />
+                                                    <span>OF STOCK</span>
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Product Info */}

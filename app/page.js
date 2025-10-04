@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import Slider from "react-slick";
 import Link from "next/link";
@@ -7,8 +7,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { AddProduct, setCart } from "./store/CartProductsSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
-
-
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -34,9 +32,30 @@ export default function Home() {
   }, [colList]);
 
   const [slides, setSlides] = useState([]);
+  const [slidesToShow, setSlidesToShow] = useState(1);
   const [loading, setLoading] = useState(true);
   const [homepageCollections, setHomepageCollections] = useState([]);
   const [colLoading, setColLoading] = useState(true);
+
+  useLayoutEffect(() => {
+    const updateSlides = () => {
+      const width = window.innerWidth;
+      if (width < 724) {
+        setSlidesToShow(1); // Mobile / Tablet
+      } else if(width < 1224) {
+        setSlidesToShow(2); // Desktop
+      } else {
+        setSlidesToShow(3);
+      }
+    };
+
+    // Run once before first paint
+    updateSlides();
+
+    // Listen for resizes
+    window.addEventListener("resize", updateSlides);
+    return () => window.removeEventListener("resize", updateSlides);
+  }, []);
 
   const settings = {
     dots: true,
@@ -47,16 +66,53 @@ export default function Home() {
     autoplay: true,
     autoplaySpeed: 4000,
     swipe: true,
-    arrows: false,
-    appendDots: (dots) => (
-      <div>
-        <ul className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex">
-          {dots}
-        </ul>
+    arrows: true,
+    slidesToShow,
+
+    appendDots: (dots) => {
+      const activeIndex = dots.findIndex((dot) =>
+        dot.props.className.includes("slick-active")
+      );
+
+      let visibleDots = [];
+
+      if (dots.length <= 3) {
+        visibleDots = dots;
+      } else {
+        if (activeIndex === 0) {
+          visibleDots = [dots[0], dots[1], dots[2]];
+        } else if (activeIndex === dots.length - 1) {
+          visibleDots = [
+            dots[dots.length - 3],
+            dots[dots.length - 2],
+            dots[dots.length - 1],
+          ];
+        } else {
+          visibleDots = [
+            dots[activeIndex - 1],
+            dots[activeIndex],
+            dots[activeIndex + 1],
+          ];
+        }
+      }
+
+      return (
+        <div>
+          <ul className="absolute bottom-1 sm:bottom-2 left-1/2 transform -translate-x-1/2 flex">
+            {visibleDots}
+          </ul>
+        </div>
+      );
+    },
+
+    customPaging: (i) => (
+      <div className="group relative w-[10px] h-[10px] sm:w-[14px] sm:h-[14px] mx-[4px] rounded-full transition-all duration-300">
+        {/* Glow effect for active */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-100 blur-[2px]" />
+
+        {/* Inner dot */}
+        <div className="w-full h-full bg-[rgba(255,255,255,0.3)] group-hover:bg-gradient-to-r group-hover:from-pink-400 group-hover:to-yellow-300 rounded-full transition-all duration-100 scale-90 group-hover:scale-100 shadow-md" />
       </div>
-    ),
-    customPaging: () => (
-      <div className="w-[20px] sm:w-[25px] sm:h-[6px] h-[5px] bg-white border-[1px] border-[rgb(146,145,145)] rounded-full"></div>
     ),
   };
 
@@ -133,7 +189,7 @@ export default function Home() {
       </div> */}
 
       <div className="flex w-full justify-center">
-        <div className="relative w-full max-w-4xl overflow-hidden py-4">
+        <div className="relative w-full overflow-hidden py-4">
           <div className="w-full">
             {loading ? (
               <div className="flex justify-center gap-4">
@@ -141,7 +197,7 @@ export default function Home() {
                 {[...Array(1)].map((_, idx) => (
                   <div
                     key={idx}
-                    className="w-full max-w-4xl h-[144px] sm:h-[200px] bg-gray-300 animate-pulse"
+                    className="w-full h-[144px] sm:h-[240px] bg-gray-300 animate-pulse"
                   />
                 ))}
               </div>
@@ -150,13 +206,16 @@ export default function Home() {
                 {slides.map((slide, idx) => (
                   <div
                     key={slide._id}
-                    className="w-full aspect-[7/3] max-h-[240px]"
+                    className="w-full aspect-[7/3] bg-white"
                   >
                     <Link href={slide.link || "#"}>
                       <img
                         src={slide.image}
                         alt={`Slide ${idx}`}
-                        className="w-full h-full object-cover rounded-xl cursor-pointer p-1"
+                        loading={idx === 0 ? "eager" : "lazy"}
+                        fetchPriority={idx === 0 ? "high" : "auto"}
+                        decoding="async"
+                        className="w-full h-full object-cover object-top sm:object-contain sm:rounded-xs cursor-pointer p-1"
                       />
                     </Link>
                   </div>
@@ -169,19 +228,18 @@ export default function Home() {
 
       {/* Collection List */}
       <div className="flex flex-col w-full gap-4 sm:gap-6 px-2">
-        <h2 className="flex font-mono text-2xl justify-center sm:text-3xl leading-tight">
+        <h2 className="flex font-mono text-2xl justify-center sm:text-3xl leading-tight mt-1 sm:mt-2">
           Collection List
         </h2>
         {catLoaded ? (
           <div className="flex flex-col gap-4 w-full overflow-hidden py-4">
-
             {/* <div className="flex w-[100px] h-[28px] relative">
               <div className="absolute inset-0 rounded-md bg-gray-300 animate-pulse" />
             </div> */}
 
             {/* Row 1 */}
             <div className="flex w-full sm:gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
-              {[...Array(9)].map((_, idx) => (
+              {[...Array(11)].map((_, idx) => (
                 <div
                   key={`row1-${idx}`}
                   className="min-w-[5rem] min-h-[5rem] sm:min-w-[7rem] sm:min-h-[7rem] flex items-center justify-center snap-start"
@@ -193,7 +251,7 @@ export default function Home() {
             </div>
             {/* Row 2 */}
             <div className="flex w-full sm:gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
-              {[...Array(9)].map((_, idx) => (
+              {[...Array(11)].map((_, idx) => (
                 <div
                   key={`row1-${idx}`}
                   className="min-w-[5rem] min-h-[5rem] sm:min-w-[7rem] sm:min-h-[7rem] flex items-center justify-center snap-start"
@@ -222,12 +280,14 @@ export default function Home() {
                     <Link
                       href={{
                         pathname: "/collection_products",
-                        query: { category: item.collection, id: item.collectionId }, // pass subcategory as query param
+                        query: {
+                          category: item.collection,
+                          id: item.collectionId,
+                        }, // pass subcategory as query param
                       }}
                       className="flex flex-col items-center gap-1 cursor-pointer"
                     >
                       <div className="w-20 h-20 sm:w-28 sm:h-28 relative">
-
                         {/* Actual image */}
                         <img
                           className={`w-20 h-20 sm:w-28 sm:h-28 rounded-full object-cover object-center border border-gray-400`}
@@ -305,6 +365,26 @@ export default function Home() {
                           alt={product.name}
                           className={`w-full h-full object-cover rounded-lg`}
                         />
+
+                        {product.isActive &&
+                          product.stock > 0 &&
+                          product.sizes[0]?.discount > 0 && (
+                            <div className="absolute z-[20] top-0 left-0 px-1 py-[2px] bg-[rgba(0,0,0,0.5)]">
+                              <p className="text-sm font-semibold text-white">
+                                {product.sizes[0]?.discount}% OFF
+                              </p>
+                            </div>
+                          )}
+
+                        {(!product.isActive || product.stock === 0) && (
+                          <div className="flex items-center justify-center absolute inset-0 z-[30] bg-[rgba(0,0,0,0.3)] rounded-lg transition">
+                            <p className="text-center font-extrabold text-xl bg-gradient-to-br from-red-200 via-red-100 to-white bg-clip-text text-transparent drop-shadow-md">
+                              <span>OUT</span>
+                              <br />
+                              <span>OF STOCK</span>
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       {/* Product Info */}
