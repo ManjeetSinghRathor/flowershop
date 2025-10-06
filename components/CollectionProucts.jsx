@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react'
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ const CollectionProducts = () => {
 
     const searchParams = useSearchParams();
     const dispatch = useDispatch();
+    const router = useRouter();
     const user = useSelector((state) => state.user?.data);
     const category = searchParams.get("category"); // e.g. "Birthday Flowers"
     const categoryId = searchParams.get("id");
@@ -19,7 +20,7 @@ const CollectionProducts = () => {
     const [collection_products, setCollection_products] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const handleAddToCart = async (id) => {
+    const handleAddToCart = async (id, deliveryTime) => {
         if (user) {
             try {
                 const res = await axios.post(
@@ -29,7 +30,7 @@ const CollectionProducts = () => {
                 );
                 if (res.data.success) {
                     toast.success("Item added to your cart");
-                    dispatch(AddProduct({ id, q: 1 }));
+                    dispatch(AddProduct({ id, q: 1, deliveryTime }));
                     // Optional: update Redux state with res.data.cart
                 }
             } catch (err) {
@@ -37,7 +38,7 @@ const CollectionProducts = () => {
                 console.error(err);
             }
         } else {
-            dispatch(AddProduct({ id, q: 1 })); // guest cart in redux
+            dispatch(AddProduct({ id, q: 1, deliveryTime })); // guest cart in redux
             toast.success("Item added to cart (guest)");
         }
     };
@@ -160,24 +161,6 @@ const CollectionProducts = () => {
                                             alt={product.name}
                                             className={`w-full h-full object-cover rounded-lg`}
                                         />
-
-                                        {
-                                            ((product.isActive && product.stock > 0) && product.sizes[0]?.discount > 0) && (
-                                                <div className="absolute z-[20] top-0 left-0 px-1 py-[2px] bg-[rgba(0,0,0,0.5)]">
-                                                    <p className="text-sm font-semibold text-white">{product.sizes[0]?.discount}% OFF</p>
-                                                </div>
-                                            )
-                                        }
-
-                                        {(!product.isActive || product.stock === 0) && (
-                                            <div className="flex items-center justify-center absolute inset-0 z-[30] bg-[rgba(0,0,0,0.3)] rounded-lg transition">
-                                                <p className="text-center font-extrabold text-xl bg-gradient-to-br from-red-200 via-red-100 to-white bg-clip-text text-transparent drop-shadow-md">
-                                                    <span>OUT</span>
-                                                    <br />
-                                                    <span>OF STOCK</span>
-                                                </p>
-                                            </div>
-                                        )}
                                     </div>
 
                                     {/* Product Info */}
@@ -199,10 +182,15 @@ const CollectionProducts = () => {
 
                                 {/* Buttons at bottom */}
                                 <div className="mt-auto flex gap-2 pt-3">
-                                    <button className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded">
+                                    <button
+                                        onClick={() => {
+                                            router.push(`/cart_products/checkout_?product_id=${product._id}&delivery_time=${encodeURIComponent(product.deliveryTime[0])}`)
+                                        }}
+                                        className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded"
+                                    >
                                         Buy
                                     </button>
-                                    <button onClick={() => handleAddToCart(product._id)} className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded">
+                                    <button onClick={() => handleAddToCart(product._id, product.deliveryTime[0])} className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded">
                                         <span className="text-lg">+</span>{" "}
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"

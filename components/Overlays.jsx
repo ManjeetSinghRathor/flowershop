@@ -295,7 +295,7 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                     </div>
                     <div className='flex w-full h-full justify-center items-center bg-gray-800'>
                         {user == null ?
-                            <div className="flex max-w-xs">
+                            <div className="flex max-w-xs cursor-pointer">
                                 <GoogleLogin
                                     onSuccess={handleGoogleLogin}
                                     onError={() => setError("Google login failed")}

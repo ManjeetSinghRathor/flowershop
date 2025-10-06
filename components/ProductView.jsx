@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import ImageCarousel from "@/components/ImageCarousel";
 import Link from "next/link";
 import {
@@ -54,6 +54,7 @@ const Star = ({ filled = 0, className = "w-6 h-6" }) => {
 
 const ProductView = () => {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const productId = searchParams.get("id");
     const [review, setReview] = useState({
         rating: 0,
@@ -165,190 +166,196 @@ const ProductView = () => {
                 </div>
             </div>
 
-            <div className="px-2 sm:px-8 lg:px-24 ">
-                <ImageCarousel images={productDetails?.images} />
-            </div>
-
-            <div className="flex flex-col gap-4 mt-2 px-2 sm:px-8 lg:px-24 ">
-                <div className="flex flex-col gap-2 py-2">
-                    {/* Stock */}
-                    <p
-                        className={`text-sm ${(productDetails.isActive && productDetails.stock > 0) ? "text-green-600" : "text-red-600"
-                            }`}
-                    >
-                        {(productDetails.isActive && productDetails.stock > 0) ? `In Stock` : "Out of Stock"}
-                    </p>
-
-                    {/* Reviews */}
-                    <div className="flex items-center gap-1 text-gray-500">
-                        {Array.from({ length: 5 }).map((_, i) => {
-                            let fill = 0;
-                            if ((review?.rating || 0) >= i + 1) fill = 1; // full star
-                            else if (
-                                (review?.rating || 0) > i &&
-                                (review?.rating || 0) < i + 1
-                            )
-                                fill = 0.5; // half star
-                            return <Star key={i} filled={fill} className="w-4 h-4" />;
-                        })}
-                        <span className="ml-1">
-                            {review?.rating > 0 ? review.rating : "No Reviews"}
-                        </span>
-                    </div>
-
-                    {/* Price Section */}
-                    <div className="flex items-center gap-2">
-                        {productDetails?.sizes[currentSizeIdx].discount > 0 && (
-                            <span className="text-gray-500 line-through text-lg">
-                                {productDetails?.sizes[currentSizeIdx].price}₹
-                            </span>
-                        )}
-                        <span className="font-mono text-2xl text-red-600">
-                            {productDetails?.sizes[currentSizeIdx].finalPrice}₹
-                        </span>
-                        <span className="px-1 leading-tight bg-green-600 text-white">
-                            Save {productDetails?.sizes[currentSizeIdx].discount}%
-                        </span>
-                    </div>
+            <div className="flex flex-col lg:flex-row px-2 gap-12 sm:px-8 lg:px-24">
+                <div className="lg:min-w-xl">
+                    <ImageCarousel images={productDetails?.images} />
                 </div>
 
-                <div className="border-t border-b border-gray-300 sm:grid sm:grid-cols-2 sm:gap-6 sm:py-2">
-                    {/* Delivery */}
-                    <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
-                        <label
-                            htmlFor="deliveryTime"
-                            className="font-mono font-semibold text-gray-800"
+                <div className="flex flex-col gap-4 mt-2">
+                    <div className="flex flex-col gap-2 py-2">
+                        {/* Stock */}
+                        <p
+                            className={`text-sm ${(productDetails.isActive && productDetails.stock > 0) ? "text-green-600" : "text-red-600"
+                                }`}
                         >
-                            Delivery Time
-                        </label>
-
-                        <select
-                            id="deliveryTime"
-                            name="deliveryTime"
-                            value={delivery_time}
-                            onChange={(e) => setDelivery_time(e.target.value)}
-                            className="border border-gray-300 rounded-md px-2 py-1 text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800"
-                        >
-                            {/* productDetails.delivery_options */}
-                            {(productDetails?.deliveryTime || ["1-2 days"]).map((option, index) => (
-                                <option key={index} value={option}>
-                                    {option}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Size */}
-                    <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
-                        <label
-                            htmlFor="Size"
-                            className="font-mono font-semibold text-gray-800"
-                        >
-                            Size
-                        </label>
-
-                        <select
-                            id="Size"
-                            name="Size"
-                            value={currentSizeIdx}
-                            onChange={(e) => setCurrentSizeIdx(parseInt(e.target.value))}
-                            className="border border-gray-300 rounded-md px-2 py-1 text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800"
-                        >
-                            {/* productDetails.delivery_options */}
-                            {productDetails?.sizes?.map((option, index) => (
-                                <option key={index} value={index}>
-                                    {option.sizeName}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                {/* Quantity + Add to Cart row */}
-                <div className="grid grid-cols-2 gap-2 mb-1">
-                    {/* Quantity box */}
-                    <div className="grid grid-cols-3 border border-gray-400 rounded-lg w-full">
-                        {/* Minus Button */}
-                        <button
-                            type="button"
-                            className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 border-1 rounded-l-lg"
-                            onClick={() => {
-                                const input = document.getElementById("qtyBox");
-                                if (input.value > 1) input.value = parseInt(input.value) - 1;
-                            }}
-                        >
-                            -
-                        </button>
-
-                        {/* Number Input */}
-                        <input
-                            id="qtyBox"
-                            type="number"
-                            min="1"
-                            value={quantity} // bind state to input value
-                            onChange={(e) => setQuantity(Number(e.target.value))}
-                            className="flex justify-center text-center border-x border-gray-400 focus:outline-none"
-                        />
-
-                        {/* Plus Button */}
-                        <button
-                            type="button"
-                            className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 border-1 rounded-r-lg"
-                            onClick={() => {
-                                const input = document.getElementById("qtyBox");
-                                input.value = parseInt(input.value) + 1;
-                            }}
-                        >
-                            +
-                        </button>
-                    </div>
-
-                    {/* Add to Cart button */}
-                    <button onClick={() => handleAddToCart(productDetails._id)} className="border border-gray-400 py-2 rounded-lg hover:bg-gray-100">
-                        + Add to Cart
-                    </button>
-                </div>
-
-                {/* Full width Buy Now */}
-                <button className="w-full bg-gray-800 text-white py-3 rounded-lg hover:bg-red-700 sticky top-14 z-[45]">
-                    Buy Now
-                </button>
-
-                <div className="flex flex-col gap-2">
-                    <div>
-                        <h2 className="font-semibold mb-1">Description:</h2>
-                        <p className="text-gray-700 font-serif text-base leading-relaxed tracking-wide px-4 leading-tight">
-                            {productDetails.description}
+                            {(productDetails.isActive && productDetails.stock > 0) ? `In Stock` : "Out of Stock"}
                         </p>
+
+                        {/* Reviews */}
+                        <div className="flex items-center gap-1 text-gray-500">
+                            {Array.from({ length: 5 }).map((_, i) => {
+                                let fill = 0;
+                                if ((review?.rating || 0) >= i + 1) fill = 1; // full star
+                                else if (
+                                    (review?.rating || 0) > i &&
+                                    (review?.rating || 0) < i + 1
+                                )
+                                    fill = 0.5; // half star
+                                return <Star key={i} filled={fill} className="w-4 h-4" />;
+                            })}
+                            <span className="ml-1">
+                                {review?.rating > 0 ? review.rating : "No Reviews"}
+                            </span>
+                        </div>
+
+                        {/* Price Section */}
+                        <div className="flex items-center gap-2">
+                            {productDetails?.sizes[currentSizeIdx].discount > 0 && (
+                                <span className="text-gray-500 line-through text-lg">
+                                    {productDetails?.sizes[currentSizeIdx].price}₹
+                                </span>
+                            )}
+                            <span className="font-mono text-2xl text-red-600">
+                                {productDetails?.sizes[currentSizeIdx].finalPrice}₹
+                            </span>
+                            <span className="px-1 leading-tight bg-green-600 text-white">
+                                Save {productDetails?.sizes[currentSizeIdx].discount}%
+                            </span>
+                        </div>
                     </div>
 
-                    {/* Package Details */}
-                    <div>
-                        <h2 className="font-semibold mb-1">Package Contains:</h2>
-                        <ul className="list-disc list-inside px-4 py-1 text-sm text-gray-700">
-                            {productDetails?.packContains?.map((item, idx) => (
-                                <li key={idx}>{item}</li>
-                            ))}
-                        </ul>
+                    <div className="border-t border-b border-gray-300 sm:grid xl:grid-cols-2 sm:gap-6 sm:py-2">
+                        {/* Delivery */}
+                        <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
+                            <label
+                                htmlFor="deliveryTime"
+                                className="font-mono font-semibold text-gray-800"
+                            >
+                                Delivery Time
+                            </label>
+
+                            <select
+                                id="deliveryTime"
+                                name="deliveryTime"
+                                value={delivery_time}
+                                onChange={(e) => setDelivery_time(e.target.value)}
+                                className="border border-gray-300 rounded-md px-2 py-1 text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800"
+                            >
+                                {/* productDetails.delivery_options */}
+                                {(productDetails?.deliveryTime || ["1-2 days"]).map((option, index) => (
+                                    <option key={index} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Size */}
+                        <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
+                            <label
+                                htmlFor="Size"
+                                className="font-mono font-semibold text-gray-800"
+                            >
+                                Size
+                            </label>
+
+                            <select
+                                id="Size"
+                                name="Size"
+                                value={currentSizeIdx}
+                                onChange={(e) => setCurrentSizeIdx(parseInt(e.target.value))}
+                                className="border border-gray-300 rounded-md px-2 py-1 text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800"
+                            >
+                                {/* productDetails.delivery_options */}
+                                {productDetails?.sizes?.map((option, index) => (
+                                    <option key={index} value={index}>
+                                        {option.sizeName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
-                    {/* Occasions */}
-                    <div>
-                        <h2 className="font-semibold mb-1">Best For:</h2>
-                        <ul className="flex flex-wrap px-4 py-1 gap-2 text-sm text-gray-700">
-                            {productDetails?.occasions?.map((occ, idx) => (
-                                <li
-                                    key={idx}
-                                    className="bg-gray-100 px-2 py-1 rounded-md border"
-                                >
-                                    {occ}
-                                </li>
-                            ))}
-                        </ul>
+                    {/* Quantity + Add to Cart row */}
+                    <div className="grid grid-cols-2 gap-2 mb-1">
+                        {/* Quantity box */}
+                        <div className="grid grid-cols-3 border border-gray-400 rounded-lg w-full">
+                            {/* Minus Button */}
+                            <button
+                                type="button"
+                                className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 border-1 rounded-l-lg"
+                                onClick={() => {
+                                    const input = document.getElementById("qtyBox");
+                                    if (input.value > 1) input.value = parseInt(input.value) - 1;
+                                }}
+                            >
+                                -
+                            </button>
+
+                            {/* Number Input */}
+                            <input
+                                id="qtyBox"
+                                type="number"
+                                min="1"
+                                value={quantity} // bind state to input value
+                                onChange={(e) => setQuantity(Number(e.target.value))}
+                                className="flex justify-center text-center border-x border-gray-400 focus:outline-none"
+                            />
+
+                            {/* Plus Button */}
+                            <button
+                                type="button"
+                                className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 border-1 rounded-r-lg"
+                                onClick={() => {
+                                    const input = document.getElementById("qtyBox");
+                                    input.value = parseInt(input.value) + 1;
+                                }}
+                            >
+                                +
+                            </button>
+                        </div>
+
+                        {/* Add to Cart button */}
+                        <button onClick={() => handleAddToCart(productDetails._id)} className="border border-gray-400 py-2 rounded-lg hover:bg-gray-100">
+                            + Add to Cart
+                        </button>
                     </div>
 
-                    {/* Care Instructions */}
-                    {/* <div>
+                    {/* Full width Buy Now */}
+                    <button
+                        onClick={() => {
+                            router.push(`/cart_products/checkout_?product_id=${productDetails._id}&delivery_time=${encodeURIComponent(delivery_time)}`)
+                        }}
+                        className="w-full bg-gray-800 text-white py-3 rounded-lg hover:bg-red-700"
+                    >
+                        Buy Now
+                    </button>
+
+                    <div className="flex flex-col gap-2">
+                        <div>
+                            <h2 className="font-semibold mb-1">Description:</h2>
+                            <p className="text-gray-700 font-serif text-base leading-relaxed tracking-wide px-4 leading-tight">
+                                {productDetails.description}
+                            </p>
+                        </div>
+
+                        {/* Package Details */}
+                        <div>
+                            <h2 className="font-semibold mb-1">Package Contains:</h2>
+                            <ul className="list-disc list-inside px-4 py-1 text-sm text-gray-700">
+                                {productDetails?.packContains?.map((item, idx) => (
+                                    <li key={idx}>{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Occasions */}
+                        <div>
+                            <h2 className="font-semibold mb-1">Best For:</h2>
+                            <ul className="flex flex-wrap px-4 py-1 gap-2 text-sm text-gray-700">
+                                {productDetails?.occasions?.map((occ, idx) => (
+                                    <li
+                                        key={idx}
+                                        className="bg-gray-100 px-2 py-1 rounded-md border"
+                                    >
+                                        {occ}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Care Instructions */}
+                        {/* <div>
                     <h2 className="font-semibold mb-1">Care Instructions:</h2>
                     <ul className="list-disc list-inside text-sm text-gray-700">
                         {productDetails.care_instructions.map((rule, idx) => (
@@ -357,135 +364,137 @@ const ProductView = () => {
                     </ul>
                 </div> */}
 
-                    {/* Add Ons */}
-                    {productDetails.addOns && (
-                        <div>
-                            <h2 className="font-semibold mb-1">Available Add-Ons:</h2>
-                            <ul className="flex flex-wrap gap-2 text-sm text-gray-700">
-                                {productDetails.addOns.map((addon, idx) => (
-                                    <li
-                                        key={idx}
-                                        className="bg-pink-100 px-2 py-1 rounded-md border border-pink-300"
-                                    >
-                                        {addon}
-                                    </li>
-                                ))}
-                            </ul>
+                        {/* Add Ons */}
+                        {productDetails.addOns && (
+                            <div>
+                                <h2 className="font-semibold mb-1">Available Add-Ons:</h2>
+                                <ul className="flex flex-wrap gap-2 text-sm text-gray-700">
+                                    {productDetails.addOns.map((addon, idx) => (
+                                        <li
+                                            key={idx}
+                                            className="bg-pink-100 px-2 py-1 rounded-md border border-pink-300"
+                                        >
+                                            {addon}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        <div className="w-full">
+                            {/* Header */}
+                            <button
+                                onClick={() => setIsOpen(!isOpen)}
+                                className="w-full flex justify-between items-center pt-1 text-left font-semibold text-black"
+                            >
+                                <span>Shipping and Delivery:</span>
+                                {isOpen ? (
+                                    <FaChevronUp className="text-gray-500" />
+                                ) : (
+                                    <FaChevronDown className="text-gray-500" />
+                                )}
+                            </button>
+
+                            {/* Content */}
+                            {isOpen && (
+                                <div className="px-4 py-3 text-sm text-gray-700 space-y-4">
+                                    <div>
+                                        <p className="font-medium">
+                                            Can I get my order delivered earlier?
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">
+                                            What Payment methods are available?
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">
+                                            What if I receive the product damaged?
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    )}
 
-                    <div className="w-full">
-                        {/* Header */}
-                        <button
-                            onClick={() => setIsOpen(!isOpen)}
-                            className="w-full flex justify-between items-center pt-1 text-left font-semibold text-black"
-                        >
-                            <span>Shipping and Delivery:</span>
-                            {isOpen ? (
-                                <FaChevronUp className="text-gray-500" />
-                            ) : (
-                                <FaChevronDown className="text-gray-500" />
+                        <div className="w-full">
+                            {/* Header */}
+                            <button
+                                onClick={() => setIsReviewsOpen(!isReviewsOpen)}
+                                className="w-full flex justify-between items-center pt-1 text-left font-semibold text-black"
+                            >
+                                <span>Customer Reviews:</span>
+                                {isReviewsOpen ? (
+                                    <FaChevronUp className="text-gray-500" />
+                                ) : (
+                                    <FaChevronDown className="text-gray-500" />
+                                )}
+                            </button>
+
+                            {/* Content */}
+                            {isReviewsOpen && (
+                                <div className="px-4 py-3 text-sm text-gray-700 space-y-4">
+                                    <div>
+                                        <p className="font-medium">
+                                            Can I get my order delivered earlier?
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">
+                                            What Payment methods are available?
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">
+                                            What if I receive the product damaged?
+                                        </p>
+                                    </div>
+                                </div>
                             )}
-                        </button>
+                        </div>
 
-                        {/* Content */}
-                        {isOpen && (
-                            <div className="px-4 py-3 text-sm text-gray-700 space-y-4">
-                                <div>
-                                    <p className="font-medium">
-                                        Can I get my order delivered earlier?
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="font-medium">
-                                        What Payment methods are available?
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="font-medium">
-                                        What if I receive the product damaged?
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                        <div className="w-full">
+                            {/* Header */}
+                            <button
+                                onClick={() => setIsShareOpen(!isShareOpen)}
+                                className="w-full flex justify-between items-center pt-1 text-left font-semibold text-black"
+                            >
+                                <span>Share This Product On:</span>
+                                {isShareOpen ? (
+                                    <FaChevronUp className="text-gray-500" />
+                                ) : (
+                                    <FaChevronDown className="text-gray-500" />
+                                )}
+                            </button>
 
-                    <div className="w-full">
-                        {/* Header */}
-                        <button
-                            onClick={() => setIsReviewsOpen(!isReviewsOpen)}
-                            className="w-full flex justify-between items-center pt-1 text-left font-semibold text-black"
-                        >
-                            <span>Customer Reviews:</span>
-                            {isReviewsOpen ? (
-                                <FaChevronUp className="text-gray-500" />
-                            ) : (
-                                <FaChevronDown className="text-gray-500" />
+                            {/* Content */}
+                            {isShareOpen && (
+                                <div className="flex px-4 mt-4 space-x-4">
+                                    <a
+                                        href="https://www.instagram.com/graduate.mentors/?igsh=bjgxczU1Y2M2M3px#"
+                                        className="text-pink-500 hover:text-pink-600 transition-colors text-3xl"
+                                    >
+                                        <FaInstagram />
+                                    </a>
+                                    <a
+                                        href="https://www.instagram.com/graduate.mentors/?igsh=bjgxczU1Y2M2M3px#"
+                                        className="text-green-500 hover:text-green-600 transition-colors text-3xl"
+                                    >
+                                        <FaWhatsapp />
+                                    </a>
+                                    <a
+                                        href="#"
+                                        className="text-blue-600 hover:text-blue-700 transition-colors text-3xl"
+                                    >
+                                        <FaFacebook />
+                                    </a>
+                                </div>
                             )}
-                        </button>
-
-                        {/* Content */}
-                        {isReviewsOpen && (
-                            <div className="px-4 py-3 text-sm text-gray-700 space-y-4">
-                                <div>
-                                    <p className="font-medium">
-                                        Can I get my order delivered earlier?
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="font-medium">
-                                        What Payment methods are available?
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="font-medium">
-                                        What if I receive the product damaged?
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="w-full">
-                        {/* Header */}
-                        <button
-                            onClick={() => setIsShareOpen(!isShareOpen)}
-                            className="w-full flex justify-between items-center pt-1 text-left font-semibold text-black"
-                        >
-                            <span>Share This Product On:</span>
-                            {isShareOpen ? (
-                                <FaChevronUp className="text-gray-500" />
-                            ) : (
-                                <FaChevronDown className="text-gray-500" />
-                            )}
-                        </button>
-
-                        {/* Content */}
-                        {isShareOpen && (
-                            <div className="flex px-4 mt-4 space-x-4">
-                                <a
-                                    href="https://www.instagram.com/graduate.mentors/?igsh=bjgxczU1Y2M2M3px#"
-                                    className="text-pink-500 hover:text-pink-600 transition-colors text-3xl"
-                                >
-                                    <FaInstagram />
-                                </a>
-                                <a
-                                    href="https://www.instagram.com/graduate.mentors/?igsh=bjgxczU1Y2M2M3px#"
-                                    className="text-green-500 hover:text-green-600 transition-colors text-3xl"
-                                >
-                                    <FaWhatsapp />
-                                </a>
-                                <a
-                                    href="#"
-                                    className="text-blue-600 hover:text-blue-700 transition-colors text-3xl"
-                                >
-                                    <FaFacebook />
-                                </a>
-                            </div>
-                        )}
+                        </div>
                     </div>
                 </div>
             </div>
+
 
             <div className="flex flex-col w-full gap-3 pt-12 pb-4 px-4 sm:px-10 lg:px-26 ">
                 <h2 className="flex font-mono text-xl justify-center sm:text-3xl">

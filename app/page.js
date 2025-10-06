@@ -7,9 +7,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { AddProduct, setCart } from "./store/CartProductsSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+
 
 export default function Home() {
   const dispatch = useDispatch();
+  const router = useRouter();
   const user = useSelector((state) => state.user?.data);
   const colList = useSelector((state) => state.collectionList.data);
 
@@ -116,7 +119,7 @@ export default function Home() {
     ),
   };
 
-  const handleAddToCart = async (id) => {
+  const handleAddToCart = async (id, deliveryTime) => {
     if (user) {
       try {
         const res = await axios.post(
@@ -126,7 +129,7 @@ export default function Home() {
         );
         if (res.data.success) {
           toast.success("Item added to your cart");
-          dispatch(AddProduct({ id, q: 1 }));
+          dispatch(AddProduct({ id, q: 1, deliveryTime }));
           // Optional: update Redux state with res.data.cart
         }
       } catch (err) {
@@ -134,7 +137,7 @@ export default function Home() {
         console.error(err);
       }
     } else {
-      dispatch(AddProduct({ id, q: 1 })); // guest cart in redux
+      dispatch(AddProduct({ id, q: 1, deliveryTime })); // guest cart in redux
       toast.success("Item added to cart (guest)");
     }
   };
@@ -410,11 +413,15 @@ export default function Home() {
 
                     {/* Buttons at bottom */}
                     <div className="mt-auto flex gap-2 pt-3">
-                      <button className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded">
+                      <button
+                      onClick={()=>{
+                        router.push(`/cart_products/checkout_?product_id=${product._id}&delivery_time=${encodeURIComponent(product.deliveryTime[0])}`)
+                      }}
+                      className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded">
                         Buy
                       </button>
                       <button
-                        onClick={() => handleAddToCart(product._id)}
+                        onClick={() => handleAddToCart(product._id, product.deliveryTime[0])}
                         className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded"
                       >
                         <span className="text-lg">+</span>{" "}

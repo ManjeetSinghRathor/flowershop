@@ -5,11 +5,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { IncreaseQty, DecreaseQty, removeProduct } from '@/app/store/CartProductsSlice';
 import axios from 'axios';
-
+import { useRouter } from 'next/navigation';
 
 const CartProducts = () => {
 
     const dispatch = useDispatch();
+    const router = useRouter();
     const user = useSelector((state) => state?.user?.data);
     const cart_product_ids = useSelector((state) => state.CartProducts);
 
@@ -129,7 +130,7 @@ const CartProducts = () => {
                 {cart_products?.length > 0 && <button
                     disabled={cart_product_ids?.length === 0}
                     onClick={() => {
-                        console.log("click")
+                        router.push("/cart_products/checkout_");
                     }}
                     className='flex w-fit py-2 px-4 font-semibold bg-black text-white hover:bg-gray-900 hover:cursor-pointer'
                 >
@@ -275,7 +276,7 @@ const CartProducts = () => {
                                 <button
                                     disabled={cart_product_ids?.length === 0}
                                     onClick={() => {
-                                        console.log("click")
+                                        router.push("/cart_products/checkout_");
                                     }}
                                     className='flex w-full items-center justify-center mt-4 py-2 px-4 font-semibold bg-black text-white hover:bg-gray-900 hover:cursor-pointer'
                                 >

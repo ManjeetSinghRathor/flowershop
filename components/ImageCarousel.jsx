@@ -45,7 +45,7 @@ export default function ImageCarousel({ images }) {
   };
 
   return (
-    <div className="w-full h-fit max-w-2xl mx-auto lg:sticky top-0 z-10">
+    <div className="w-full h-fit max-w-2xl mx-auto lg:sticky top-18 z-10">
       {/* Main Carousel */}
       <div
         className="relative w-full aspect-[1] max-h-[40vh] md:max-h-[50vh] rounded-xl overflow-hidden shadow-lg backdrop-blur-md p-4"
