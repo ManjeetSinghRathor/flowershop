@@ -21,38 +21,39 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
 export const metadata = {
   title: "Bloom's Heaven - Premium Flower Shop in Bangalore",
   description:
     "Bloom's Heaven is your premium online and offline flower shop in Bangalore. Fresh flowers, roses, bouquets, and elegant gifts for every occasion. Order now and spread happiness!",
   keywords: [
     "Bloom's Heaven",
-    "flowers Bangalore",
-    "flower shop",
+    "flower shop Bangalore",
     "buy flowers online",
     "fresh flowers",
     "roses",
     "flower delivery",
     "gifts",
     "flower bouquet",
-    "online flower store",
-    "premium flowers",
     "wedding flowers",
     "birthday gifts",
+    "online flower store",
+    "premium flowers",
+    "luxury bouquets"
   ],
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL),
   manifest: "/manifest.json",
   openGraph: {
     title: "Bloom's Heaven - Premium Flower Shop in Bangalore",
     description:
-      "Discover Bloom's Heaven – luxury flowers, bouquets, and gifts. Perfect bouquets for weddings, birthdays, and special occasions.",
-    url: "https://bloomsheaven.com",
+      "Discover Bloom's Heaven – luxury flowers, bouquets, and gifts. Perfect for weddings, birthdays, and special occasions.",
+    url: process.env.NEXT_PUBLIC_SITE_URL,
     siteName: "Bloom's Heaven",
     images: [
       {
-        url: "/favicon.png",
-        width: 800,
-        height: 600,
+        url: "/favicon-512.png",
+        width: 512,
+        height: 512,
         alt: "Bloom's Heaven Logo",
       },
     ],
@@ -64,7 +65,7 @@ export const metadata = {
     title: "Bloom's Heaven - Premium Flower Shop",
     description:
       "Fresh flowers, roses, bouquets, and elegant gifts – Bloom's Heaven, your one-stop flower shop in Bangalore.",
-    images: ["/favicon.png"],
+    images: ["/favicon-512.png"],
   },
 };
 
