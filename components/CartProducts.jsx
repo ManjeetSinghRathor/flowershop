@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { IncreaseQty, DecreaseQty, removeProduct } from '@/app/store/CartProductsSlice';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const CartProducts = () => {
 
@@ -141,17 +142,21 @@ const CartProducts = () => {
             {loading ?
                 <div className="flex flex-col justify-center gap-4 pt-2 px-2 sm:px-8 lg:px-24">
                     {/* Skeleton slides */}
-                    {[...Array(2)].map((_, idx) => (
-                        <div
-                            key={idx}
-                            className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
-                        />
+                    {[...Array(4)].map((_, idx) => (
+                        <div key={idx} className='flex gap-3 items-start px-4 py-2'>
+                            <div
+                                className="w-20 h-20 bg-gray-300 animate-pulse rounded-md"
+                            />
+                            <div
+                                className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
+                            />
+                        </div>
                     ))}
                 </div> :
                 <div className='flex flex-col w-full gap-3 pt-2 px-2 sm:px-8 lg:px-24'>
                     {cart_products?.length > 0 ? (
                         <>
-                            {cart_products.map((product,idx) => (
+                            {cart_products.map((product, idx) => (
                                 <div
                                     key={idx}
                                     className="flex gap-3 items-start p-3"
@@ -165,11 +170,16 @@ const CartProducts = () => {
                                         }}
                                         className="w-20 h-20 relative flex-shrink-0"
                                     >
-                                        <img
-                                            src={product.images[0].imgUrl}
-                                            alt={product.name}
-                                            className={`w-full h-full object-cover rounded-md`}
-                                        />
+                                        <div className="relative w-full h-full rounded-md overflow-hidden">
+                                            <Image
+                                                src={product.images[0].imgUrl}
+                                                alt={product.name}
+                                                fill
+                                                className="object-cover"
+                                                unoptimized
+                                            />
+                                        </div>
+
                                     </Link>
 
                                     {/* Info */}
@@ -188,16 +198,16 @@ const CartProducts = () => {
                                                 {product.description}
                                             </p>
 
-                                        <div className='flex flex-col sm:flex-row sm:gap-6 text-xs sm:text-sm py-1 gap-[2px]'>
-                                            <div>
-                                                <p className='font-[600]'>Size</p>
-                                                <p className='text-gray-600'>{product.sizes[product.sizeIdx].sizeName}</p>
+                                            <div className='flex flex-col sm:flex-row sm:gap-6 text-xs sm:text-sm py-1 gap-[2px]'>
+                                                <div>
+                                                    <p className='font-[600]'>Size</p>
+                                                    <p className='text-gray-600'>{product.sizes[product.sizeIdx].sizeName}</p>
+                                                </div>
+                                                <div>
+                                                    <p className='font-[600]'>Delivery Time</p>
+                                                    <p className='text-gray-600'>{product.delivery_time}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className='font-[600]'>Delivery Time</p>
-                                                <p className='text-gray-600'>{product.delivery_time}</p>
-                                            </div>
-                                        </div>
 
                                             {/* Price */}
                                             <div className="mt-2 flex items-center gap-2">
@@ -219,7 +229,7 @@ const CartProducts = () => {
                                                 <button
                                                     type="button"
                                                     className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 border-1 rounded-l-lg"
-                                                    disabled = {clicked}
+                                                    disabled={clicked}
                                                     onClick={() => handleMinus(product)}
                                                 >
                                                     -
@@ -238,7 +248,7 @@ const CartProducts = () => {
                                                 <button
                                                     type="button"
                                                     className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 border-1 rounded-r-lg"
-                                                    disabled = {clicked}
+                                                    disabled={clicked}
                                                     onClick={() => handlePlus(product)}
                                                 >
                                                     +
@@ -252,7 +262,7 @@ const CartProducts = () => {
                                             </p>
                                             <button
                                                 onClick={() => handleRemoveItem(product)}
-                                                disabled = {clicked}
+                                                disabled={clicked}
                                                 className="ml-2 rounded-full p-1 bg-gray-100"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-5 h-5 sm:w-6 sm:h-6' viewBox="0 0 640 640"><path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg>
@@ -263,7 +273,7 @@ const CartProducts = () => {
 
                             ))}
 
-                            <div className='flex flex-col border-t border-gray-300 w-full gap-2 py-4'>
+                            <div className='flex flex-col border-t border-gray-300 w-full gap-2 py-4 sticky bottom-0'>
                                 <div className='flex justify-between font-mono text-xl sm:text-2xl font-semibold'>
                                     <span>Subtotal</span>
                                     <p className='flex font-mono gap-[2px]'>
@@ -295,18 +305,29 @@ const CartProducts = () => {
                         </>
                     ) : (
                         <div className="flex flex-col grow w-full h-full items-center justify-center text-center gap-2">
-                            <p className='flex justify-center items-center h-[120px] text-gray-400'>
-                                Your Cart is Empty
+
+                            <Image
+                                src={"/empty-cart.png"} // fallback image from public/
+                                alt="Empty Cart"
+                                width={320} // matches Tailwind's w-16
+                                height={320}
+                                className={`object-cover`}
+                            />
+
+                            <p className='flex justify-center items-center text-gray-500'>
+                                YOUR CART IS EMPTY
                             </p>
+
                             <Link
                                 href={{
                                     pathname: "/collection_products",
                                     query: { category: "All Products", id: "68db488464d038f4c3298faa" }, // pass subcategory as query param
                                 }}
-                                className='flex items-center p-1 border text-blue-400'
+                                className='flex items-center text-sm leading-tight underline text-blue-600'
                             >
-                                Continue shopping {">"}
+                                Continue shopping {">>"}
                             </Link>
+
                         </div>
                     )}
                 </div>

@@ -107,7 +107,12 @@ const AddCollection = () => {
 
         // Upload to Supabase (bucket: "collections")
         const fileName = `collections/${tempId}`;
-        const { error } = await supabase.storage.from("collections").upload(fileName, file);
+        const { error } = await supabase.storage
+            .from("collections")
+            .upload(fileName, file, {
+                cacheControl: "public, max-age=31536000", // 1 year cache
+                upsert: true,
+            });;
 
         if (error) {
             console.error("Supabase upload error:", error.message);

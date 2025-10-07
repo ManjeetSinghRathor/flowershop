@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setCart } from "@/app/store/CartProductsSlice";
+import Image from "next/image";
 // deliveryOptions.js
 
 const deliveryOptions = {
@@ -84,6 +85,7 @@ export default function CheckoutPage() {
     const [isPhoneValid, setIsPhoneValid] = useState(true);
 
     const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(true);
     const [cartItems, setCartItems] = useState([]);
 
     useEffect(() => {
@@ -99,8 +101,6 @@ export default function CheckoutPage() {
                 // Find the default address, or fallback to first address
                 const defaultAddress =
                     user.addresses.find((add) => add.isDefault) || user.addresses[0];
-
-                console.log(defaultAddress);
 
                 setUserAdd(defaultAddress);
 
@@ -138,7 +138,7 @@ export default function CheckoutPage() {
         } catch (error) {
             console.error("Error fetching local cart:", error);
         } finally {
-            setLoading(false);
+            setFetching(false);
         }
     };
 
@@ -389,13 +389,13 @@ export default function CheckoutPage() {
             </div>
 
             {/* Main layout */}
-            <div className="px-2 sm:px-8 lg:px-24 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="px-2 sm:px-8 lg:px-24 py-4 sm:py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left - Form */}
                 <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
                     <div
-                        onClick={() =>{
-                            if(Object.entries(userAdd).length > 0)
-                            setCollapsed(true)
+                        onClick={() => {
+                            if (Object.entries(userAdd).length > 0)
+                                setCollapsed(true)
                         }}
                         className="flex justify-between items-center cursor-pointer mb-4"
                     >
@@ -562,7 +562,7 @@ export default function CheckoutPage() {
                     </div>
                         :
                         (Object.entries(userAdd).length > 0 &&
-                            <div className="grid grid-cols-1 gap-4 px-2 sm:px-8 lg:px-24 py-4">
+                            <div className="grid grid-cols-1 gap-4 px-2 py-2">
                                 <div
                                     className={`relative border-1 rounded-lg p-4 gap-1 cursor-pointer transition-all duration-200 ${userAdd.isDefault
                                         ? "border-blue-500 shadow-md"
@@ -605,14 +605,33 @@ export default function CheckoutPage() {
                 {/* Right - Order Summary */}
                 <div className="bg-white p-6 rounded-lg shadow-md h-fit">
                     <h2 className="font-mono text-xl mb-4">Order Summary</h2>
+                    {fetching ?
+                <div className="flex flex-col justify-center gap-4 pt-2 px-2 sm:px-8 lg:px-24">
+                    {/* Skeleton slides */}
+                    {[...Array(2)].map((_, idx) => (
+                        <div key={idx} className='flex gap-3 items-start'>
+                            <div
+                                className="w-20 h-20 bg-gray-300 animate-pulse rounded-md"
+                            />
+                            <div
+                                className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
+                            />
+                        </div>
+                    ))}
+                </div> :
                     <div className="flex flex-col gap-3 mb-4 max-h-[300px] overflow-y-auto">
                         {cartItems.map((item, idx) => (
                             <div key={idx} className="flex gap-3 border-b pb-2">
-                                <img
-                                    src={item.images[0].imgUrl}
-                                    alt={item.name}
-                                    className="w-16 h-16 object-cover rounded"
-                                />
+                                <div className="relative w-16 h-16 rounded overflow-hidden">
+                                    <Image
+                                        src={item.images[0].imgUrl}
+                                        alt={item.name}
+                                        fill
+                                        className="object-cover"
+                                        unoptimized
+                                    />
+                                </div>
+
                                 <div className="flex flex-col flex-1">
                                     <p className="font-semibold text-gray-700">{item.name}</p>
                                     <div className="flex flex-col sm:flex-row sm:gap-6 text-xs sm:text-sm gap-[2px]">
@@ -637,21 +656,27 @@ export default function CheckoutPage() {
                                 </div>
                             </div>
                         ))}
-                    </div>
+                    </div>}
 
                     <div className="mt-4 text-gray-800 font-mono">
                         <div className="flex justify-between">
                             <span>Subtotal</span>
-                            <span>₹{subtotal}</span>
+                            {fetching ? <div
+                                className="w-20 h-5 bg-gray-300 animate-pulse rounded-md"
+                            />: <span>₹{subtotal}</span>}
                         </div>
                         <div className="flex justify-between">
                             <span>Shipping</span>
-                            <span>{shippingFee > 0 ? `₹${shippingFee}` : "Free"}</span>
+                            {fetching ? <div
+                                className="w-16 h-5 bg-gray-300 animate-pulse rounded-md"
+                            />: <span>{shippingFee > 0 ? `₹${shippingFee}` : "Free"}</span>}
                         </div>
                         <hr className="my-3" />
                         <div className="flex justify-between font-semibold text-lg">
                             <span>Total</span>
-                            <span>₹{total}</span>
+                            {fetching ? <div
+                                className="w-20 h-5 bg-gray-300 animate-pulse rounded-md"
+                            />: <span>₹{total}</span>}
                         </div>
                     </div>
 

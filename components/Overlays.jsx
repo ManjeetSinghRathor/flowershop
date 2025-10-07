@@ -19,7 +19,6 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
     const router = useRouter();
     const menuRef = useRef(null);
     const swipeRef = useRef(null);
-    const [categoryLoaded, setCategoryLoaded] = useState({});
     const [openLoginPopup, setOpenLoginPopup] = useState(false);
 
     const user = useSelector((state) => state.user?.data || null);
@@ -220,6 +219,11 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                                 <span>Profile</span><span><FaChevronRight className="w-[14px] h-[14px] text-blue-600" /></span>
                             </Link>
                         </div>}
+
+                    {user === null && <div className="w-full max-w-md mx-auto flex items-center justify-center px-4 pt-4 pb-2">
+                        <img className="h-12 w-auto" src="./favicon.png" alt="" />
+                    </div>}
+
                     <div className="w-full max-w-md mx-auto p-4">
                         {Object.entries(updatedCollectionList).map(([category, items]) => (
                             <div key={category} className="mb-2 border rounded-lg overflow-hidden">
@@ -252,17 +256,12 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                                                 }, 300)}
                                             >
                                                 <div className="w-16 h-16 relative">
-                                                    {/* Skeleton */}
-                                                    {!categoryLoaded[item.id] && (
-                                                        <div className="absolute inset-0 rounded-full bg-gray-300 animate-pulse" />
-                                                    )}
-
-                                                    <img
+                                                    <Image
                                                         src={item.image}
                                                         alt={item.collection}
-                                                        className={`w-16 h-16 rounded-full border object-cover ${categoryLoaded[item.id] ? "block" : "hidden"}`}
-                                                        onLoad={() => setCategoryLoaded(prev => ({ ...prev, [item.id]: true }))}
-                                                        onError={() => setCategoryLoaded(prev => ({ ...prev, [item.id]: true }))}
+                                                        width={64} // corresponds to w-16
+                                                        height={64} // corresponds to h-16
+                                                        className="rounded-full border object-cover"
                                                     />
                                                 </div>
                                                 <span className="mt-1 text-sm text-gray-700">

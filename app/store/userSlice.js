@@ -11,7 +11,7 @@ const userSlice = createSlice({
     // ✅ Update addresses in user object
     setUserAddresses: (state, action) => {
       if (state) {
-        state.addresses = action.payload; // replaces existing addresses
+        state.data.addresses = action.payload; // replaces existing addresses
       }
     },
 
@@ -20,7 +20,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, setUserAddresses, logout } =
-  userSlice.actions;
+export const { setUser, setUserAddresses, logout } = userSlice.actions;
 
 export default userSlice.reducer;

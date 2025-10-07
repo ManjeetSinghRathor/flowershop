@@ -76,7 +76,9 @@ const HandleCollections = () => {
   const toggleActive = async (id, current) => {
     try {
       const res = await axios.patch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${id}/toggleActive`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${id}/toggleActive`,
+        {},
+        {  withCredentials: true }
       );
       if (res.data.success) {
         setCollections((prev) =>

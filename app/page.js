@@ -8,7 +8,8 @@ import { AddProduct, setCart } from "./store/CartProductsSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
+import FloatingButton from "@/components/FloatingButton";
+import Image from "next/image";
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -45,7 +46,7 @@ export default function Home() {
       const width = window.innerWidth;
       if (width < 724) {
         setSlidesToShow(1); // Mobile / Tablet
-      } else if(width < 1224) {
+      } else if (width < 1224) {
         setSlidesToShow(2); // Desktop
       } else {
         setSlidesToShow(3);
@@ -207,19 +208,20 @@ export default function Home() {
             ) : (
               <Slider {...settings}>
                 {slides.map((slide, idx) => (
-                  <div
-                    key={slide._id}
-                    className="w-full aspect-[7/3] bg-white"
-                  >
+                  <div key={slide._id} className="w-full aspect-[7/3] bg-white">
                     <Link href={slide.link || "#"}>
-                      <img
-                        src={slide.image}
-                        alt={`Slide ${idx}`}
-                        loading={idx === 0 ? "eager" : "lazy"}
-                        fetchPriority={idx === 0 ? "high" : "auto"}
-                        decoding="async"
-                        className="w-full h-full object-cover object-top sm:object-contain sm:rounded-xs cursor-pointer p-1"
-                      />
+                      <div className="relative w-full h-full p-1 cursor-pointer">
+                        <Image
+                          src={slide.image}
+                          alt={`Offer ${idx + 1}`}
+                          fill
+                          loading={idx === 0 ? "eager" : "lazy"}
+                          fetchPriority={idx === 0 ? "high" : "auto"}
+                          decoding="async"
+                          className="object-cover object-top sm:object-contain sm:rounded-xs"
+                          unoptimized
+                        />
+                      </div>
                     </Link>
                   </div>
                 ))}
@@ -292,11 +294,15 @@ export default function Home() {
                     >
                       <div className="w-20 h-20 sm:w-28 sm:h-28 relative">
                         {/* Actual image */}
-                        <img
-                          className={`w-20 h-20 sm:w-28 sm:h-28 rounded-full object-cover object-center border border-gray-400`}
-                          src={item.image}
-                          alt={item.collection}
-                        />
+                        <div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full border border-gray-400 overflow-hidden">
+                          <Image
+                            src={item.image}
+                            alt={item.collection}
+                            fill
+                            className="object-cover object-center"
+                            unoptimized
+                          />
+                        </div>
                       </div>
                       <div className="text-center text-sm max-w-18 sm:max-w-28">
                         {item.collection}
@@ -363,11 +369,15 @@ export default function Home() {
                     >
                       <div className="w-full h-36 mb-2 relative">
                         {/* Actual image */}
-                        <img
-                          src={product.images[0].imgUrl}
-                          alt={product.name}
-                          className={`w-full h-full object-cover rounded-lg`}
-                        />
+                        <div className="relative w-full h-full rounded-lg overflow-hidden">
+                          <Image
+                            src={product.images[0].imgUrl}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
+                        </div>
 
                         {product.isActive &&
                           product.stock > 0 &&
@@ -414,14 +424,23 @@ export default function Home() {
                     {/* Buttons at bottom */}
                     <div className="mt-auto flex gap-2 pt-3">
                       <button
-                      onClick={()=>{
-                        router.push(`/cart_products/checkout_?product_id=${product._id}&delivery_time=${encodeURIComponent(product.deliveryTime[0])}`)
-                      }}
-                      className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded">
+                        onClick={() => {
+                          router.push(
+                            `/cart_products/checkout_?product_id=${
+                              product._id
+                            }&delivery_time=${encodeURIComponent(
+                              product.deliveryTime[0]
+                            )}`
+                          );
+                        }}
+                        className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded"
+                      >
                         Buy
                       </button>
                       <button
-                        onClick={() => handleAddToCart(product._id, product.deliveryTime[0])}
+                        onClick={() =>
+                          handleAddToCart(product._id, product.deliveryTime[0])
+                        }
                         className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded"
                       >
                         <span className="text-lg">+</span>{" "}
@@ -462,7 +481,7 @@ export default function Home() {
         ))
       )}
 
-      {/* Footer */}
+      {user?.role === "admin" && <FloatingButton />}
     </div>
   );
 }

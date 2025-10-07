@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { setUserAddresses } from '@/app/store/userSlice';
@@ -48,6 +48,7 @@ const deliveryOptions = {
 
 const UserAddress = () => {
 
+  const dispatch = useDispatch();
   const user = useSelector((state) => state?.user?.data);
   const [userAdd, setUserAdd] = useState([]);
   const [isPhoneValid, setIsPhoneValid] = useState(true);
@@ -163,8 +164,8 @@ const UserAddress = () => {
         {},
         { withCredentials: true }
       );
-      setUserAdd(res.data.addresses);
-      setUserAddresses(res.data.addresses);
+      setUserAdd(res.data.addresses);      
+      dispatch(setUserAddresses(res.data.addresses));
       toast.success(res.data.message || "Default address set successfully");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to set default address");
@@ -178,7 +179,7 @@ const UserAddress = () => {
         { withCredentials: true }
       );
       setUserAdd(res.data.addresses);
-      setUserAddresses(res.data.addresses);
+      dispatch(setUserAddresses(res.data.addresses));
       toast.success(res.data.message || "Address deleted successfully");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to delete address");
@@ -195,7 +196,7 @@ const UserAddress = () => {
 
       toast.success(res.data.message || "Address updated successfully");
       setUserAdd(res.data.addresses);
-      setUserAddresses(res.data.addresses);
+      dispatch(setUserAddresses(res.data.addresses));
       setCollapsed(true); // close edit form/modal if you have one
       setAddress((pre) => ({
                 ...pre,
@@ -311,7 +312,7 @@ const UserAddress = () => {
         setSearch("");
         // Optionally refresh address list
         setUserAdd(res.data.addresses);
-        setUserAddresses(res.data.addresses);
+        dispatch(setUserAddresses(res.data.addresses));
       }
     } catch (err) {
       console.error("Add address error:", err);
@@ -524,7 +525,7 @@ const UserAddress = () => {
           {userAdd.map((addr, idx) => (
             <div
               key={idx}
-              className={`relative border-1 rounded-lg p-4 gap-1 cursor-pointer transition-all duration-200 ${addr.isDefault
+              className={`relative border-1 rounded-lg p-4 gap-1 bg-[#fefefe] cursor-pointer transition-all duration-200 ${addr.isDefault
                 ? "border-blue-500 shadow-md"
                 : "border-gray-300 hover:border-gray-400"
                 }`}
@@ -550,6 +551,7 @@ const UserAddress = () => {
               <div className="flex gap-2 mt-3">
                 {!addr.isDefault && (
                   <button
+                    disabled={loading}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSetDefault(addr._id);
@@ -561,6 +563,7 @@ const UserAddress = () => {
                 )}
 
                 <button
+                  disabled={loading}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleEditAddress(addr);
@@ -571,6 +574,7 @@ const UserAddress = () => {
                 </button>
 
                 <button
+                  disabled={loading}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDeleteAddress(addr._id);

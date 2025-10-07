@@ -11,6 +11,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "react-hot-toast";
 import Footer from "@/components/Footer";
 
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -89,7 +90,7 @@ export default function RootLayout({ children }) {
           showSpinner={false}
           easing="cubic-bezier(0.4, 0, 0.2, 1)"
           speed={400}
-          shadow="0 0 10px #2299dd,0 0 5px #2299dd"
+          shadow="0 0 10px #f3002dff,0 0 5px #f04949ff"
         />
 
         <Toaster

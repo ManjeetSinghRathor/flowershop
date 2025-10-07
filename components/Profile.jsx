@@ -87,6 +87,15 @@ const Profile = () => {
                         Admin Section:
                     </h2>
                     <div className='grid grid-cols-2 sm:flex sm:flex-wrap gap-6 px-4 text-sm'>
+                        <Link href={"/shipping_orders"} className='flex flex-col items-center text-center gap-1 p-2 rounded-lg bg-gradient-to-r from-[#f6f6f6] to-[#fafafa] min-w-30'>
+                            <Image
+                                src={"/cargo_3045670.png"}
+                                alt="Shipping Orders"
+                                width={48}
+                                height={48}
+                            />
+                            Shipping <br />Orders
+                        </Link>
                         <Link href={"/handle_products"} className='flex flex-col items-center text-center gap-1 p-2 rounded-lg bg-gradient-to-r from-[#f6f6f6] to-[#fafafa] min-w-30'>
                             <Image
                                 src={"/product_9504576.png"}

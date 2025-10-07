@@ -186,11 +186,11 @@ const CollectionProducts = () => {
                                         onClick={() => {
                                             router.push(`/cart_products/checkout_?product_id=${product._id}&delivery_time=${encodeURIComponent(product.deliveryTime[0])}`)
                                         }}
-                                        className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded"
+                                        className="flex-1 bg-white hover:scale-102 active:bg-red-500 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded"
                                     >
                                         Buy
                                     </button>
-                                    <button onClick={() => handleAddToCart(product._id, product.deliveryTime[0])} className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded">
+                                    <button onClick={() => handleAddToCart(product._id, product.deliveryTime[0])} className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 active:bg-red-500 transform duration-200 text-white py-1 rounded">
                                         <span className="text-lg">+</span>{" "}
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
