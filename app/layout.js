@@ -43,30 +43,6 @@ export const metadata = {
   ],
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL),
   manifest: "/manifest.json",
-  openGraph: {
-    title: "Bloom's Heaven - Premium Flower Shop in Bangalore",
-    description:
-      "Discover Bloom's Heaven – luxury flowers, bouquets, and gifts. Perfect for weddings, birthdays, and special occasions.",
-    url: process.env.NEXT_PUBLIC_SITE_URL,
-    siteName: "Bloom's Heaven",
-    images: [
-      {
-        url: "/favicon-512.png",
-        width: 512,
-        height: 512,
-        alt: "Bloom's Heaven Logo",
-      },
-    ],
-    locale: "en_IN",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Bloom's Heaven - Premium Flower Shop",
-    description:
-      "Fresh flowers, roses, bouquets, and elegant gifts – Bloom's Heaven, your one-stop flower shop in Bangalore.",
-    images: ["/favicon-512.png"],
-  },
 };
 
 
