@@ -41,7 +41,7 @@ export const metadata = {
     "birthday gifts",
   ],
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL),
-  manifest: "./manifest.json",
+  manifest: "/manifest.json",
   openGraph: {
     title: "Bloom's Heaven - Premium Flower Shop in Bangalore",
     description:
@@ -50,7 +50,7 @@ export const metadata = {
     siteName: "Bloom's Heaven",
     images: [
       {
-        url: "./favicon.png",
+        url: "/favicon.png",
         width: 800,
         height: 600,
         alt: "Bloom's Heaven Logo",
@@ -64,7 +64,7 @@ export const metadata = {
     title: "Bloom's Heaven - Premium Flower Shop",
     description:
       "Fresh flowers, roses, bouquets, and elegant gifts – Bloom's Heaven, your one-stop flower shop in Bangalore.",
-    images: ["./favicon.png"],
+    images: ["/favicon.png"],
   },
 };
 
