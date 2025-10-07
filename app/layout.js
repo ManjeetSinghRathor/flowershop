@@ -40,10 +40,8 @@ export const metadata = {
     "wedding flowers",
     "birthday gifts",
   ],
-  icons: {
-    icon: "./favicon.png",
-    apple: "./favicon.png",
-  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL),
+  manifest: "./manifest.json",
   openGraph: {
     title: "Bloom's Heaven - Premium Flower Shop in Bangalore",
     description:

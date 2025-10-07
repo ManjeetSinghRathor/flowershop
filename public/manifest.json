@@ -1,0 +1,22 @@
+{
+  "name": "Bloom's Heaven - Premium Flower Shop in Bangalore",
+  "short_name": "Bloom's Heaven",
+  "description":
+      "Discover Bloom's Heaven – luxury flowers, bouquets, and gifts. Perfect bouquets for weddings, birthdays, and special occasions.",  
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1D1E49",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
