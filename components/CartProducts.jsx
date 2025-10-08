@@ -228,7 +228,7 @@ const CartProducts = () => {
                                                 {/* Minus Button */}
                                                 <button
                                                     type="button"
-                                                    className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 border-1 rounded-l-lg"
+                                                    className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 border-1 rounded-l-lg active:text-white transform duration-50"
                                                     disabled={clicked}
                                                     onClick={() => handleMinus(product)}
                                                 >
@@ -247,7 +247,7 @@ const CartProducts = () => {
                                                 {/* Plus Button */}
                                                 <button
                                                     type="button"
-                                                    className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 border-1 rounded-r-lg"
+                                                    className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 border-1 rounded-r-lg active:text-white transform duration-50"
                                                     disabled={clicked}
                                                     onClick={() => handlePlus(product)}
                                                 >

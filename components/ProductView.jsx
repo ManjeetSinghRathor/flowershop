@@ -276,7 +276,7 @@ const ProductView = () => {
                             {/* Minus Button */}
                             <button
                                 type="button"
-                                className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 border-1 rounded-l-lg"
+                                className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 border-1 rounded-l-lg active:text-white transform duration-100"
                                 onClick={() => {
                                     const input = document.getElementById("qtyBox");
                                     if (input.value > 1) input.value = parseInt(input.value) - 1;
@@ -298,7 +298,7 @@ const ProductView = () => {
                             {/* Plus Button */}
                             <button
                                 type="button"
-                                className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 border-1 rounded-r-lg"
+                                className="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-200 border-1 rounded-r-lg active:text-white transform duration-100"
                                 onClick={() => {
                                     const input = document.getElementById("qtyBox");
                                     input.value = parseInt(input.value) + 1;
@@ -319,7 +319,7 @@ const ProductView = () => {
                         onClick={() => {
                             router.push(`/cart_products/checkout_?product_id=${productDetails._id}&delivery_time=${encodeURIComponent(delivery_time)}`)
                         }}
-                        className="w-full bg-gray-800 text-white py-3 rounded-lg hover:bg-red-700"
+                        className="w-full bg-gray-800 text-white py-3 rounded-lg hover:bg-gray-700 active:bg-white active:text-gray-800 transform duration-100"
                     >
                         Buy Now
                     </button>

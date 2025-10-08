@@ -62,7 +62,7 @@ export default function CheckoutPage() {
         state: "Karnataka",
         postalCode: "",
         country: "India",
-        paymentMethod: "UPI",
+        paymentMethod: "Razorpay",
     });
 
     const dispatch = useDispatch();
@@ -322,7 +322,7 @@ export default function CheckoutPage() {
                     toast.success("Order placed successfully!");
                     localStorage.removeItem("cart");
                     dispatch(setCart([]));
-                    router.replace("/");
+                    router.replace("/user_orders");
                 } else {
                     toast.error(res.data.message || "Failed to place order");
                 }
@@ -367,7 +367,7 @@ export default function CheckoutPage() {
                             toast.success("Payment successful! 🎉");
                             localStorage.removeItem("cart");
                             dispatch(setCart([]));
-                            router.replace("/orders");
+                            router.replace("/user_orders");
                         } else {
                             toast.error("Payment verification failed!");
                         }
@@ -663,9 +663,9 @@ export default function CheckoutPage() {
                         onChange={handleChange}
                         className="border p-2 rounded w-full"
                     >
-                        {/* <option value="COD">Cash on Delivery</option> */}
-                        <option value="UPI">UPI</option>
-                        <option value="Card">Card</option>
+                        <option value="Razorpay">💳 Pay Online (UPI / Card / Wallet)</option>
+                        <option value="COD">💵 Cash on Delivery (COD)</option>
+
                         {/* <option value="NetBanking">Net Banking</option> */}
                         {/* <option value="Wallet">Wallet</option> */}
                     </select>

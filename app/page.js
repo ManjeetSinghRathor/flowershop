@@ -112,10 +112,10 @@ export default function Home() {
     customPaging: (i) => (
       <div className="group relative w-[10px] h-[10px] sm:w-[14px] sm:h-[14px] mx-[4px] rounded-full transition-all duration-300">
         {/* Glow effect for active */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-100 blur-[2px]" />
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-50 blur-[2px]" />
 
         {/* Inner dot */}
-        <div className="w-full h-full bg-[rgba(255,255,255,0.3)] group-hover:bg-gradient-to-r group-hover:from-pink-400 group-hover:to-yellow-300 rounded-full transition-all duration-100 scale-90 group-hover:scale-100 shadow-md" />
+        <div className="w-full h-full bg-[rgba(255,255,255,0.3)] group-hover:bg-gradient-to-r group-hover:from-pink-400 group-hover:to-yellow-300 rounded-full transition-all duration-50 scale-90 group-hover:scale-100 shadow-md" />
       </div>
     ),
   };
@@ -433,7 +433,7 @@ export default function Home() {
                             )}`
                           );
                         }}
-                        className="flex-1 bg-white hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded"
+                        className="flex-1 bg-white active:scale-98 transform duration-50 hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded"
                       >
                         Buy
                       </button>
@@ -441,12 +441,12 @@ export default function Home() {
                         onClick={() =>
                           handleAddToCart(product._id, product.deliveryTime[0])
                         }
-                        className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 transform duration-200 text-white py-1 rounded"
+                        className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 active:scale-98 transform duration-50 text-white py-1 rounded"
                       >
                         <span className="text-lg">+</span>{" "}
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                          className="w-5 h-5 sm:w-6 sm:h-6"
                           fill="currentColor"
                           viewBox="0 0 640 640"
                         >
@@ -464,13 +464,13 @@ export default function Home() {
                   pathname: "/collection_products",
                   query: { category: col.name, id: col._id }, // pass product ID as query param
                 }}
-                className="flex items-center gap-1 bg-gray-900 text-white py-1 px-4 rounded"
+                className="flex items-center gap-1 bg-white border border-gray-300 text-gray-700 text-sm font-medium py-1.5 px-4 rounded-lg shadow-sm hover:bg-gray-100 active:scale-95 transition-all duration-150"
               >
                 <span>View All</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="currentColor"
-                  className="w-4 h-4 text-white"
+                  className="w-4 h-4"
                   viewBox="0 0 640 640"
                 >
                   <path d="M342.6 534.6C330.1 547.1 309.8 547.1 297.3 534.6L137.3 374.6C124.8 362.1 124.8 341.8 137.3 329.3C149.8 316.8 170.1 316.8 182.6 329.3L320 466.7L457.4 329.4C469.9 316.9 490.2 316.9 502.7 329.4C515.2 341.9 515.2 362.2 502.7 374.7L342.7 534.7zM502.6 182.6L342.6 342.6C330.1 355.1 309.8 355.1 297.3 342.6L137.3 182.6C124.8 170.1 124.8 149.8 137.3 137.3C149.8 124.8 170.1 124.8 182.6 137.3L320 274.7L457.4 137.4C469.9 124.9 490.2 124.9 502.7 137.4C515.2 149.9 515.2 170.2 502.7 182.7z" />
