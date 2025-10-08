@@ -1,29 +1,50 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 export default function ImageCarousel({ images }) {
   const [current, setCurrent] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const [isSliding, setIsSliding] = useState(false);
+  const sliderRef = useRef(null);
 
-  const minSwipeDistance = 50; // minimum swipe length (px)
+  const minSwipeDistance = 50;
 
   const prevImage = () => {
-    setCurrent((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    if (isSliding) return;
+    slideTo(current === 0 ? images.length - 1 : current - 1);
   };
 
   const nextImage = () => {
-    setCurrent((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    if (isSliding) return;
+    slideTo(current === images.length - 1 ? 0 : current + 1);
   };
 
   const goToImage = (index) => {
-    setCurrent(index);
+    if (isSliding || index === current) return;
+    slideTo(index);
+  };
+
+  const slideTo = (index) => {
+    setIsSliding(true);
+    const slider = sliderRef.current;
+    if (!slider) return;
+
+    slider.style.transition = "transform 0.3s ease-in-out";
+    slider.style.transform = `translateX(-${index * 100}%)`;
+
+    setTimeout(() => {
+      setCurrent(index);
+      slider.style.transition = "none";
+      slider.style.transform = `translateX(-${index * 100}%)`;
+      setIsSliding(false);
+    }, 300); // match transition duration
   };
 
   const onTouchStart = (e) => {
-    setTouchEnd(null); // reset
+    setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
   };
 
@@ -32,68 +53,76 @@ export default function ImageCarousel({ images }) {
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
     const distance = touchStart - touchEnd;
-
-    if (distance > minSwipeDistance) {
-      // swipe left
-      nextImage();
-    }
-
-    if (distance < -minSwipeDistance) {
-      // swipe right
-      prevImage();
-    }
+    if (distance > minSwipeDistance) nextImage();
+    if (distance < -minSwipeDistance) prevImage();
   };
 
   return (
-    <div className="w-full h-fit max-w-2xl mx-auto lg:sticky top-18 z-10">
+    <div className="w-full max-w-2xl mx-auto lg:sticky top-18 z-10">
       {/* Main Carousel */}
       <div
-        className="relative w-full aspect-[1] max-h-[40vh] md:max-h-[50vh] rounded-xl overflow-hidden shadow-lg backdrop-blur-md p-4"
+        className="relative w-full overflow-hidden rounded-xl"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        <img
-          src={images[current].imgUrl}
-          alt={`Image ${current + 1}`}
-          className="w-full h-full object-contain"
-        />
+        <div
+          ref={sliderRef}
+          className="flex w-full"
+          style={{ transform: `translateX(-${current * 100}%)` }}
+        >
+          {images.map((img, idx) => (
+            <div key={idx} className="flex items-center justify-center w-full max-h-[50vh] lg:max-h-[55vh] flex-shrink-0 aspect-[1]">
+              <img
+                src={img.imgUrl}
+                alt={`Image ${idx + 1}`}
+                className="w-full h-full object-contain rounded-xl"
+              />
+            </div>
+          ))}
+        </div>
 
-        {/* Left Arrow */}
+        {/* Arrows */}
         <button
           onClick={prevImage}
-          className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-1 rounded-full"
+          className="absolute top-1/2 left-2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full z-10"
         >
-          <FaChevronLeft size={16} />
+          <FaChevronLeft size={18} />
         </button>
-
-        {/* Right Arrow */}
         <button
           onClick={nextImage}
-          className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-1 rounded-full"
+          className="absolute top-1/2 right-2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full z-10"
         >
-          <FaChevronRight size={16} />
+          <FaChevronRight size={18} />
         </button>
       </div>
 
-      {/* Thumbnails */}
-      <div className="grid grid-cols-4 justify-center gap-4 pt-6 pb-2">
-        {images.map((img, index) => (
-          <button
-            key={index}
-            onClick={() => goToImage(index)}
-            className={`h-16 w-auto rounded-lg overflow-hidden border-1 ${
-              current === index ? "border-gray-600" : "border-transparent"
-            }`}
-          >
-            <img
-              src={img.imgUrl}
-              alt={`Thumb ${index + 1}`}
-              className="w-full h-full object-contain"
-            />
-          </button>
-        ))}
+      <div className="relative mt-4">
+        {/* Horizontal scroll container */}
+        <div
+          className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 px-1"
+        >
+          {images.map((img, idx) => (
+            <button
+              key={idx}
+              onClick={() => goToImage(idx)}
+              className={`flex-shrink-0 h-16 w-16 rounded-lg overflow-hidden border-2 ${current === idx ? "border-gray-600" : "border-transparent"
+                }`}
+            >
+              <img
+                src={img.imgUrl}
+                alt={`Thumb ${idx + 1}`}
+                className="w-full h-full object-contain"
+              />
+            </button>
+          ))} 
+        </div>
+
+        {/* Right gradient to indicate more items */}
+        <div className="absolute top-0 right-0 h-full w-6 pointer-events-none bg-gradient-to-l from-white to-transparent"></div>
       </div>
+
+
     </div>
   );
 }

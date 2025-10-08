@@ -232,7 +232,7 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                                     className="w-full flex justify-between items-center py-3 px-2 bg-gray-100 hover:bg-gray-200"
                                     onClick={() => toggleCategory(category)}
                                 >
-                                    <span className="font-serif text-gray-800 text-[15px] sm:text-[18px] pr-2">{category}</span>
+                                    <span className="font-serif text-gray-800 text-[15px] sm:text-[16px] pr-2">{category}</span>
                                     {openCategory === category ? (
                                         <FaChevronUp className="w-5 h-5 text-gray-600" />
                                     ) : (

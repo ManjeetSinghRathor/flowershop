@@ -152,27 +152,25 @@ const ProductView = () => {
 
     return (
         <div className="w-full min-h-[50vh]">
-            <div className="px-2 sm:px-8 lg:px-24">
-                <div className="flex flex-col w-full gap-1 pb-2">
-                    <h1 className="flex w-full justify-start items-center font-mono sm:text-lg pt-4">
-                        <Link href="/" className="hover:underline font-light">
-                            Home
-                        </Link>
-                        <>
-                            <span className="mx-1">{">"}</span>
-                        </>
-                    </h1>
-                    <h1 className="font-serif text-xl font-[600]">{productDetails.name}</h1>
-                </div>
+            <div className='flex flex-col w-full sm:px-8 lg:px-24'>
+                <h1 className="flex flex-col w-full justify-center items-start font-mono sm:text-lg px-2 py-4">
+                    <Link href="/" className="hover:underline font-light">
+                        Home{" "}{">"}
+                    </Link>
+                    <span>{productDetails.name}</span>
+                </h1>
             </div>
 
-            <div className="flex flex-col lg:flex-row px-2 gap-12 sm:px-8 lg:px-24">
+            <div className="flex flex-col lg:flex-row px-2 gap-2 sm:gap-4 lg:gap-12 sm:px-8 lg:px-24">
                 <div className="lg:min-w-xl">
                     <ImageCarousel images={productDetails?.images} />
                 </div>
 
-                <div className="flex flex-col gap-4 mt-2">
+                <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2 py-2">
+                        <p className="text-[20px] lg:text-2xl font-[530]">
+                            {productDetails?.name}
+                        </p>
                         {/* Stock */}
                         <p
                             className={`text-sm ${(productDetails.isActive && productDetails.stock > 0) ? "text-green-600" : "text-red-600"
@@ -205,7 +203,7 @@ const ProductView = () => {
                                     {productDetails?.sizes[currentSizeIdx].price}₹
                                 </span>
                             )}
-                            <span className="font-mono text-2xl text-red-600">
+                            <span className="font-mono font-[500] text-[28px] lg:text-[32px] text-gray-900">
                                 {productDetails?.sizes[currentSizeIdx].finalPrice}₹
                             </span>
                             <span className="px-1 leading-tight bg-green-600 text-white">
@@ -214,12 +212,17 @@ const ProductView = () => {
                         </div>
                     </div>
 
-                    <div className="border-t border-b border-gray-300 sm:grid xl:grid-cols-2 sm:gap-6 sm:py-2">
+                    <p className="text-center text-sm font-medium text-gray-600 max-w-xs mx-auto leading-tight">
+                        Order before <span className="font-semibold">12:00pm</span> to get{" "}
+                        <span className="font-semibold">Same Day Delivery</span>
+                    </p>
+
+                    <div className="border-t border-b border-gray-300 sm:grid xl:grid-cols-2 sm:gap-6 py-2">
                         {/* Delivery */}
                         <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
                             <label
                                 htmlFor="deliveryTime"
-                                className="font-mono font-semibold text-gray-800"
+                                className="font-semibold text-gray-800"
                             >
                                 Delivery Time
                             </label>
@@ -232,7 +235,7 @@ const ProductView = () => {
                                 className="border border-gray-300 rounded-md px-2 py-1 text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800"
                             >
                                 {/* productDetails.delivery_options */}
-                                {(productDetails?.deliveryTime || ["1-2 days"]).map((option, index) => (
+                                {(productDetails?.deliveryTime || ["Next Day Delivery"]).map((option, index) => (
                                     <option key={index} value={option}>
                                         {option}
                                     </option>
@@ -244,7 +247,7 @@ const ProductView = () => {
                         <div className="flex items-center justify-between w-full py-2 text-sm sm:text-md">
                             <label
                                 htmlFor="Size"
-                                className="font-mono font-semibold text-gray-800"
+                                className="font-semibold text-gray-800"
                             >
                                 Size
                             </label>

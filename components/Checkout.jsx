@@ -144,7 +144,7 @@ export default function CheckoutPage() {
 
     useEffect(() => {
         fetchLocalCart();
-    }, [cart_product_ids]);
+    }, []);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -197,21 +197,28 @@ export default function CheckoutPage() {
 
     const { subtotal, shippingFee, total, discount } = calculateTotals();
 
-    const handlePlaceOrder = async () => {
+    useEffect(() => {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        document.body.appendChild(script);
+    }, []);
 
+    const handlePlaceOrder = async () => {
+        // ------------------- VALIDATIONS -------------------
         if (search !== "" && !options.includes(search)) {
-            setIsInvalid(true); // show red shadow
-            setSearch(""); // revert to previous valid value
+            setIsInvalid(true);
+            setSearch("");
             toast("❌ Invalid postal code", {
                 style: {
-                    border: "1px solid #f87171",  // red border
-                    background: "#fee2e2",         // light red background
-                    color: "#b91c1c",              // dark red text
+                    border: "1px solid #f87171",
+                    background: "#fee2e2",
+                    color: "#b91c1c",
                     padding: "5px 15px",
                     borderRadius: "8px",
                     fontSize: "14px",
                     fontWeight: "500",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.15)"
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
                 },
             });
             return;
@@ -228,14 +235,14 @@ export default function CheckoutPage() {
         ) {
             toast("❌ Add Shipping Details", {
                 style: {
-                    border: "1px solid #f87171",  // red border
-                    background: "#fee2e2",         // light red background
-                    color: "#b91c1c",              // dark red text
+                    border: "1px solid #f87171",
+                    background: "#fee2e2",
+                    color: "#b91c1c",
                     padding: "5px 15px",
                     borderRadius: "8px",
                     fontSize: "14px",
                     fontWeight: "500",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.15)"
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
                 },
             });
             return;
@@ -269,8 +276,6 @@ export default function CheckoutPage() {
                 },
             });
             return;
-        } else {
-            setIsInvalid(false);
         }
 
         if (cartItems.length === 0) {
@@ -280,13 +285,14 @@ export default function CheckoutPage() {
 
         setLoading(true);
         try {
+            // ------------------- COMMON PAYLOAD -------------------
             const payload = {
                 ...(user ? { user: user._id } : { email: form.email }),
                 items: cartItems.map((item) => ({
                     product: item._id,
                     quantity: item.quantity,
                     sizeIdx: item.sizeIdx,
-                    deliveryTime: item.delivery_time
+                    deliveryTime: item.delivery_time,
                 })),
                 shippingAddress: {
                     fullName: form.fullName,
@@ -301,25 +307,88 @@ export default function CheckoutPage() {
                 subtotal,
                 shippingFee,
                 totalAmount: total,
-                discount: discount
+                discount,
             };
 
-            const res = await axios.post(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/add`,
-                payload
+            // ------------------- IF PAYMENT METHOD = COD -------------------
+            if (form.paymentMethod === "COD") {
+                const res = await axios.post(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/add`,
+                    payload,
+                    { withCredentials: true }
+                );
+
+                if (res.data.success) {
+                    toast.success("Order placed successfully!");
+                    localStorage.removeItem("cart");
+                    dispatch(setCart([]));
+                    router.replace("/");
+                } else {
+                    toast.error(res.data.message || "Failed to place order");
+                }
+
+                return;
+            }
+
+            // ------------------- IF PAYMENT METHOD = ONLINE -------------------
+            // 1️⃣ Create Razorpay order on backend
+            const orderRes = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/create-razorpay-order`,
+                { totalAmount: total },
+                { withCredentials: true }
             );
 
-            if (res.data.success) {
-                toast.success("Order placed successfully!");
-                localStorage.removeItem("cart");
-                dispatch(setCart([]));
-                router.replace("/");
-            } else {
-                toast.error(res.data.message || "Failed to place order");
-            }
+            const razorOrder = orderRes.data.order;
+
+            // 2️⃣ Open Razorpay checkout
+            const options = {
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                amount: razorOrder.amount,
+                currency: "INR",
+                name: "Bloom's Heaven",
+                description: "Order Payment",
+                image: "/favicon.png",
+                order_id: razorOrder.id,
+                handler: async function (response) {
+                    try {
+                        // 3️⃣ Verify payment on backend
+                        const verifyRes = await axios.post(
+                            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/verify-razorpay-payment`,
+                            {
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                orderData: payload,
+                            },
+                            { withCredentials: true }
+                        );
+
+                        if (verifyRes.data.success) {
+                            toast.success("Payment successful! 🎉");
+                            localStorage.removeItem("cart");
+                            dispatch(setCart([]));
+                            router.replace("/orders");
+                        } else {
+                            toast.error("Payment verification failed!");
+                        }
+                    } catch (err) {
+                        console.error("Payment verification failed:", err);
+                        toast.error("Error verifying payment");
+                    }
+                },
+                prefill: {
+                    name: form.fullName,
+                    email: form.email,
+                    contact: form.phone,
+                },
+                theme: { color: "#16a34a" },
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.open();
         } catch (err) {
-            console.error(err);
-            toast.error("Error placing order");
+            console.error("Error placing order:", err);
+            toast.error("Something went wrong during checkout");
         } finally {
             setLoading(false);
         }
@@ -606,77 +675,77 @@ export default function CheckoutPage() {
                 <div className="bg-white p-6 rounded-lg shadow-md h-fit">
                     <h2 className="font-mono text-xl mb-4">Order Summary</h2>
                     {fetching ?
-                <div className="flex flex-col justify-center gap-4 pt-2 px-2 sm:px-8 lg:px-24">
-                    {/* Skeleton slides */}
-                    {[...Array(2)].map((_, idx) => (
-                        <div key={idx} className='flex gap-3 items-start'>
-                            <div
-                                className="w-20 h-20 bg-gray-300 animate-pulse rounded-md"
-                            />
-                            <div
-                                className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
-                            />
-                        </div>
-                    ))}
-                </div> :
-                    <div className="flex flex-col gap-3 mb-4 max-h-[300px] overflow-y-auto">
-                        {cartItems.map((item, idx) => (
-                            <div key={idx} className="flex gap-3 border-b pb-2">
-                                <div className="relative w-16 h-16 rounded overflow-hidden">
-                                    <Image
-                                        src={item.images[0].imgUrl}
-                                        alt={item.name}
-                                        fill
-                                        className="object-cover"
-                                        unoptimized
+                        <div className="flex flex-col justify-center gap-4 pt-2 px-2 sm:px-8 lg:px-24">
+                            {/* Skeleton slides */}
+                            {[...Array(2)].map((_, idx) => (
+                                <div key={idx} className='flex gap-3 items-start'>
+                                    <div
+                                        className="w-20 h-20 bg-gray-300 animate-pulse rounded-md"
+                                    />
+                                    <div
+                                        className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
                                     />
                                 </div>
-
-                                <div className="flex flex-col flex-1">
-                                    <p className="font-semibold text-gray-700">{item.name}</p>
-                                    <div className="flex flex-col sm:flex-row sm:gap-6 text-xs sm:text-sm gap-[2px]">
-                                        <div>
-                                            <p className="text-gray-800 font-[600]">Size</p>
-                                            <p className="text-gray-600">{item.sizes[item.sizeIdx].sizeName}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-gray-800 font-[600]">Delivery Time</p>
-                                            <p className="text-gray-600">{item.delivery_time}</p>
-                                        </div>
-                                    </div>
-                                    <div className="border-b border-t border-gray-100 my-1">
-                                        <p className="text-gray-500 text-sm">
-                                            Qty: {item.quantity} × ₹{item?.sizes[item.sizeIdx].finalPrice}
-                                        </p>
-                                        <p className="font-medium text-gray-800 text-sm">
-                                            ₹{item?.sizes[item.sizeIdx].finalPrice * item.quantity}
-                                        </p>
+                            ))}
+                        </div> :
+                        <div className="flex flex-col gap-3 mb-4 max-h-[300px] overflow-y-auto">
+                            {cartItems.map((item, idx) => (
+                                <div key={idx} className="flex gap-3 border-b pb-2">
+                                    <div className="relative w-16 h-16 rounded overflow-hidden">
+                                        <Image
+                                            src={item.images[0].imgUrl}
+                                            alt={item.name}
+                                            fill
+                                            className="object-cover"
+                                            unoptimized
+                                        />
                                     </div>
 
+                                    <div className="flex flex-col flex-1">
+                                        <p className="font-semibold text-gray-700">{item.name}</p>
+                                        <div className="flex flex-col sm:flex-row sm:gap-6 text-xs sm:text-sm gap-[2px]">
+                                            <div>
+                                                <p className="text-gray-800 font-[600]">Size</p>
+                                                <p className="text-gray-600">{item.sizes[item.sizeIdx].sizeName}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-gray-800 font-[600]">Delivery Time</p>
+                                                <p className="text-gray-600">{item.delivery_time}</p>
+                                            </div>
+                                        </div>
+                                        <div className="border-b border-t border-gray-100 my-1">
+                                            <p className="text-gray-500 text-sm">
+                                                Qty: {item.quantity} × ₹{item?.sizes[item.sizeIdx].finalPrice}
+                                            </p>
+                                            <p className="font-medium text-gray-800 text-sm">
+                                                ₹{item?.sizes[item.sizeIdx].finalPrice * item.quantity}
+                                            </p>
+                                        </div>
+
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>}
+                            ))}
+                        </div>}
 
                     <div className="mt-4 text-gray-800 font-mono">
                         <div className="flex justify-between">
                             <span>Subtotal</span>
                             {fetching ? <div
                                 className="w-20 h-5 bg-gray-300 animate-pulse rounded-md"
-                            />: <span>₹{subtotal}</span>}
+                            /> : <span>₹{subtotal}</span>}
                         </div>
                         <div className="flex justify-between">
                             <span>Shipping</span>
                             {fetching ? <div
                                 className="w-16 h-5 bg-gray-300 animate-pulse rounded-md"
-                            />: <span>{shippingFee > 0 ? `₹${shippingFee}` : "Free"}</span>}
+                            /> : <span>{shippingFee > 0 ? `₹${shippingFee}` : "Free"}</span>}
                         </div>
                         <hr className="my-3" />
                         <div className="flex justify-between font-semibold text-lg">
                             <span>Total</span>
                             {fetching ? <div
                                 className="w-20 h-5 bg-gray-300 animate-pulse rounded-md"
-                            />: <span>₹{total}</span>}
+                            /> : <span>₹{total}</span>}
                         </div>
                     </div>
 
