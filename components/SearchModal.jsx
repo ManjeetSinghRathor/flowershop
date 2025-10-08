@@ -8,6 +8,7 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
     const [query, setQuery] = useState("");
     const [productsImgloaded, setProductsImgLoaded] = useState({});
     const [results, setResults] = useState([]);
+    const [totalCount, setTotalCount] = useState(0);
 
     useEffect(() => {
         if (isSearchOpen) {
@@ -52,6 +53,7 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
 
                 if (res.data.success) {
                     setResults(res.data.results);
+                     setTotalCount(res.data.totalCount);
                 }
             } catch (err) {
                 console.error("Search failed:", err);
@@ -178,13 +180,13 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
                                 ))}
 
                                 {/* View All */}
-                                {results.length > 4 && (
+                                {totalCount > 4 && (
                                     <Link
-                                        href={`/search?query=${query}`}
+                                        href={`/search_products?query=${query}`}
                                         onClick={() => setIsSearchOpen(false)}
                                         className="block text-center mt-3 py-2 bg-yellow-500 text-black rounded-lg font-medium"
                                     >
-                                        View All Results ({results.length})
+                                        View All Results ({totalCount})
                                     </Link>
                                 )}
                             </>

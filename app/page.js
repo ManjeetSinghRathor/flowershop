@@ -351,16 +351,16 @@ export default function Home() {
             key={col.collectionCode}
             className="flex flex-col w-full gap-3 py-4 px-2"
           >
-            <h2 className="flex font-mono text-2xl justify-center sm:text-3xl leading-tight">
+            <h2 className="flex font-mono text-2xl justify-center sm:text-3xl sm:pb-4">
               {col.name}
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
               {/* Example Product Cards */}
               {col?.products?.length > 0 &&
                 col.products.map((product) => (
                   <div
                     key={product.productCode}
-                    className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full cursor-pointer hover:shadow-lg transition"
+                    className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full cursor-pointer hover:shadow-lg hover:scale-102 transition"
                   >
                     <Link
                       href={{
@@ -368,7 +368,7 @@ export default function Home() {
                         query: { id: product._id }, // pass product ID as query param
                       }}
                     >
-                      <div className="w-full h-36 mb-2 relative">
+                      <div className="w-full aspect-[1] mb-2 relative">
                         {/* Actual image */}
                         <div className="relative w-full h-full rounded-lg overflow-hidden">
                           <Image

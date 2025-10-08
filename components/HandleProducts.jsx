@@ -64,6 +64,7 @@ const HandleProducts = () => {
       );
 
       if (res.data.success) {
+
         setProducts((prev) => {
           const existingIds = new Set(prev.map((p) => p._id));
           const filtered = res.data.products.filter(

@@ -12,6 +12,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
 
 
 export default function Overlays({ setIsOpen, isOpen = false }) {
@@ -20,44 +21,94 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
     const menuRef = useRef(null);
     const swipeRef = useRef(null);
     const [openLoginPopup, setOpenLoginPopup] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
 
     const user = useSelector((state) => state.user?.data || null);
+    const cartProducts = useSelector((state) => state.CartProducts);
     const updatedCollectionList = useSelector((state) => state.collectionList.data);
 
     const handleGoogleLogin = async (response) => {
+        setGoogleLoading(true);
         try {
             const { credential } = response;
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google-login`, { token: credential }, { withCredentials: true });
+
+            // Step 1: Login with Google
+            const res = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google-login`,
+                { token: credential },
+                { withCredentials: true }
+            );
 
             if (res.data.success) {
-
-                toast.success(res.data.message);
-
-                const userRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`, { withCredentials: true });
+                // Step 2: Get user data (including backend cart)
+                const userRes = await axios.get(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`,
+                    { withCredentials: true }
+                );
 
                 if (userRes?.data?.success) {
+                    const userData = userRes.data.data;
+                    const backendCart = userData?.cart || [];
 
-                    dispatch(setUser(userRes?.data));
-                    // setIsOpen(false);
+                    // Step 3: Get local cart (saved in localStorage or from Redux)
+                    const localCart = cartProducts || [];
+                    // Step 4: Merge both carts
+                    const mergedCart = mergeCarts(localCart, backendCart);
 
-                    const userData = userRes.data.data; // <-- the actual user object
+                    // Step 5: Save merged cart to backend
+                    const syncRes = await axios.post(
+                        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/cart/sync`,
+                        {
+                            cart: mergedCart.map((item) => ({
+                                productId: item.id,
+                                quantity: item.q,
+                                sizeIdx: item.sizeIdx,
+                                deliveryTime: item.deliveryTime,
+                            })),
+                        },
+                        { withCredentials: true }
+                    );
 
-                    // Convert backend cart to Redux format, if cart exists
-                    const formattedCart = userData?.cart?.map((item) => ({
-                        id: item.productId,
-                        q: item.quantity,
-                        sizeIdx: item.sizeIdx,
-                        deliveryTime: item.deliveryTime
-                    })) || [];
-
-                    // Update Redux
-                    dispatch(setCart(formattedCart));
+                    if (syncRes.data.success) {
+                        // Step 6: Update Redux and clear local cart
+                        dispatch(setUser(userRes?.data)); // keep user info from /me
+                        dispatch(setCart(mergedCart));
+                    }
                 }
             }
         } catch (err) {
             console.error("Google login failed", err);
+        } finally {
+            setGoogleLoading(false);
         }
     };
+
+    // Helper function for merging
+    function mergeCarts(localCart, backendCart) {
+        const map = new Map();
+
+        // Add backend cart first
+        backendCart.forEach(item => {
+            map.set(item.productId, {
+                id: item.productId,
+                q: item.quantity,
+                sizeIdx: item.sizeIdx,
+                deliveryTime: item.deliveryTime,
+            });
+        });
+
+        // Merge local cart
+        localCart.forEach(item => {
+            const key = item.id;
+            if (map.has(key)) {
+                map.get(key).q += item.q; // combine quantity
+            } else {
+                map.set(key, item);
+            }
+        });
+
+        return Array.from(map.values());
+    }
 
 
     useEffect(() => {
@@ -155,6 +206,8 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
         const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/logout`, {}, { withCredentials: true });
 
         if (res.data?.success) {
+            localStorage.removeItem("cartProducts");
+            dispatch(setCart([]));
             dispatch(logout());
         }
     }
@@ -168,6 +221,12 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
         `}
             ref={swipeRef}
         >
+            {googleLoading &&
+                <div className="fixed inset-0 bg-none flex items-center justify-center">
+                    <Loader2 className="animate-spin text-purple-600" size={64} />
+                </div>
+            }
+
             <div className="flex flex-col h-full grow justify-between w-60 sm:w-64 bg-white" ref={menuRef}>
                 <div className="flex flex-col w-60 sm:w-64 bg-white overflow-y-auto">
                     {user != null &&
