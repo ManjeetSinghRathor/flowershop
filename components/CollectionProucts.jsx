@@ -55,7 +55,7 @@ const CollectionProducts = () => {
         setLoading(true);
         try {
             const res = await axios.get(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/products/${categoryId}?page=${page}&limit=8`
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/products/${categoryId}?page=${page}&limit=2`
             );
 
             if (res.data.success) {
