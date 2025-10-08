@@ -24,23 +24,6 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
     const user = useSelector((state) => state.user?.data || null);
     const updatedCollectionList = useSelector((state) => state.collectionList.data);
 
-    const getUser = async () => {
-        try {
-            const res = await axios.get(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`,
-                { withCredentials: true }
-            );
-
-            if (res?.data?.success) {
-                // setCurrentUser(res?.data);
-                dispatch(setUser(res?.data));
-
-            }
-        } catch (err) {
-            // Not logged in
-        }
-    };
-
     const handleGoogleLogin = async (response) => {
         try {
             const { credential } = response;
@@ -76,11 +59,6 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
         }
     };
 
-    useEffect(() => {
-        if (!user) {
-            getUser();
-        }
-    }, [user])
 
     useEffect(() => {
         if (isOpen) {

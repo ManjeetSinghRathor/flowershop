@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { setCollectionList } from "@/app/store/collectionListSlice";
 import { setUser } from "@/app/store/userSlice";
-
+import { setCart } from "@/app/store/CartProductsSlice";
 
 const Navbar = () => {
     const dispatch = useDispatch();
@@ -68,7 +68,7 @@ const Navbar = () => {
         }
     }, [collectionList]);
 
-        const getUser = async () => {
+    const getUser = async () => {
         try {
             const res = await axios.get(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`,
@@ -76,18 +76,28 @@ const Navbar = () => {
             );
 
             if (res?.data?.success) {
-                // setCurrentUser(res?.data);
-                dispatch(setCart(res?.data?.data?.cart))
-                dispatch(setUser(res?.data));
+                const cart = res?.data?.data?.cart || [];
+
+                // ✅ Transform the cart data correctly
+                const updatedCart = cart.map((item) => ({
+                    id: item.productId,
+                    q: item.quantity,
+                    sizeIdx: item.sizeIdx ?? 0,
+                    deliveryTime: item.deliveryTime ?? "1-2 days",
+                }));
+
+                dispatch(setCart(updatedCart)); // ✅ set properly formatted cart
+                dispatch(setUser(res?.data?.data)); // ✅ assuming data.data is the user info
             }
+
         } catch (err) {
             // Not logged in
         }
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         getUser();
-    },[])
+    }, [])
 
     const saved_cart_products = useSelector((state) => state.CartProducts);
 
