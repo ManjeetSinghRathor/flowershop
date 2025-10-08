@@ -87,7 +87,7 @@ const Navbar = () => {
                 }));
 
                 dispatch(setCart(updatedCart)); // ✅ set properly formatted cart
-                dispatch(setUser(res?.data?.data)); // ✅ assuming data.data is the user info
+                dispatch(setUser(res?.data)); // ✅ assuming data.data is the user info
             }
 
         } catch (err) {
