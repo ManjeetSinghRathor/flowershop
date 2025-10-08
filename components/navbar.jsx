@@ -7,6 +7,8 @@ import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { setCollectionList } from "@/app/store/collectionListSlice";
+import { setUser } from "@/app/store/userSlice";
+
 
 const Navbar = () => {
     const dispatch = useDispatch();
@@ -65,6 +67,27 @@ const Navbar = () => {
             fetchCategories();
         }
     }, [collectionList]);
+
+        const getUser = async () => {
+        try {
+            const res = await axios.get(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`,
+                { withCredentials: true }
+            );
+
+            if (res?.data?.success) {
+                // setCurrentUser(res?.data);
+                dispatch(setCart(res?.data?.data?.cart))
+                dispatch(setUser(res?.data));
+            }
+        } catch (err) {
+            // Not logged in
+        }
+    };
+
+    useEffect(()=>{
+        getUser();
+    },[])
 
     const saved_cart_products = useSelector((state) => state.CartProducts);
 

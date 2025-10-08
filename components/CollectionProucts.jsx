@@ -25,7 +25,7 @@ const CollectionProducts = () => {
             try {
                 const res = await axios.post(
                     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/add-to-cart/${id}`,
-                    {},
+                    { deliveryTime },
                     { withCredentials: true }
                 );
                 if (res.data.success) {

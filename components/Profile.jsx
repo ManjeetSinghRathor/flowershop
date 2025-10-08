@@ -150,7 +150,7 @@ const Profile = () => {
                             />
                             Orders
                         </Link>
-                        <Link href={"/user_wishlist"} className='flex flex-col items-center text-center gap-1 p-2 rounded-lg bg-gradient-to-r from-[#f6f6f6] to-[#fafafa] min-w-30'>
+                        {/* <Link href={"/user_wishlist"} className='flex flex-col items-center text-center gap-1 p-2 rounded-lg bg-gradient-to-r from-[#f6f6f6] to-[#fafafa] min-w-30'>
                             <Image
                                 src={"/wishlist_12894029.png"}
                                 alt="Wishlist Icon"
@@ -158,7 +158,7 @@ const Profile = () => {
                                 height={48}
                             />
                             Wishlist
-                        </Link>
+                        </Link> */}
                         <Link href={"/user_address"} className='flex flex-col items-center text-center gap-1 p-2 rounded-lg bg-gradient-to-r from-[#f6f6f6] to-[#fafafa] min-w-30'>
                             <Image
                                 src={"/location_icon.png"}
