@@ -67,7 +67,8 @@ const EditCollection = () => {
             setQueryLoaded(true);
             try {
                 const res = await axios.get(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search/add-to-collection?search=${encodeURIComponent(searchQuery)}`
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search/add-to-collection?search=${encodeURIComponent(searchQuery)}`,
+                    { withCredentials: true }
                 );
                 setSearchResults(res.data);
             } catch (err) {

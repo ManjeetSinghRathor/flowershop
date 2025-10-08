@@ -7,6 +7,8 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddProduct } from '@/app/store/CartProductsSlice';
 import toast from 'react-hot-toast';
+import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 const CollectionProducts = () => {
 
@@ -17,8 +19,13 @@ const CollectionProducts = () => {
     const category = searchParams.get("category"); // e.g. "Birthday Flowers"
     const categoryId = searchParams.get("id");
 
-    const [collection_products, setCollection_products] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [collection_products, setCollection_products] = useState([]);
+
+    const pathname = usePathname();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
 
     const handleAddToCart = async (id, deliveryTime) => {
         if (user) {
@@ -44,70 +51,70 @@ const CollectionProducts = () => {
     };
 
 
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+    const pageRef = useRef(1);
+    const hasMoreRef = useRef(true);
+    const loadingRef = useRef(false);
+
     const observer = useRef();
 
-    // 🔹 Fetch paginated products for a collection
     const fetchCollectionProducts = useCallback(async () => {
-        if (!categoryId || !hasMore) return;
+        if (!categoryId || !hasMoreRef.current || loadingRef.current) return;
 
-        setLoading(true);
+        loadingRef.current = true;
         try {
             const res = await axios.get(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/products/${categoryId}?page=${page}&limit=2`
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/products/${categoryId}?page=${pageRef.current}&limit=8`
             );
 
             if (res.data.success) {
                 const newProducts = res.data.data.products || [];
 
-                console.log(newProducts);
-
                 setCollection_products((prev) => {
                     const existingIds = new Set(prev.map((p) => p._id));
-                    const filtered = newProducts.filter((p) => !existingIds.has(p._id));
-                    return [...prev, ...filtered];
+                    return [...prev, ...newProducts.filter((p) => !existingIds.has(p._id))];
                 });
 
-                setHasMore(newProducts.length >= 4); // if fewer than 10, stop loading more
-                setPage((prev) => prev + 1);
+                hasMoreRef.current = newProducts.length >= 8;
+                pageRef.current += 1;
             }
         } catch (err) {
             console.error("Failed to fetch collection products", err);
             toast.error("Failed to load products");
         } finally {
-            setLoading(false);
+            loadingRef.current = false;
         }
-    }, [categoryId, page, hasMore, loading]);
+    }, [categoryId]);
 
-    // 🔹 Observer for infinite scroll
+
     const lastProductRef = useCallback(
         (node) => {
-            if (loading) return;
+            if (loadingRef.current) return;
             if (observer.current) observer.current.disconnect();
 
             observer.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting && hasMore) {
+                if (entries[0].isIntersecting && hasMoreRef.current) {
                     fetchCollectionProducts();
                 }
             });
 
             if (node) observer.current.observe(node);
         },
-        [loading, hasMore, fetchCollectionProducts]
+        [fetchCollectionProducts]
     );
 
-    // 🔹 Reset when category changes
+
     useEffect(() => {
         setCollection_products([]);
-        setPage(1);
-        setHasMore(true);
+        pageRef.current = 1;
+        hasMoreRef.current = true;
+
+        // scroll to top
+        window.scrollTo(0, 0);
+
+        if (categoryId)
+            fetchCollectionProducts();
     }, [categoryId]);
 
-    // 🔹 Initial fetch
-    useEffect(() => {
-        if (categoryId) fetchCollectionProducts();
-    }, [categoryId, fetchCollectionProducts]);
 
 
     return (
@@ -163,9 +170,18 @@ const CollectionProducts = () => {
 
             </div>
 
-            {(!loading && !hasMore && collection_products?.length === 0) &&
+            {(!loadingRef.current && !hasMoreRef.current && collection_products?.length === 0) &&
                 <div className='flex w-full px-2 sm:px-8 lg:px-24 items-center justify-center py-4'>
-                    <img className='object-cover object-center' src="./no_product.png" alt="No Product Available" />
+                    <div className="relative w-full h-[50vh] rounded-lg overflow-hidden">
+                        <Image
+                            src="/no_product.png"
+                            alt="No Product Available"
+                            fill
+                            className="object-contain"
+                            loading="eager"
+                            unoptimized
+                        />
+                    </div>
                 </div>}
 
             <div className="px-2 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 py-4 sm:py-6">
@@ -174,7 +190,7 @@ const CollectionProducts = () => {
                     return (<div
                         key={product._id}
                         ref={isLast ? lastProductRef : null}
-                        className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full"
+                        className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full hover:scale-102"
                     >
 
                         <Link
@@ -185,12 +201,16 @@ const CollectionProducts = () => {
                         >
                             <div className="w-full aspect-[1] mb-2 relative">
 
-                                {/* Actual image */}
-                                <img
-                                    src={product.images[0].imgUrl}
-                                    alt={product.name}
-                                    className={`w-full h-full object-cover rounded-lg`}
-                                />
+                                <div className="relative w-full h-full rounded-lg overflow-hidden">
+                                    <Image
+                                        src={product.images[0].imgUrl}
+                                        alt={product.name}
+                                        fill
+                                        className="object-cover"
+                                        loading="lazy"
+                                        unoptimized
+                                    />
+                                </div>
                             </div>
 
                             {/* Product Info */}
@@ -236,7 +256,7 @@ const CollectionProducts = () => {
                 })}
             </div>
 
-            {(loading && hasMore) &&
+            {(loadingRef.current && hasMoreRef.current) &&
                 <div className="flex flex-col gap-6 w-full overflow-hidden py-4 px-2 sm:px-8 lg:px-24">
                     {/* Row 1 */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 w-full px-2 gap-4">

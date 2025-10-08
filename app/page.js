@@ -130,7 +130,6 @@ export default function Home() {
         );
         if (res.data.success) {
           toast.success("Item added to your cart");
-          console.log(deliveryTime);
           dispatch(AddProduct({ id, q: 1, deliveryTime }));
           // Optional: update Redux state with res.data.cart
         }
@@ -301,6 +300,7 @@ export default function Home() {
                             alt={item.collection}
                             fill
                             className="object-cover object-center"
+                            loading="eager"
                             unoptimized
                           />
                         </div>
@@ -376,6 +376,7 @@ export default function Home() {
                             alt={product.name}
                             fill
                             className="object-cover"
+                            loading="lazy"
                             unoptimized
                           />
                         </div>

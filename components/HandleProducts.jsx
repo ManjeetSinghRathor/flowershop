@@ -47,115 +47,95 @@ function EditableCell({ value: initialValue, onSave }) {
 
 const HandleProducts = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const pageRef = useRef(1);
+  const hasMoreRef = useRef(true);
+  const loadingRef = useRef(false);
   const observer = useRef();
 
   // Load products from API
   const fetchProducts = useCallback(async () => {
-    if (!hasMore || loading) return; // prevent double calls
+    if (!hasMoreRef.current || loadingRef.current) return;
 
+    loadingRef.current = true;
     setLoading(true);
+
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/all/list?page=${page}&limit=20`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/all/list?page=${pageRef.current}&limit=8`,
+        { withCredentials: true }
       );
 
       if (res.data.success) {
-
         setProducts((prev) => {
           const existingIds = new Set(prev.map((p) => p._id));
-          const filtered = res.data.products.filter(
-            (p) => !existingIds.has(p._id)
-          );
-          return [...prev, ...filtered];
+          return [...prev, ...res.data.products.filter(p => !existingIds.has(p._id))];
         });
 
-        setHasMore(res.data.hasMore);
-        setPage((prev) => prev + 1);
+        hasMoreRef.current = res.data.hasMore;
+        pageRef.current += 1;
       }
     } catch (err) {
       console.error(err);
       toast.error("Failed to load products");
     } finally {
+      loadingRef.current = false;
       setLoading(false);
     }
-  }, [page, hasMore, loading]); // ✅ include loading too
+  }, []);
+
 
   // Infinite scroll observer
-  const lastProductRef = useCallback(
-    (node) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
+  const lastProductRef = useCallback((node) => {
+    if (loadingRef.current) return;
+    if (observer.current) observer.current.disconnect();
 
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          fetchProducts();
-        }
-      });
-
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore, fetchProducts] // ✅ include loading here too
-  );
-
-
-  const fetchSearch = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL
-        }/api/products/search/query?q=${encodeURIComponent(query)}`
-      );
-
-      if (res.data.success) {
-        setProducts(res.data.results);
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMoreRef.current) {
+        fetchProducts();
       }
-    } catch (err) {
-      console.error("Search failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    });
+
+    if (node) observer.current.observe(node);
+  }, [fetchProducts]);
 
   useEffect(() => {
-    if (query === "") {
-      // reset state
-      setProducts([]);
-      setPage(1);
-      setHasMore(true);
+    pageRef.current = 1;
+    hasMoreRef.current = true;
 
-      // ✅ force fresh fetch for page=1
+    if (query === "") {
+      setProducts([]);
+      fetchProducts(); // initial fetch
+    } else {
+      // search
       (async () => {
+        setLoading(true);
         try {
-          setLoading(true);
           const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/all/list?page=1&limit=20`
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search/query?q=${encodeURIComponent(query)}`
           );
+
           if (res.data.success) {
-            setProducts(res.data.products);
-            setHasMore(res.data.hasMore);
-            setPage(2); // ✅ next page will be 2
+            setProducts(res.data.results);
           }
         } catch (err) {
-          console.error(err);
-          toast.error("Failed to load products");
+          console.error("Search failed:", err);
         } finally {
           setLoading(false);
         }
       })();
-    } else {
-      fetchSearch();
     }
-  }, [query]);
+  }, [query, fetchProducts]);
 
 
   // Toggle isActive
   const toggleActive = async (id, current) => {
     try {
       const res = await axios.patch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/${id}/toggleActive`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/${id}/toggleActive`,
+        {},
+        { withCredentials: true }
       );
       if (res.data.success) {
         setProducts((prev) =>
@@ -172,7 +152,8 @@ const HandleProducts = () => {
     try {
       const res = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/${id}/stock`,
-        { stock: newStock }
+        { stock: newStock },
+        { withCredentials: true }
       );
       if (res.data.success) {
         toast.success("Stock updated");
@@ -259,9 +240,6 @@ const HandleProducts = () => {
         </div>
       </div>
 
-      {loading ? (
-        <p>Loading products...</p>
-      ) : (
         <div className="overflow-x-auto">
           <table className="w-full bg-white rounded shadow-md">
             <thead className="bg-gray-200">
@@ -314,7 +292,6 @@ const HandleProducts = () => {
           </table>
           {products?.length === 0 && <p className="mt-4">No products found.</p>}
         </div>
-      )}
     </div>
   );
 };

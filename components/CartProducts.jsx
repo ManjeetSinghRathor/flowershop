@@ -19,7 +19,7 @@ const CartProducts = () => {
     const [cart_products, setCartProducts] = useState([]);
     const [clicked, setClicked] = useState(false);
 
-    const fetchLocalCart = async () => {
+    const fetchLocalCart = async () => {        
         try {
             const res = await axios.post(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/cart/local`,
@@ -37,7 +37,8 @@ const CartProducts = () => {
     };
 
     useEffect(() => {
-        fetchLocalCart();
+        if(cart_product_ids)
+            fetchLocalCart();
     }, [cart_product_ids])
 
 
@@ -175,6 +176,7 @@ const CartProducts = () => {
                                                 src={product.images[0].imgUrl}
                                                 alt={product.name}
                                                 fill
+                                                loading='eager'
                                                 className="object-cover"
                                                 unoptimized
                                             />
@@ -273,7 +275,7 @@ const CartProducts = () => {
 
                             ))}
 
-                            <div className='flex flex-col border-t border-gray-300 w-full gap-2 py-4 sticky bottom-0'>
+                            <div className='flex flex-col border-t border-gray-300 w-full gap-2 py-4'>
                                 <div className='flex justify-between font-mono text-xl sm:text-2xl font-semibold'>
                                     <span>Subtotal</span>
                                     <p className='flex font-mono gap-[2px]'>

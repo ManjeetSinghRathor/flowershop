@@ -696,6 +696,7 @@ export default function CheckoutPage() {
                                             src={item.images[0].imgUrl}
                                             alt={item.name}
                                             fill
+                                            loading="eager"
                                             className="object-cover"
                                             unoptimized
                                         />
