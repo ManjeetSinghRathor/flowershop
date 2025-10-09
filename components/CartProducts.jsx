@@ -385,7 +385,7 @@ const CartProducts = () => {
                                         {/* Overlay */}
                                         <motion.div
                                             initial={{ opacity: 0 }}
-                                            animate={{ opacity: 0.5 }}
+                                            animate={{ opacity: 0.3 }}
                                             exit={{ opacity: 0 }}
                                             className="fixed inset-0 bg-black z-40"
                                             onClick={() => setShowUnavailable(false)}
@@ -404,7 +404,7 @@ const CartProducts = () => {
                                                 These products are currently out of stock. Remove them to continue checkout.
                                             </p>
 
-                                            <div className="space-y-2 overflow-y-auto max-h-[22vh]">
+                                            <div className="space-y-2 overflow-y-auto max-h-[18vh]">
                                                 {unavailableProducts.map((p) => (
                                                     <div
                                                         key={p._id}

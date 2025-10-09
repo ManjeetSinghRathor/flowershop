@@ -459,10 +459,10 @@ export default function Home() {
                           );
                         }}
                         disabled={!product.isActive || product.stock === 0}
-                        className={`flex-1 bg-white transform duration-50 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded ${
+                        className={`flex-1 bg-white transform duration-50 transform duration-200 border-1 font-semibold py-1 rounded ${
                           !product.isActive || product.stock === 0
-                            ? ""
-                            : "hover:scale-102 active:scale-98"
+                            ? "border-gray-300"
+                            : "hover:scale-102 active:scale-98 border-gray-500"
                         }`}
                       >
                         Buy

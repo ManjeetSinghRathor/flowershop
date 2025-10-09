@@ -116,8 +116,6 @@ const CollectionProducts = () => {
             fetchCollectionProducts();
     }, [categoryId]);
 
-
-
     return (
         <div className="min-h-[80vh]">
             <div className='flex flex-col w-full bg-white sticky top-14 z-[45] shadow-md sm:px-8 lg:px-24'>
@@ -264,7 +262,7 @@ const CollectionProducts = () => {
                                     );
                                 }}
                                 disabled={(!product.isActive || product.stock === 0)}
-                                className={`flex-1 bg-white transform duration-50 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded ${(!product.isActive || product.stock === 0) ? "" : "hover:scale-102 active:scale-98"}`}
+                                className={`flex-1 bg-white transform duration-50 transform duration-200 border-1 font-semibold py-1 rounded ${(!product.isActive || product.stock === 0) ? "border-gray-300" : "hover:scale-102 active:scale-98 border-gray-500"}`}
                             >
                                 Buy
                             </button>
@@ -375,7 +373,7 @@ const CollectionProducts = () => {
                                                 );
                                             }}
                                             disabled={(!product.isActive || product.stock === 0)}
-                                            className={`flex-1 bg-white transform duration-50 border border-gray-500 font-semibold py-1 rounded ${(!product.isActive || product.stock === 0) ? "" : "hover:scale-102 active:scale-98"}`}
+                                            className={`flex-1 bg-white transform duration-50 border font-semibold py-1 rounded ${(!product.isActive || product.stock === 0) ? "border-gray-300" : "hover:scale-102 active:scale-98 border-gray-500"}`}
                                         >
                                             Buy
                                         </button>

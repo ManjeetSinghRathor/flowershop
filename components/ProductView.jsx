@@ -314,7 +314,7 @@ const ProductView = () => {
                         </div>
 
                         {/* Add to Cart button */}
-                        <button onClick={() => handleAddToCart(productDetails._id)} className={`border border-gray-400 py-2 rounded-lg ${(!productDetails.isActive || productDetails.stock === 0) ? "text-gray-400":"hover:bg-gray-100"}`}>
+                        <button disabled = {(!productDetails.isActive || productDetails.stock === 0)} onClick={() => handleAddToCart(productDetails._id)} className={`border border-gray-400 py-2 rounded-lg ${(!productDetails.isActive || productDetails.stock === 0) ? "text-gray-400":"hover:bg-gray-100"}`}>
                             + Add to Cart
                         </button>
                     </div>

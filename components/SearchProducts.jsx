@@ -62,13 +62,14 @@ const SearchProducts = () => {
 
       if (res.data.success) {
         const newProducts = res.data.data || [];
+        console.log(res.data.totalCount, newProducts.length);
         setProducts((prev) => {
           const existingIds = new Set(prev.map((p) => p._id));
           return [...prev, ...newProducts.filter((p) => !existingIds.has(p._id))];
         });
 
-        hasMoreRef.current = res.data.hasMore;
-        pageRef.current += res.data.hasMore ? 1 : 0;
+        hasMoreRef.current = newProducts.length >= 8;
+        pageRef.current += newProducts.length >= 8 ? 1 : 0;
       }
     } catch (err) {
       console.error("Search fetch failed:", err);
