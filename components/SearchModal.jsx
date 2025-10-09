@@ -105,7 +105,7 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
                         <input
                             id="searchBox"
                             type="text"
-                            placeholder="Search products by name, code, tags, flowers..."
+                            placeholder="Search products..."
                             className="p-2 w-full text-black outline-none"
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}

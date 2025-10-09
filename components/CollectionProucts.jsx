@@ -358,7 +358,7 @@ const CollectionProducts = () => {
                                                     {product.sizes[0].price}₹
                                                 </span>
                                             )}
-                                            <span className="font-semibold text-lg">
+                                            <span className="font-semibold">
                                                 {product.sizes[0].finalPrice}₹
                                             </span>
                                         </div>
