@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import ImageCarousel from "@/components/ImageCarousel";
 import Link from "next/link";
 import {
@@ -66,6 +66,11 @@ const ProductView = () => {
     const [currentSizeIdx, setCurrentSizeIdx] = useState(0);
     const [delivery_time, setDelivery_time] = useState("");
     const [quantity, setQuantity] = useState(1);
+    const pathname = usePathname();
+
+    useEffect(()=>{
+        window.scrollTo(0,0);
+    },[pathname])
 
 
     const handleAddToCart = async (id) => {
@@ -173,7 +178,7 @@ const ProductView = () => {
                         </p>
                         {/* Stock */}
                         <p
-                            className={`text-sm ${(productDetails.isActive && productDetails.stock > 0) ? "text-green-600" : "text-red-600"
+                            className={`font-semibold font-serif ${(productDetails.isActive && productDetails.stock > 0) ? "text-green-600" : "text-red-600"
                                 }`}
                         >
                             {(productDetails.isActive && productDetails.stock > 0) ? `In Stock` : "Out of Stock"}
@@ -309,7 +314,7 @@ const ProductView = () => {
                         </div>
 
                         {/* Add to Cart button */}
-                        <button onClick={() => handleAddToCart(productDetails._id)} className="border border-gray-400 py-2 rounded-lg hover:bg-gray-100">
+                        <button onClick={() => handleAddToCart(productDetails._id)} className={`border border-gray-400 py-2 rounded-lg ${(!productDetails.isActive || productDetails.stock === 0) ? "text-gray-400":"hover:bg-gray-100"}`}>
                             + Add to Cart
                         </button>
                     </div>
@@ -319,7 +324,8 @@ const ProductView = () => {
                         onClick={() => {
                             router.push(`/cart_products/checkout_?product_id=${productDetails._id}&delivery_time=${encodeURIComponent(delivery_time)}`)
                         }}
-                        className="w-full bg-gray-800 text-white py-3 rounded-lg hover:bg-gray-700 active:bg-white active:text-gray-800 transform duration-100"
+                        disabled = {(!productDetails.isActive || productDetails.stock === 0)}
+                        className={`w-full text-white py-3 rounded-lg transform duration-100 ${(!productDetails.isActive || productDetails.stock === 0) ? "bg-gray-500":"bg-gray-800 hover:bg-gray-700 active:bg-white active:text-gray-800"}`}
                     >
                         Buy Now
                     </button>

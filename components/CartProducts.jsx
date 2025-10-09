@@ -3,10 +3,11 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
-import { IncreaseQty, DecreaseQty, removeProduct } from '@/app/store/CartProductsSlice';
+import { IncreaseQty, DecreaseQty, removeProduct, setCart } from '@/app/store/CartProductsSlice';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { motion, AnimatePresence } from "framer-motion";
 
 const CartProducts = () => {
 
@@ -14,12 +15,76 @@ const CartProducts = () => {
     const router = useRouter();
     const user = useSelector((state) => state?.user?.data);
     const cart_product_ids = useSelector((state) => state.CartProducts);
-
     const [loading, setLoading] = useState(true);
+    const [navLoading, setNavLoading] = useState(false);
     const [cart_products, setCartProducts] = useState([]);
     const [clicked, setClicked] = useState(false);
+    const pathname = usePathname();
 
-    const fetchLocalCart = async () => {        
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname])
+
+    const [showUnavailable, setShowUnavailable] = useState(false);
+    const [unavailableProducts, setUnavailableProducts] = useState([]);
+
+    const handleCheckout = () => {
+        const unavailable = cart_products.filter(
+            (p) => !p.isActive || p.stock === 0
+        );
+
+        if (unavailable.length > 0) {
+            setUnavailableProducts(unavailable);
+            setShowUnavailable(true);
+        } else {
+            router.push("/cart_products/checkout_");
+        }
+    };
+
+    const handleRemoveUnavailable = async () => {
+        // Remove from cart_products
+        const filtered = cart_products.filter(
+            (p) => p.isActive && p.stock > 0
+        );
+        
+        setCartProducts(filtered);
+
+        // Remove from CartProducts state
+        const filteredCart = cart_product_ids.filter((item) => {
+            const match = unavailableProducts.find((p) => p._id === item.id);
+            return !match;
+        });
+
+        dispatch(setCart(filteredCart));
+
+        try {
+            // If user logged in → replace backend cart
+            if (user && user !== null) {
+                const backendCart = filteredCart.map(item => ({
+                    productId: item.id,
+                    quantity: item.q,
+                    sizeIdx: item.sizeIdx,
+                    deliveryTime: item.deliveryTime,
+                }));
+
+                await axios.post(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/cart/replace`,
+                    { cart: backendCart },
+                    { withCredentials: true }
+                );
+            }
+        } catch (err) {
+            console.error("Failed to replace backend cart:", err);
+        }
+
+        setShowUnavailable(false);
+        setUnavailableProducts([]);
+
+        // Now continue to checkout
+        router.push("/cart_products/checkout_");
+    };
+
+    const fetchLocalCart = async () => {
         try {
             const res = await axios.post(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/cart/local`,
@@ -37,7 +102,7 @@ const CartProducts = () => {
     };
 
     useEffect(() => {
-        if(cart_product_ids)
+        if (cart_product_ids)
             fetchLocalCart();
     }, [cart_product_ids])
 
@@ -180,8 +245,18 @@ const CartProducts = () => {
                                                 className="object-cover"
                                                 unoptimized
                                             />
-                                        </div>
 
+                                            {(!product.isActive || product.stock === 0) && (
+                                                <div className="flex items-center justify-center absolute inset-0 z-[30] bg-[rgba(0,0,0,0.3)] rounded-lg transition">
+                                                    <p className="text-center font-extrabold text-xl bg-gradient-to-br from-red-200 via-red-100 to-white bg-clip-text text-transparent drop-shadow-md">
+                                                        <span>OUT</span>
+                                                        <br />
+                                                        <span>OF STOCK</span>
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                        </div>
                                     </Link>
 
                                     {/* Info */}
@@ -225,13 +300,13 @@ const CartProducts = () => {
                                         </Link>
 
                                         {/* Quantity */}
-                                        <div className='flex w-full max-w-32 py-2 '>
-                                            <div className="grid grid-cols-3 border border-gray-400 rounded-lg w-fit">
+                                        <div className='flex w-full max-w-32 py-2'>
+                                            <div className={`grid grid-cols-3 border border-gray-400 rounded-lg w-fit ${(!product.isActive || product.stock === 0) ? "text-gray-400" : ""}`}>
                                                 {/* Minus Button */}
                                                 <button
                                                     type="button"
-                                                    className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 border-1 rounded-l-lg active:text-white transform duration-50"
-                                                    disabled={clicked}
+                                                    className={`px-3 font-bold text-xl border-1 rounded-l-lg transform duration-50 ${(!product.isActive || product.stock === 0) ? "" : "hover:bg-gray-200 active:text-white"}`}
+                                                    disabled={clicked || (!product.isActive || product.stock === 0)}
                                                     onClick={() => handleMinus(product)}
                                                 >
                                                     -
@@ -249,8 +324,8 @@ const CartProducts = () => {
                                                 {/* Plus Button */}
                                                 <button
                                                     type="button"
-                                                    className="px-3 font-bold text-xl text-gray-600 hover:bg-gray-200 border-1 rounded-r-lg active:text-white transform duration-50"
-                                                    disabled={clicked}
+                                                    className={`px-3 font-bold text-xl border-1 rounded-r-lg transform duration-50 ${(!product.isActive || product.stock === 0) ? "" : "hover:bg-gray-200 active:text-white"}`}
+                                                    disabled={clicked || (!product.isActive || product.stock === 0)}
                                                     onClick={() => handlePlus(product)}
                                                 >
                                                     +
@@ -287,9 +362,7 @@ const CartProducts = () => {
                                 </p>
                                 <button
                                     disabled={cart_product_ids?.length === 0}
-                                    onClick={() => {
-                                        router.push("/cart_products/checkout_");
-                                    }}
+                                    onClick={handleCheckout}
                                     className='flex w-full items-center justify-center mt-4 py-2 px-4 font-semibold bg-black text-white hover:bg-gray-900 hover:cursor-pointer'
                                 >
                                     Check out
@@ -304,6 +377,72 @@ const CartProducts = () => {
                                     Continue shopping {">"}
                                 </Link>
                             </div>
+
+                            {/* Bottom Sheet Modal */}
+                            <AnimatePresence>
+                                {showUnavailable && (
+                                    <>
+                                        {/* Overlay */}
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 0.5 }}
+                                            exit={{ opacity: 0 }}
+                                            className="fixed inset-0 bg-black z-40"
+                                            onClick={() => setShowUnavailable(false)}
+                                        />
+
+                                        {/* Bottom Sheet */}
+                                        <motion.div
+                                            initial={{ y: "100%" }}
+                                            animate={{ y: 0 }}
+                                            exit={{ y: "100%" }}
+                                            transition={{ type: "spring", stiffness: 80, damping: 15 }}
+                                            className="fixed bottom-0 left-0 right-0 bg-white z-50 rounded-t-2xl shadow-lg p-4 h-[40vh] overflow-y-auto"
+                                        >
+                                            <h2 className="text-lg font-semibold mb-2">Unavailable Products</h2>
+                                            <p className="text-gray-600 mb-3 text-sm">
+                                                These products are currently out of stock. Remove them to continue checkout.
+                                            </p>
+
+                                            <div className="space-y-2 overflow-y-auto max-h-[22vh]">
+                                                {unavailableProducts.map((p) => (
+                                                    <div
+                                                        key={p._id}
+                                                        className="flex items-center justify-between border p-2 rounded-md"
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <img
+                                                                src={p.images?.[0]?.imgUrl}
+                                                                alt={p.name}
+                                                                className="w-10 h-10 object-cover rounded"
+                                                            />
+                                                            <span className="text-sm font-medium">{p.name}</span>
+                                                        </div>
+                                                        <span className="text-red-600 text-xs font-semibold">
+                                                            {(!p.isActive || p.stock === 0) && "Out of Stock"}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <div className="flex justify-end gap-3 mt-4">
+                                                <button
+                                                    onClick={() => setShowUnavailable(false)}
+                                                    className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    onClick={handleRemoveUnavailable}
+                                                    className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+                                                >
+                                                    Remove & Continue
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    </>
+                                )}
+                            </AnimatePresence>
                         </>
                     ) : (
                         <div className="flex flex-col grow w-full h-full items-center justify-center text-center gap-2">

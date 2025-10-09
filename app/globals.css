@@ -26,5 +26,5 @@ body {
 }
 
 .slick-dots li.slick-active div {
-  @apply scale-110;
+  @apply scale-150 transition-transform duration-200;
 }

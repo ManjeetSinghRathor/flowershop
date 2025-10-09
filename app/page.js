@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useLayoutEffect } from "react";
+import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import Slider from "react-slick";
 import Link from "next/link";
@@ -16,6 +16,7 @@ export default function Home() {
   const router = useRouter();
   const user = useSelector((state) => state.user?.data);
   const colList = useSelector((state) => state.collectionList.data);
+  const isDragging = useRef(false);
 
   const [collectionList, setCollection_List] = useState({});
   const [catLoaded, setCatLoaded] = useState(true);
@@ -102,7 +103,7 @@ export default function Home() {
 
       return (
         <div>
-          <ul className="absolute bottom-1 sm:bottom-2 left-1/2 transform -translate-x-1/2 flex">
+          <ul className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex">
             {visibleDots}
           </ul>
         </div>
@@ -110,12 +111,7 @@ export default function Home() {
     },
 
     customPaging: (i) => (
-      <div className="group relative w-[10px] h-[10px] sm:w-[14px] sm:h-[14px] mx-[4px] rounded-full transition-all duration-300">
-        {/* Glow effect for active */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-50 blur-[2px]" />
-
-        {/* Inner dot */}
-        <div className="w-full h-full bg-[rgba(255,255,255,0.3)] group-hover:bg-gradient-to-r group-hover:from-pink-400 group-hover:to-yellow-300 rounded-full transition-all duration-50 scale-90 group-hover:scale-100 shadow-md" />
+      <div className="group relative w-[8px] h-[8px] rounded-full transition-all duration-300 border-[1px] border-gray-400">
       </div>
     ),
   };
@@ -207,24 +203,45 @@ export default function Home() {
               </div>
             ) : (
               <Slider {...settings}>
-                {slides.map((slide, idx) => (
-                  <div key={slide._id} className="w-full aspect-[7/3] bg-white">
-                    <Link href={slide.link || "#"}>
-                      <div className="relative w-full h-full p-1 cursor-pointer">
-                        <Image
-                          src={slide.image}
-                          alt={`Offer ${idx + 1}`}
-                          fill
-                          loading={idx === 0 ? "eager" : "lazy"}
-                          fetchPriority={idx === 0 ? "high" : "auto"}
-                          decoding="async"
-                          className="object-cover object-top sm:object-contain sm:rounded-xs"
-                          unoptimized
-                        />
-                      </div>
-                    </Link>
-                  </div>
-                ))}
+                {slides.map((slide, idx) => {
+                  const handleMouseDown = () => {
+                    isDragging.current = false;
+                  };
+
+                  const handleMouseMove = () => {
+                    isDragging.current = true;
+                  };
+
+                  const handleClick = (e) => {
+                    if (!isDragging.current) {
+                      router.push(slide.link)
+                    }
+                  };
+
+                  return (
+                    <div
+                      key={slide._id}
+                      className="w-full aspect-[7/3] p-1"
+                      onMouseDown={handleMouseDown}
+                      onMouseMove={handleMouseMove}
+                      onTouchStart={handleMouseDown}
+                      onTouchMove={handleMouseMove}
+                    >
+                        <div onClick={(e)=> handleClick(e)} className="relative w-full h-full cursor-pointer">
+                          <Image
+                            src={slide.image}
+                            alt={`Offer ${idx + 1}`}
+                            fill
+                            loading={idx === 0 ? "eager" : "lazy"}
+                            fetchPriority={idx === 0 ? "high" : "auto"}
+                            decoding="async"
+                            className="object-cover object-top sm:object-contain sm:rounded-xs"
+                            unoptimized
+                          />
+                        </div>
+                    </div>
+                  );
+                })}
               </Slider>
             )}
           </div>
@@ -360,7 +377,7 @@ export default function Home() {
                 col.products.map((product) => (
                   <div
                     key={product.productCode}
-                    className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full cursor-pointer hover:shadow-lg hover:scale-102 transition"
+                    className={`flex flex-col bg-white shadow-md rounded-lg p-3 h-full cursor-pointer hover:shadow-lg hover:scale-102 transition`}
                   >
                     <Link
                       href={{
@@ -424,7 +441,13 @@ export default function Home() {
                     </Link>
 
                     {/* Buttons at bottom */}
-                    <div className="mt-auto flex gap-2 pt-3">
+                    <div
+                      className={`mt-auto flex gap-2 pt-3 ${
+                        !product.isActive || product.stock === 0
+                          ? "text-gray-400"
+                          : "text-black"
+                      }`}
+                    >
                       <button
                         onClick={() => {
                           router.push(
@@ -435,7 +458,12 @@ export default function Home() {
                             )}`
                           );
                         }}
-                        className="flex-1 bg-white active:scale-98 transform duration-50 hover:scale-102 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded"
+                        disabled={!product.isActive || product.stock === 0}
+                        className={`flex-1 bg-white transform duration-50 transform duration-200 border-1 border-gray-500 font-semibold py-1 rounded ${
+                          !product.isActive || product.stock === 0
+                            ? ""
+                            : "hover:scale-102 active:scale-98"
+                        }`}
                       >
                         Buy
                       </button>
@@ -443,7 +471,12 @@ export default function Home() {
                         onClick={() =>
                           handleAddToCart(product._id, product.deliveryTime[0])
                         }
-                        className="flex gap-[2px] items-center justify-center flex-1 bg-gray-800  hover:scale-102 active:scale-98 transform duration-50 text-white py-1 rounded"
+                        disabled={!product.isActive || product.stock === 0}
+                        className={`flex gap-[2px] items-center justify-center flex-1 transform duration-50 text-white py-1 rounded ${
+                          !product.isActive || product.stock === 0
+                            ? "bg-gray-500"
+                            : "bg-gray-800 hover:scale-102 active:scale-98"
+                        }`}
                       >
                         <span className="text-lg">+</span>{" "}
                         <svg
