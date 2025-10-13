@@ -252,7 +252,7 @@ export default function Home() {
 
       {/* Collection List */}
       <div className="flex flex-col w-full gap-4 sm:gap-6 px-2">
-        <h2 className="flex justify-center font-mono text-2xl sm:text-3xl mt-3 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 relative">
+        <h2 className="flex justify-center font-mono text-2xl sm:text-3xl mt-4 mb-1 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 relative">
           Collection List
           <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-[2px] bg-gradient-to-r from-pink-500 to-yellow-400 rounded-full animate-pulse"></span>
         </h2>
@@ -334,14 +334,14 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="w-full aspect-[7/2] mt-4 mb-1 relative">
+      <div className="w-full aspect-[9/2] mt-5 mb-2 px-2 relative max-w-lg sm:hidden">
         {/* Actual image */}
         <div className="relative w-full h-full rounded-lg overflow-hidden">
           <Image
-            src={"/custom_bouquet_poster.png"}
+            src={"/custom_bouquet_poster.jpg"}
             alt={"Make a Custom Bouquet Now!"}
             fill
-            className="object-cover object-center transition-transform duration-500 hover:scale-110"
+            className="object-cover object-center"
             loading="lazy"
             unoptimized
           />

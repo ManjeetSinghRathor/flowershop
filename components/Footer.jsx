@@ -21,9 +21,9 @@ const Footer = () => {
 
   return (
     <div className="list-layout flex flex-col w-full items-center gap-6">
-      <footer className="w-full bg-primary py-8 px-4">
-        <hr className='w-full h-[1px] bg-gray-600 px-4 mb-8'/>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+      <footer className="w-full bg-primary py-6 px-4">
+        <hr className='w-full h-[1px] bg-gray-600 px-4 mb-6'/>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {/* Brand Info */}
           <div className="flex flex-col items-start gap-2">
             <h1 className='flex w-full justify-center text-xl sm:text-2xl font-bold text-center'><img className="h-14 w-auto" src="./favicon.png" alt="" /></h1>
