@@ -251,7 +251,7 @@ export default function Home() {
       </div>
 
       {/* Collection List */}
-      <div className="flex flex-col w-full gap-4 sm:gap-6 px-2">
+      <div className="flex flex-col w-full gap-4 sm:gap-6 px-2 mt-3">
         {/* <h2 className="flex justify-center font-mono text-2xl sm:text-3xl mt-4 mb-1 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 relative">
           Collection List
           <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-[2px] bg-gradient-to-r from-pink-500 to-yellow-400 rounded-full animate-pulse"></span>
