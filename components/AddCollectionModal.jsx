@@ -63,7 +63,7 @@ const AddCollectionModal = ({ isAddColOpen, setIsAddColOpen, catId, onCollection
     }, [isAddColOpen]);
 
     return (
-        <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] w-full flex items-start justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] w-full flex items-start justify-center p-4 z-[50]">
             <div className="bg-white rounded-lg p-4 w-full max-w-md shadow-lg">
                 <div className="flex w-full justify-between items-center py-2 mb-2">
                     <h2 className="text-xl font-semibold">Add Collection</h2>

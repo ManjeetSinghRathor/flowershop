@@ -157,7 +157,7 @@ const UserOrders = () => {
       {/* ✅ Order Details Drawer */}
       {selectedOrder && (
         <div
-          className="fixed inset-0 bg-black/60 z-50 flex justify-start"
+          className="fixed inset-0 bg-black/60 z-[50] flex justify-start"
           onClick={() => setSelectedOrder(null)}
         >
           <div

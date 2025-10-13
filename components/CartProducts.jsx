@@ -397,7 +397,7 @@ const CartProducts = () => {
                                             animate={{ y: 0 }}
                                             exit={{ y: "100%" }}
                                             transition={{ type: "spring", stiffness: 80, damping: 15 }}
-                                            className="fixed bottom-0 left-0 right-0 bg-white z-50 rounded-t-2xl shadow-lg p-4 h-[40vh] overflow-y-auto"
+                                            className="fixed bottom-0 left-0 right-0 bg-white z-[50] rounded-t-2xl shadow-lg p-4 h-[40vh] overflow-y-auto"
                                         >
                                             <h2 className="text-lg font-semibold mb-2">Unavailable Products</h2>
                                             <p className="text-gray-600 mb-3 text-sm">

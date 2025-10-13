@@ -218,7 +218,7 @@ const ProductView = () => {
                     </div>
 
                     <p className="text-center text-sm font-medium text-gray-600 max-w-xs mx-auto leading-tight">
-                        Order before <span className="font-semibold">12:00pm</span> to get{" "}
+                        Order before <span className="font-semibold">8:00pm</span> to get{" "}
                         <span className="font-semibold">Same Day Delivery</span>
                     </p>
 

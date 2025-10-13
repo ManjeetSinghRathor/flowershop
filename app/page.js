@@ -267,7 +267,7 @@ export default function Home() {
                   className="min-w-[5rem] min-h-[5rem] sm:min-w-[7rem] sm:min-h-[7rem] flex items-center justify-center snap-start"
                 >
                   {/* Skeleton */}
-                  <div className="w-18 h-18 sm:w-28 sm:h-28 rounded-full bg-gray-300 animate-pulse" />
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg bg-gray-300 animate-pulse" />
                 </div>
               ))}
             </div>
@@ -279,7 +279,7 @@ export default function Home() {
                   className="min-w-[5rem] min-h-[5rem] sm:min-w-[7rem] sm:min-h-[7rem] flex items-center justify-center snap-start"
                 >
                   {/* Skeleton */}
-                  <div className="w-18 h-18 sm:w-28 sm:h-28 rounded-full bg-gray-300 animate-pulse" />
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg bg-gray-300 animate-pulse" />
                 </div>
               ))}
             </div>
@@ -309,9 +309,9 @@ export default function Home() {
                       }}
                       className="flex flex-col items-center gap-1 cursor-pointer"
                     >
-                      <div className="w-20 h-20 sm:w-28 sm:h-28 relative">
+                      <div className="w-16 h-16 sm:w-24 sm:h-24 relative">
                         {/* Actual image */}
-                        <div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full border border-gray-400 overflow-hidden">
+                        <div className="relative w-16 h-16 sm:w-24 sm:h-24 rounded-lg border border-gray-400 overflow-hidden">
                           <Image
                             src={item.image}
                             alt={item.collection}
@@ -322,7 +322,7 @@ export default function Home() {
                           />
                         </div>
                       </div>
-                      <div className="text-center text-sm max-w-18 sm:max-w-28">
+                      <div className="text-center font-serif text-sm sm:text-lg max-w-18 sm:max-w-28 leading-tight">
                         {item.collection}
                         {/* {item.collection.split(" ").map((word, index) => (
                           <span key={index}>
@@ -434,7 +434,7 @@ export default function Home() {
                             {product.sizes[0].price}₹
                           </span>
                         )}
-                        <span className="font-semibold">
+                        <span className="font-bold text-lg">
                           {product.sizes[0].finalPrice}₹
                         </span>
                       </div>

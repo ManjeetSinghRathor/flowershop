@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import Link from "next/link";
-import { Products } from '@/public/products';
 import axios from 'axios';
 
 const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
@@ -9,6 +8,15 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
     const [productsImgloaded, setProductsImgLoaded] = useState({});
     const [results, setResults] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [dots, setDots] = useState("");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
 
     useEffect(() => {
         if (isSearchOpen) {
@@ -46,6 +54,7 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
                 return;
             }
 
+            setLoading(true);
             try {
                 const res = await axios.get(
                     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search/query?q=${encodeURIComponent(query)}`
@@ -57,6 +66,8 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
                 }
             } catch (err) {
                 console.error("Search failed:", err);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -191,6 +202,7 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
                                 )}
                             </>
                         ) : (
+                            loading ? <p className="text-gray-400 px-4">Loading{dots}</p> :
                             <p className="text-gray-400">No results found for "{query}"</p>
                         )}
                     </div>

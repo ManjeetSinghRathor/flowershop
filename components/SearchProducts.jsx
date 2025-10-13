@@ -1,12 +1,15 @@
 "use client";
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { AddProduct } from "@/app/store/CartProductsSlice";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import Link from "next/link";
+import FiltersSection from './FiltersSection';
+import SortList from './SortByList';
+
 
 const SearchProducts = () => {
   const searchParams = useSearchParams();
@@ -17,16 +20,85 @@ const SearchProducts = () => {
 
   const [products, setProducts] = useState([]);
   const [gridMenu, setGridMenu] = useState(true);
+  const [sortValue, setSortValue] = useState("newest");
+  const [openFilters, setOpenFilters] = useState(false);
+  const [filterApplied, setFilterApplied] = useState(false);
+  const [openSortBy, setOpenSortBy] = useState(false);
+
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  const handleSort = (val) => {
+    setSortValue(val); // keep track of selected sort option
+
+    // Get the source array: filteredProducts if any, otherwise all products
+    const sourceArray = filteredProducts?.length ? [...filteredProducts] : [...products];
+
+    let sortedArray = [];
+
+    switch (val) {
+      case "price_asc":
+        sortedArray = sourceArray.sort((a, b) => {
+          const aPrice = Math.min(...a.sizes.map((s) => s.finalPrice));
+          const bPrice = Math.min(...b.sizes.map((s) => s.finalPrice));
+          return aPrice - bPrice;
+        });
+        break;
+
+      case "price_desc":
+        sortedArray = sourceArray.sort((a, b) => {
+          const aPrice = Math.min(...a.sizes.map((s) => s.finalPrice));
+          const bPrice = Math.min(...b.sizes.map((s) => s.finalPrice));
+          return bPrice - aPrice;
+        });
+        break;
+
+      case "newest":
+        sortedArray = sourceArray.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        break;
+
+      case "oldest":
+        sortedArray = sourceArray.sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
+        break;
+
+      case "az":
+        sortedArray = sourceArray.sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        break;
+
+      case "za":
+        sortedArray = sourceArray.sort((a, b) =>
+          b.name.localeCompare(a.name)
+        );
+        break;
+
+      default:
+        sortedArray = sourceArray;
+        break;
+    }
+
+    // Update filteredProducts if filters are applied, otherwise update collection_products display
+    if (filteredProducts?.length) {
+      setFilteredProducts([...sortedArray]);
+    } else {
+      setFilteredProducts([...sortedArray]); // still set filteredProducts so display uses this sorted list
+    }
+  };
 
   const pageRef = useRef(1);
   const hasMoreRef = useRef(true);
   const loadingRef = useRef(false);
   const observer = useRef();
-
-  // Scroll top on query change
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [query]);
 
   const handleAddToCart = async (id, deliveryTime) => {
     if (user) {
@@ -116,12 +188,31 @@ const SearchProducts = () => {
         </h1>
 
         <div className='grid grid-cols-2 px-2 pb-4 font-mono sm:text-lg'>
-          <div className='flex justify-start gap-3 sm:gap-4 sm:px-4'>
-            <span className='flex gap-1 items-center'>
-              <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-5 sm:h-5 text-black' viewBox="0 0 640 640"><path d="M96 128C78.3 128 64 142.3 64 160C64 177.7 78.3 192 96 192L182.7 192C195 220.3 223.2 240 256 240C288.8 240 317 220.3 329.3 192L544 192C561.7 192 576 177.7 576 160C576 142.3 561.7 128 544 128L329.3 128C317 99.7 288.8 80 256 80C223.2 80 195 99.7 182.7 128L96 128zM96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L342.7 352C355 380.3 383.2 400 416 400C448.8 400 477 380.3 489.3 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L489.3 288C477 259.7 448.8 240 416 240C383.2 240 355 259.7 342.7 288L96 288zM96 448C78.3 448 64 462.3 64 480C64 497.7 78.3 512 96 512L150.7 512C163 540.3 191.2 560 224 560C256.8 560 285 540.3 297.3 512L544 512C561.7 512 576 497.7 576 480C576 462.3 561.7 448 544 448L297.3 448C285 419.7 256.8 400 224 400C191.2 400 163 419.7 150.7 448L96 448z" /></svg>
-              Filters
-            </span>
-            <span className='flex gap-1 items-center whitespace-nowrap'>
+          <div className='flex justify-start gap-3 sm:gap-4'>
+            {
+              filterApplied ?
+                <p className='flex gap-1 items-center cursor-pointer bg-gray-200 rounded-full px-[2px] '>
+                  <span className="flex w-full items-center gap-1" onClick={() => setOpenFilters(true)}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-5 sm:h-5' viewBox="0 0 640 640"><path d="M96 128C78.3 128 64 142.3 64 160C64 177.7 78.3 192 96 192L182.7 192C195 220.3 223.2 240 256 240C288.8 240 317 220.3 329.3 192L544 192C561.7 192 576 177.7 576 160C576 142.3 561.7 128 544 128L329.3 128C317 99.7 288.8 80 256 80C223.2 80 195 99.7 182.7 128L96 128zM96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L342.7 352C355 380.3 383.2 400 416 400C448.8 400 477 380.3 489.3 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L489.3 288C477 259.7 448.8 240 416 240C383.2 240 355 259.7 342.7 288L96 288zM96 448C78.3 448 64 462.3 64 480C64 497.7 78.3 512 96 512L150.7 512C163 540.3 191.2 560 224 560C256.8 560 285 540.3 297.3 512L544 512C561.7 512 576 497.7 576 480C576 462.3 561.7 448 544 448L297.3 448C285 419.7 256.8 400 224 400C191.2 400 163 419.7 150.7 448L96 448z" /></svg>
+                    Filters
+                  </span>
+
+                  <button
+                    onClick={() => {
+                      setFilteredProducts([]);
+                      setFilterApplied(false);
+                    }}
+                    className='border-[1px] border-gray-300 p-1 rounded-full'
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4' viewBox="0 0 640 640"><path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg>
+                  </button>
+                </p> :
+                <span className='flex gap-1 items-center cursor-pointer' onClick={() => setOpenFilters(true)}>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-5 sm:h-5' viewBox="0 0 640 640"><path d="M96 128C78.3 128 64 142.3 64 160C64 177.7 78.3 192 96 192L182.7 192C195 220.3 223.2 240 256 240C288.8 240 317 220.3 329.3 192L544 192C561.7 192 576 177.7 576 160C576 142.3 561.7 128 544 128L329.3 128C317 99.7 288.8 80 256 80C223.2 80 195 99.7 182.7 128L96 128zM96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L342.7 352C355 380.3 383.2 400 416 400C448.8 400 477 380.3 489.3 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L489.3 288C477 259.7 448.8 240 416 240C383.2 240 355 259.7 342.7 288L96 288zM96 448C78.3 448 64 462.3 64 480C64 497.7 78.3 512 96 512L150.7 512C163 540.3 191.2 560 224 560C256.8 560 285 540.3 297.3 512L544 512C561.7 512 576 497.7 576 480C576 462.3 561.7 448 544 448L297.3 448C285 419.7 256.8 400 224 400C191.2 400 163 419.7 150.7 448L96 448z" /></svg>
+                  Filters
+                </span>
+            }
+            <span className='flex gap-1 items-center whitespace-nowrap cursor-pointer' onClick={() => setOpenSortBy(true)}>
               <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-5 sm:h-5 text-black' viewBox="0 0 640 640"><path d="M470.6 566.6L566.6 470.6C575.8 461.4 578.5 447.7 573.5 435.7C568.5 423.7 556.9 416 544 416L480 416L480 96C480 78.3 465.7 64 448 64C430.3 64 416 78.3 416 96L416 416L352 416C339.1 416 327.4 423.8 322.4 435.8C317.4 447.8 320.2 461.5 329.3 470.7L425.3 566.7C437.8 579.2 458.1 579.2 470.6 566.7zM214.6 73.4C202.1 60.9 181.8 60.9 169.3 73.4L73.3 169.4C64.1 178.6 61.4 192.3 66.4 204.3C71.4 216.3 83.1 224 96 224L160 224L160 544C160 561.7 174.3 576 192 576C209.7 576 224 561.7 224 544L224 224L288 224C300.9 224 312.6 216.2 317.6 204.2C322.6 192.2 319.8 178.5 310.7 169.3L214.7 73.3z" /></svg>
               Sort By
             </span>
@@ -154,8 +245,34 @@ const SearchProducts = () => {
 
       </div>
 
+      <div className={`fixed inset-0 bg-[rgba(0,0,0,0.7)] flex items-start justify-end z-999 transition-all duration-300 ${openFilters ? "-translate-x-0" : "translate-x-[100%]"}`} onClick={() => setOpenFilters(false)}>
+        <div className='flex w-full max-w-sm h-screen bg-white overflow-y-auto'>
+          <FiltersSection
+            collection_products={products}
+            openFilters={openFilters}
+            setOpenFilters={setOpenFilters}
+            onFilter={(filteredList) => {
+              setFilteredProducts(filteredList); // update products on main screen
+              setOpenFilters(false); // close modal after applying filters
+              setFilterApplied(true);
+            }}
+          />
+        </div>
+      </div>
+
+      <div className={`fixed inset-0 bg-[rgba(0,0,0,0.7)] flex items-start justify-end z-999 transition-all duration-300 ${openSortBy ? "-translate-x-0" : "translate-x-[100%]"}`} onClick={() => setOpenSortBy(false)}>
+        <div className='flex w-full max-w-sm h-screen bg-white overflow-y-auto'>
+          <SortList
+            openSortBy={openSortBy}
+            setOpenSortBy={setOpenSortBy}
+            value={sortValue}
+            onChange={handleSort}
+          />
+        </div>
+      </div>
+
       {/* Results */}
-      {(!loadingRef.current && !hasMoreRef.current && products.length === 0) ? (
+      {(!loadingRef.current && !hasMoreRef.current && (filterApplied ? filteredProducts : products)?.length === 0) ? (
         <div className="flex justify-center items-center h-[60vh]">
           <Image
             src="/no_product.png"
@@ -171,8 +288,8 @@ const SearchProducts = () => {
         <div
           className={`px-2 sm:px-8 lg:px-24 py-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4`}
         >
-          {products.map((product, i) => {
-            const isLast = i === products.length - 1;
+          {(filterApplied ? filteredProducts : products).map((product, i) => {
+            const isLast = i === (filterApplied ? filteredProducts : products).length - 1;
             return (
               <div
                 key={product._id}
@@ -242,8 +359,8 @@ const SearchProducts = () => {
         <div
           className={`grid grid-cols-1 md:grid-cols-2 px-2 sm:px-8 lg:px-24 gap-4 sm:gap-6 py-4 sm:py-6`}
         >
-          {products.map((product, i) => {
-            const isLast = i === products.length - 1;
+          {(filterApplied ? filteredProducts : products).map((product, i) => {
+            const isLast = i === (filterApplied ? filteredProducts : products).length - 1;
             return (
               <div
                 key={product._id}
