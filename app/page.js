@@ -252,10 +252,10 @@ export default function Home() {
 
       {/* Collection List */}
       <div className="flex flex-col w-full gap-4 sm:gap-6 px-2">
-        <h2 className="flex justify-center font-mono text-2xl sm:text-3xl mt-4 mb-1 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 relative">
+        {/* <h2 className="flex justify-center font-mono text-2xl sm:text-3xl mt-4 mb-1 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 relative">
           Collection List
           <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-[2px] bg-gradient-to-r from-pink-500 to-yellow-400 rounded-full animate-pulse"></span>
-        </h2>
+        </h2> */}
 
         <div className="w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth px-2 sm:px-4">
           {catLoaded ? (
@@ -380,7 +380,7 @@ export default function Home() {
               🌸 {col.name} 🌸
             </h2>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 pb-1 sm:py-2">
               {/* Example Product Cards */}
               {col?.products?.length > 0 &&
                 col.products.map((product) => (
