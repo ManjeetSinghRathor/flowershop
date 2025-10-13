@@ -252,8 +252,9 @@ export default function Home() {
 
       {/* Collection List */}
       <div className="flex flex-col w-full gap-4 sm:gap-6 px-2">
-        <h2 className="flex font-mono text-2xl justify-center sm:text-3xl leading-tight mt-1 sm:mt-2">
+        <h2 className="flex justify-center font-mono text-2xl sm:text-3xl mt-3 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 relative">
           Collection List
+          <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-[2px] bg-gradient-to-r from-pink-500 to-yellow-400 rounded-full animate-pulse"></span>
         </h2>
 
         <div className="w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth px-2 sm:px-4">
@@ -261,10 +262,7 @@ export default function Home() {
             <div className="flex flex-col gap-6 w-full py-4 items-start">
               {/* Skeleton Rows */}
               {[...Array(2)].map((_, rowIdx) => (
-                <div
-                  key={rowIdx}
-                  className="flex w-full gap-2 sm:gap-4"
-                >
+                <div key={rowIdx} className="flex w-full gap-2 sm:gap-4">
                   {[...Array(10)].map((_, idx) => (
                     <div
                       key={`row${rowIdx}-${idx}`}
@@ -278,7 +276,10 @@ export default function Home() {
             </div>
           ) : (
             Object.entries(collectionList).map(([category, items]) => (
-              <div key={category} className="flex flex-col gap-3 w-full py-[6px] sm:py-2">
+              <div
+                key={category}
+                className="flex flex-col gap-3 w-full py-[6px] sm:py-2"
+              >
                 {/* Category Title */}
                 {/* Uncomment if you want section titles */}
                 {/* <h3 className="font-serif font-semibold text-lg sm:text-xl mb-2 text-gray-800">
@@ -333,6 +334,20 @@ export default function Home() {
         </div>
       </div>
 
+      <div className="w-full aspect-[7/2] mt-4 mb-1 relative">
+        {/* Actual image */}
+        <div className="relative w-full h-full rounded-lg overflow-hidden">
+          <Image
+            src={"/custom_bouquet_poster.png"}
+            alt={"Make a Custom Bouquet Now!"}
+            fill
+            className="object-cover object-center transition-transform duration-500 hover:scale-110"
+            loading="lazy"
+            unoptimized
+          />
+        </div>
+      </div>
+
       {colLoading ? (
         <div className="flex flex-col gap-6 w-full overflow-hidden py-4">
           <div className="flex w-full justify-center">
@@ -361,9 +376,10 @@ export default function Home() {
             key={col.collectionCode}
             className="flex flex-col w-full gap-3 py-4 px-2"
           >
-            <h2 className="flex font-mono text-2xl justify-center sm:text-3xl sm:pb-4">
-              {col.name}
+            <h2 className="flex justify-center font-mono text-2xl sm:text-3xl mt-2 mb-1 text-gray-800 font-semibold animate-bounce">
+              🌸 {col.name} 🌸
             </h2>
+
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
               {/* Example Product Cards */}
               {col?.products?.length > 0 &&
