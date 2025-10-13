@@ -7,7 +7,6 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 
-
 const Footer = () => {
 
   const customerLinks = [
@@ -21,7 +20,7 @@ const Footer = () => {
 
   return (
     <div className="list-layout flex flex-col w-full items-center gap-6">
-      <footer className="w-full bg-primary py-6 px-4">
+      <footer className="w-full bg-primary pt-2 pb-4 px-4">
         <hr className='w-full h-[1px] bg-gray-600 px-4 mb-6'/>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {/* Brand Info */}

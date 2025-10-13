@@ -228,7 +228,7 @@ export default function Home() {
                     >
                       <div
                         onClick={(e) => handleClick(e)}
-                        className="relative w-full h-full cursor-pointer"
+                        className="relative w-full h-full cursor-pointer bg-white"
                       >
                         <Image
                           src={slide.image}
@@ -237,7 +237,7 @@ export default function Home() {
                           loading={idx === 0 ? "eager" : "lazy"}
                           fetchPriority={idx === 0 ? "high" : "auto"}
                           decoding="async"
-                          className="object-cover object-top sm:object-contain sm:rounded-xs"
+                          className="object-cover object-center sm:object-cover sm:rounded-xs"
                           unoptimized
                         />
                       </div>
@@ -337,6 +337,9 @@ export default function Home() {
       <div className="w-full aspect-[9/2] mt-5 mb-2 px-2 relative max-w-lg sm:hidden">
         {/* Actual image */}
         <div className="relative w-full h-full rounded-lg overflow-hidden">
+
+          <div className="w-full h-full rounded-xl bg-gray-300 animate-pulse shadow-sm" />
+
           <Image
             src={"/custom_bouquet_poster.jpg"}
             alt={"Make a Custom Bouquet Now!"}
