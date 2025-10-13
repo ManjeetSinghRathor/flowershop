@@ -263,7 +263,7 @@ const CollectionProducts = () => {
 
             </div>
 
-            <div className={`fixed inset-0 bg-[rgba(0,0,0,0.7)] flex items-start justify-end z-999 transition-all duration-300 ${openFilters ? "-translate-x-0" : "translate-x-[100%]"}`} onClick={() => setOpenFilters(false)}>
+            <div className={`fixed inset-0 bg-[rgba(0,0,0,0.7)] flex items-start justify-end z-999 transition-all duration-500 ${openFilters ? "-translate-x-0" : "translate-x-[100%]"}`} onClick={() => setOpenFilters(false)}>
                 <div className='flex w-full max-w-sm h-screen bg-white overflow-y-auto'>
                     <FiltersSection
                         collection_products={collection_products}
@@ -278,7 +278,7 @@ const CollectionProducts = () => {
                 </div>
             </div>
 
-            <div className={`fixed inset-0 bg-[rgba(0,0,0,0.7)] flex items-start justify-end z-999 transition-all duration-300 ${openSortBy ? "-translate-x-0" : "translate-x-[100%]"}`} onClick={() => setOpenSortBy(false)}>
+            <div className={`fixed inset-0 bg-[rgba(0,0,0,0.7)] flex items-start justify-end z-999 transition-all duration-500 ${openSortBy ? "-translate-x-0" : "translate-x-[100%]"}`} onClick={() => setOpenSortBy(false)}>
                 <div className='flex w-full max-w-sm h-screen bg-white overflow-y-auto'>
                 <SortList
                     openSortBy={openSortBy}
@@ -309,7 +309,7 @@ const CollectionProducts = () => {
                     return (<div
                         key={product._id}
                         ref={isLast ? lastProductRef : null}
-                        className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full hover:scale-102"
+                        className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full hover:scale-102 transition duration-500"
                     >
 
                         <Link
@@ -320,12 +320,12 @@ const CollectionProducts = () => {
                         >
                             <div className="w-full aspect-[1] mb-2 relative">
 
-                                <div className="relative w-full h-full rounded-lg">
+                                <div className="relative w-full h-full rounded-lg overflow-hidden">
                                     <Image
                                         src={product.images[0].imgUrl}
                                         alt={product.name}
                                         fill
-                                        className="object-cover"
+                                        className="object-cover object-center transition-transform duration-500 hover:scale-110"
                                         loading="lazy"
                                         unoptimized
                                     />
@@ -381,7 +381,7 @@ const CollectionProducts = () => {
                                     );
                                 }}
                                 disabled={(!product.isActive || product.stock === 0)}
-                                className={`flex-1 bg-white transform duration-50 transform duration-200 border-1 font-semibold py-1 rounded ${(!product.isActive || product.stock === 0) ? "border-gray-300" : "hover:scale-102 active:scale-98 border-gray-500"}`}
+                                className={`flex-1 bg-white transform duration-200 border-1 font-semibold py-1 rounded ${(!product.isActive || product.stock === 0) ? "border-gray-300" : "hover:scale-102 active:scale-98 border-gray-500"}`}
                             >
                                 Buy
                             </button>
@@ -390,7 +390,7 @@ const CollectionProducts = () => {
                                     handleAddToCart(product._id, product.deliveryTime[0])
                                 }
                                 disabled={(!product.isActive || product.stock === 0)}
-                                className={`flex gap-[2px] items-center justify-center flex-1 transform duration-50 text-white py-1 rounded ${(!product.isActive || product.stock === 0) ? "bg-gray-500" : "bg-gray-800 hover:scale-102 active:scale-98"}`}
+                                className={`flex gap-[2px] items-center justify-center flex-1 transform duration-200 text-white py-1 rounded ${(!product.isActive || product.stock === 0) ? "bg-gray-500" : "bg-gray-800 hover:scale-102 active:scale-98"}`}
                             >
                                 <span className="text-lg">+</span>{" "}
                                 <svg
@@ -413,7 +413,7 @@ const CollectionProducts = () => {
                             <div
                                 key={product._id}
                                 ref={isLast ? lastProductRef : null}
-                                className="flex flex-row overflow-hidden bg-white rounded-md p-2 hover:scale-[1.01] transition-transform duration-150"
+                                className="flex flex-row overflow-hidden bg-white rounded-lg p-2 sm:p-3 shadow-sm transition duration-500 hover:scale-102"
                             >
                                 {/* Image Section */}
                                 <Link
@@ -421,13 +421,13 @@ const CollectionProducts = () => {
                                         pathname: "/product_view",
                                         query: { id: product._id },
                                     }}
-                                    className="relative w-28 h-full aspect-[1]"
+                                    className="relative w-28 h-full aspect-[1] overflow-hidden"
                                 >
                                     <Image
                                         src={product.images[0].imgUrl}
                                         alt={product.name}
                                         fill
-                                        className="object-contain"
+                                        className="object-contain object-center transition-transform duration-500 hover:scale-110"
                                         loading="lazy"
                                         unoptimized
                                     />
@@ -492,7 +492,7 @@ const CollectionProducts = () => {
                                                 );
                                             }}
                                             disabled={(!product.isActive || product.stock === 0)}
-                                            className={`flex-1 bg-white transform duration-50 border font-semibold py-1 rounded ${(!product.isActive || product.stock === 0) ? "border-gray-300" : "hover:scale-102 active:scale-98 border-gray-500"}`}
+                                            className={`flex-1 bg-white transform duration-200 border font-semibold py-1 rounded ${(!product.isActive || product.stock === 0) ? "border-gray-300" : "hover:scale-102 active:scale-98 border-gray-500"}`}
                                         >
                                             Buy
                                         </button>
@@ -500,7 +500,7 @@ const CollectionProducts = () => {
                                         <button
                                             onClick={() => handleAddToCart(product._id, product.deliveryTime[0])}
                                             disabled={(!product.isActive || product.stock === 0)}
-                                            className={`flex gap-[2px] items-center justify-center flex-1 text-white transform duration-50 py-1 rounded ${(!product.isActive || product.stock === 0) ? "bg-gray-500" : "bg-gray-800 hover:scale-102 active:scale-98"}`}
+                                            className={`flex gap-[2px] items-center justify-center flex-1 text-white transform duration-200 py-1 rounded ${(!product.isActive || product.stock === 0) ? "bg-gray-500" : "bg-gray-800 hover:scale-102 active:scale-98"}`}
                                         >
                                             <span className="text-lg">+</span>
                                             <svg

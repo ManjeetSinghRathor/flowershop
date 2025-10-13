@@ -111,8 +111,7 @@ export default function Home() {
     },
 
     customPaging: (i) => (
-      <div className="group relative w-[8px] h-[8px] rounded-full transition-all duration-300 border-[1px] border-gray-400">
-      </div>
+      <div className="group relative w-[8px] h-[8px] rounded-full transition-all duration-500 border-[1px] border-gray-400"></div>
     ),
   };
 
@@ -214,7 +213,7 @@ export default function Home() {
 
                   const handleClick = (e) => {
                     if (!isDragging.current) {
-                      router.push(slide.link)
+                      router.push(slide.link);
                     }
                   };
 
@@ -227,18 +226,21 @@ export default function Home() {
                       onTouchStart={handleMouseDown}
                       onTouchMove={handleMouseMove}
                     >
-                        <div onClick={(e)=> handleClick(e)} className="relative w-full h-full cursor-pointer">
-                          <Image
-                            src={slide.image}
-                            alt={`Offer ${idx + 1}`}
-                            fill
-                            loading={idx === 0 ? "eager" : "lazy"}
-                            fetchPriority={idx === 0 ? "high" : "auto"}
-                            decoding="async"
-                            className="object-cover object-top sm:object-contain sm:rounded-xs"
-                            unoptimized
-                          />
-                        </div>
+                      <div
+                        onClick={(e) => handleClick(e)}
+                        className="relative w-full h-full cursor-pointer"
+                      >
+                        <Image
+                          src={slide.image}
+                          alt={`Offer ${idx + 1}`}
+                          fill
+                          loading={idx === 0 ? "eager" : "lazy"}
+                          fetchPriority={idx === 0 ? "high" : "auto"}
+                          decoding="async"
+                          className="object-cover object-top sm:object-contain sm:rounded-xs"
+                          unoptimized
+                        />
+                      </div>
                     </div>
                   );
                 })}
@@ -253,91 +255,82 @@ export default function Home() {
         <h2 className="flex font-mono text-2xl justify-center sm:text-3xl leading-tight mt-1 sm:mt-2">
           Collection List
         </h2>
-        {catLoaded ? (
-          <div className="flex flex-col gap-4 w-full overflow-hidden py-4">
-            {/* <div className="flex w-[100px] h-[28px] relative">
-              <div className="absolute inset-0 rounded-md bg-gray-300 animate-pulse" />
-            </div> */}
 
-            {/* Row 1 */}
-            <div className="flex w-full sm:gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
-              {[...Array(11)].map((_, idx) => (
+        <div className="w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth px-2 sm:px-4">
+          {catLoaded ? (
+            <div className="flex flex-col gap-6 w-full py-4 items-start">
+              {/* Skeleton Rows */}
+              {[...Array(2)].map((_, rowIdx) => (
                 <div
-                  key={`row1-${idx}`}
-                  className="min-w-[5rem] min-h-[5rem] sm:min-w-[7rem] sm:min-h-[7rem] flex items-center justify-center snap-start"
+                  key={rowIdx}
+                  className="flex w-full gap-2 sm:gap-4"
                 >
-                  {/* Skeleton */}
-                  <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg bg-gray-300 animate-pulse" />
-                </div>
-              ))}
-            </div>
-            {/* Row 2 */}
-            <div className="flex w-full sm:gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
-              {[...Array(11)].map((_, idx) => (
-                <div
-                  key={`row1-${idx}`}
-                  className="min-w-[5rem] min-h-[5rem] sm:min-w-[7rem] sm:min-h-[7rem] flex items-center justify-center snap-start"
-                >
-                  {/* Skeleton */}
-                  <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg bg-gray-300 animate-pulse" />
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          Object.entries(collectionList).map(([category, items]) => (
-            <div
-              key={category}
-              className="flex flex-col gap-2 w-full overflow-hiddens"
-            >
-              {/* <h3 className="font-serif font-semibold text-xl sm:text-2xl mb-1 text-gray-800">
-                {category}
-              </h3> */}
-              <div className="flex w-full gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
-                {items.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex gap-2 px-2 snap-start snap-always"
-                  >
-                    <Link
-                      href={{
-                        pathname: "/collection_products",
-                        query: {
-                          category: item.collection,
-                          id: item.collectionId,
-                        }, // pass subcategory as query param
-                      }}
-                      className="flex flex-col items-center gap-1 cursor-pointer"
+                  {[...Array(10)].map((_, idx) => (
+                    <div
+                      key={`row${rowIdx}-${idx}`}
+                      className="min-w-[5rem] min-h-[5rem] sm:min-w-[7rem] sm:min-h-[7rem] flex items-center justify-center snap-center"
                     >
-                      <div className="w-16 h-16 sm:w-24 sm:h-24 relative">
-                        {/* Actual image */}
-                        <div className="relative w-16 h-16 sm:w-24 sm:h-24 rounded-lg border border-gray-400 overflow-hidden">
+                      <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : (
+            Object.entries(collectionList).map(([category, items]) => (
+              <div key={category} className="flex flex-col gap-3 w-full py-[6px] sm:py-2">
+                {/* Category Title */}
+                {/* Uncomment if you want section titles */}
+                {/* <h3 className="font-serif font-semibold text-lg sm:text-xl mb-2 text-gray-800">
+          {category}
+        </h3> */}
+
+                <div
+                  className="flex w-full gap-2 sm:gap-6 justify-start"
+                  style={{
+                    scrollSnapType: "x mandatory",
+                    scrollBehavior: "smooth",
+                  }}
+                >
+                  {items.map((item, index) => (
+                    <div
+                      key={index}
+                      className="snap-center flex-shrink-0 transition-transform duration-500 hover:scale-[1.05]"
+                    >
+                      <Link
+                        href={{
+                          pathname: "/collection_products",
+                          query: {
+                            category: item.collection,
+                            id: item.collectionId,
+                          },
+                        }}
+                        className="flex flex-col items-center gap-1 cursor-pointer"
+                      >
+                        {/* Image Container */}
+                        <div className="relative w-18 h-18 sm:w-24 sm:h-24 rounded-xl border border-gray-300 overflow-hidden bg-white">
                           <Image
                             src={item.image}
                             alt={item.collection}
                             fill
-                            className="object-cover object-center"
-                            loading="eager"
+                            className="object-cover object-center transition-transform duration-500 hover:scale-110"
+                            loading="lazy"
                             unoptimized
                           />
                         </div>
-                      </div>
-                      <div className="text-center font-serif text-sm sm:text-lg max-w-18 sm:max-w-28 leading-tight">
-                        {item.collection}
-                        {/* {item.collection.split(" ").map((word, index) => (
-                          <span key={index}>
-                            {word}
-                            {(index + 1) % 2 === 0 ? <br /> : " "}
-                          </span>
-                        ))} */}
-                      </div>
-                    </Link>
-                  </div>
-                ))}
+
+                        {/* Text */}
+                        <div className="text-center font-serif text-xs sm:text-sm text-gray-800 leading-tight max-w-[5rem] sm:max-w-[6.5rem]">
+                          {item.collection}
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
 
       {colLoading ? (
@@ -377,7 +370,7 @@ export default function Home() {
                 col.products.map((product) => (
                   <div
                     key={product.productCode}
-                    className={`flex flex-col bg-white shadow-md rounded-lg p-3 h-full cursor-pointer hover:shadow-lg hover:scale-102 transition`}
+                    className={`flex flex-col bg-white shadow-md rounded-lg p-3 h-full cursor-pointer hover:shadow-lg hover:scale-102 transition duration-500`}
                   >
                     <Link
                       href={{
@@ -392,7 +385,7 @@ export default function Home() {
                             src={product.images[0].imgUrl}
                             alt={product.name}
                             fill
-                            className="object-cover"
+                            className="object-cover object-center transition-transform duration-500 hover:scale-110"
                             loading="lazy"
                             unoptimized
                           />
@@ -459,7 +452,7 @@ export default function Home() {
                           );
                         }}
                         disabled={!product.isActive || product.stock === 0}
-                        className={`flex-1 bg-white transform duration-50 transform duration-200 border-1 font-semibold py-1 rounded ${
+                        className={`flex-1 bg-white transform transform duration-500 border-1 font-semibold py-1 rounded ${
                           !product.isActive || product.stock === 0
                             ? "border-gray-300"
                             : "hover:scale-102 active:scale-98 border-gray-500"
@@ -472,7 +465,7 @@ export default function Home() {
                           handleAddToCart(product._id, product.deliveryTime[0])
                         }
                         disabled={!product.isActive || product.stock === 0}
-                        className={`flex gap-[2px] items-center justify-center flex-1 transform duration-50 text-white py-1 rounded ${
+                        className={`flex gap-[2px] items-center justify-center flex-1 transform duration-500 text-white py-1 rounded ${
                           !product.isActive || product.stock === 0
                             ? "bg-gray-500"
                             : "bg-gray-800 hover:scale-102 active:scale-98"
@@ -499,7 +492,7 @@ export default function Home() {
                   pathname: "/collection_products",
                   query: { category: col.name, id: col._id }, // pass product ID as query param
                 }}
-                className="flex items-center gap-1 bg-white border border-gray-300 text-gray-700 text-sm font-medium py-1.5 px-4 rounded-lg shadow-sm hover:bg-gray-100 active:scale-95 transition-all duration-150"
+                className="flex items-center gap-1 bg-white border border-gray-300 text-gray-700 text-sm font-medium py-1.5 px-4 rounded-lg shadow-sm hover:bg-gray-100 active:scale-95 transition-all duration-500"
               >
                 <span>View All</span>
                 <svg
