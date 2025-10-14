@@ -196,7 +196,7 @@ export default function Home() {
                 {[...Array(1)].map((_, idx) => (
                   <div
                     key={idx}
-                    className="w-full h-[144px] sm:h-[240px] bg-gray-300 animate-pulse"
+                    className="w-full h-[144px] sm:h-[184px] bg-gray-300 animate-pulse"
                   />
                 ))}
               </div>
@@ -266,9 +266,9 @@ export default function Home() {
                   {[...Array(10)].map((_, idx) => (
                     <div
                       key={`row${rowIdx}-${idx}`}
-                      className="min-w-[5rem] min-h-[5rem] sm:min-w-[7rem] sm:min-h-[7rem] flex items-center justify-center snap-center"
+                      className="min-w-[5rem] min-h-[5rem] sm:min-w-[7rem] sm:min-h-[7rem] lg:min-w-[8rem] lg:min-h-[8rem] flex items-center justify-center snap-center"
                     >
-                      <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
+                      <div className="w-16 h-16 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
                     </div>
                   ))}
                 </div>
@@ -287,7 +287,7 @@ export default function Home() {
         </h3> */}
 
                 <div
-                  className="flex w-full gap-2 sm:gap-6 justify-start"
+                  className="flex w-full gap-2 sm:gap-6 lg:gap-8 justify-start"
                   style={{
                     scrollSnapType: "x mandatory",
                     scrollBehavior: "smooth",
@@ -309,7 +309,7 @@ export default function Home() {
                         className="flex flex-col items-center gap-1 cursor-pointer"
                       >
                         {/* Image Container */}
-                        <div className="relative w-18 h-18 sm:w-24 sm:h-24 rounded-xl border border-gray-300 overflow-hidden bg-white">
+                        <div className="relative w-18 h-18 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-xl border border-gray-300 overflow-hidden bg-white">
                           <Image
                             src={item.image}
                             alt={item.collection}
@@ -321,7 +321,7 @@ export default function Home() {
                         </div>
 
                         {/* Text */}
-                        <div className="text-center font-serif text-xs sm:text-sm text-gray-800 leading-tight max-w-[5rem] sm:max-w-[6.5rem]">
+                        <div className="flex justify-center text-center text-gray-600 font-[300] text-xs sm:text-[14px] lg:text-[18px] lg:mt-1 text-gray-800 leading-tight max-w-[4.8rem] sm:max-w-[5.4rem] lg:max-w-[6.5rem]">
                           {item.collection}
                         </div>
                       </Link>
@@ -360,14 +360,14 @@ export default function Home() {
           </div>
 
           {/* Row 1 */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 w-full px-2 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 w-full px-2 gap-6">
             {[...Array(6)].map((_, idx) => (
               <div
                 key={`row1-${idx}`}
                 className="min-w-[7rem] min-h-[7rem] flex items-center justify-center snap-start"
               >
                 {/* Skeleton */}
-                <div className="w-full h-56 bg-gray-300 animate-pulse" />
+                <div className="w-full h-56 sm:h-84 lg:h-104 bg-gray-300 animate-pulse" />
               </div>
             ))}
           </div>
