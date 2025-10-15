@@ -227,18 +227,19 @@ export default function Home() {
                       onTouchMove={handleMouseMove}
                     >
                       <div
-                        onClick={(e) => handleClick(e)}
+                        onClick={handleClick}
                         className="relative w-full h-full cursor-pointer bg-white"
                       >
                         <Image
                           src={slide.image}
                           alt={`Offer ${idx + 1}`}
                           fill
-                          loading={idx === 0 ? "eager" : "lazy"}
-                          fetchPriority={idx === 0 ? "high" : "auto"}
+                          className="object-cover object-center sm:rounded-xs"
+                          loading={idx === 0 ? "eager" : "lazy"} // first image preloads
+                          fetchPriority={idx === 0 ? "high" : "auto"} // prioritize only first
                           decoding="async"
-                          className="object-cover object-center sm:object-cover sm:rounded-xs"
-                          unoptimized
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                          priority={idx === 0} // ensures first is optimized early
                         />
                       </div>
                     </div>
@@ -316,7 +317,8 @@ export default function Home() {
                             fill
                             className="object-cover object-center transition-transform duration-500 hover:scale-110"
                             loading="lazy"
-                            unoptimized
+                            decoding="async"
+                            sizes="(max-width: 640px) 4.5rem, (max-width: 1024px) 6rem, 7rem"
                           />
                         </div>
 
@@ -336,19 +338,23 @@ export default function Home() {
 
       <div className="w-full aspect-[9/2] mt-5 mb-2 px-2 relative max-w-lg sm:hidden">
         {/* Actual image */}
-        <div className="relative w-full h-full rounded-lg overflow-hidden">
+        <Link href={"/custom_bouquet"}>
+          <div className="relative w-full h-full rounded-lg overflow-hidden">
+            {/* Skeleton placeholder */}
+            <div className="absolute inset-0 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
 
-          <div className="w-full h-full rounded-xl bg-gray-300 animate-pulse shadow-sm" />
-
-          <Image
-            src={"/custom_bouquet_poster.jpg"}
-            alt={"Make a Custom Bouquet Now!"}
-            fill
-            className="object-cover object-center"
-            loading="lazy"
-            unoptimized
-          />
-        </div>
+            {/* Optimized image */}
+            <Image
+              src="/custom_bouquet_poster.jpg"
+              alt="Make a Custom Bouquet Now!"
+              fill
+              className="object-cover object-center transition-transform duration-700 hover:scale-105"
+              priority
+              sizes="100vw"
+              decoding="async"
+            />
+          </div>
+        </Link>
       </div>
 
       {colLoading ? (
@@ -379,9 +385,16 @@ export default function Home() {
             key={col.collectionCode}
             className="flex flex-col w-full gap-3 py-4 px-2"
           >
-            <h2 className="flex justify-center font-mono text-2xl sm:text-3xl mt-2 mb-1 text-gray-800 font-semibold animate-bounce">
-              🌸 {col.name} 🌸
-            </h2>
+            <Link
+              href={{
+                pathname: "/collection_products",
+                query: { category: col.name, id: col._id }, // pass product ID as query param
+              }}
+            >
+              <h2 className="flex justify-center font-mono text-2xl sm:text-3xl mt-2 mb-1 text-gray-800 font-semibold animate-bounce">
+                🌸 {col.name} 🌸
+              </h2>
+            </Link>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 pb-1 sm:py-2">
               {/* Example Product Cards */}
@@ -406,7 +419,8 @@ export default function Home() {
                             fill
                             className="object-cover object-center transition-transform duration-500 hover:scale-110"
                             loading="lazy"
-                            unoptimized
+                            decoding="async"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           />
                         </div>
 

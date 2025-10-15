@@ -10,7 +10,7 @@ import {
 const Footer = () => {
 
   const customerLinks = [
-    { title: "Home", href: "/home" },
+    { title: "Home", href: "/" },
     { title: "About Us", href: "/about" },
     { title: "Contact Us", href: "/contact" },
     { title: "Privacy Policy", href: "/privacy-policy" },
@@ -49,20 +49,20 @@ const Footer = () => {
             <p className="text-sm text-gray-800 break-words text-center">
               Email:{" "}
               <a
-                // href="mailto:support@flowershop.com"
+                href="mailto:bloomsheaven.ltd@gmail.com"
                 className="anchor-tag text-gray-700"
               >
-                support@flowershop.com
+                bloomsheaven.ltd@gmail.com
               </a>
             </p>
 
             <p className="text-sm text-gray-800">
               Phone:{" "}
               <a
-                href="tel:+91XXXXXXXXXX"
+                href="tel:+916361132722"
                 className="anchor-tag text-gray-700"
               >
-                +91 xxx xxxx xxx
+                +916361132722
               </a>
             </p>
 

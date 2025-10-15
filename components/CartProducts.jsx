@@ -46,7 +46,7 @@ const CartProducts = () => {
         const filtered = cart_products.filter(
             (p) => p.isActive && p.stock > 0
         );
-        
+
         setCartProducts(filtered);
 
         // Remove from CartProducts state
@@ -241,9 +241,9 @@ const CartProducts = () => {
                                                 src={product.images[0].imgUrl}
                                                 alt={product.name}
                                                 fill
-                                                loading='eager'
                                                 className="object-cover"
-                                                unoptimized
+                                                decoding="async"
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 50vw"
                                             />
 
                                             {(!product.isActive || product.stock === 0) && (
@@ -450,9 +450,10 @@ const CartProducts = () => {
                             <Image
                                 src={"/empty-cart.png"} // fallback image from public/
                                 alt="Empty Cart"
+                                className="object-cover"
+                                decoding="async"
                                 width={320} // matches Tailwind's w-16
                                 height={320}
-                                className={`object-cover`}
                             />
 
                             <p className='flex justify-center items-center text-gray-500'>

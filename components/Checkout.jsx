@@ -696,10 +696,12 @@ export default function CheckoutPage() {
                                             src={item.images[0].imgUrl}
                                             alt={item.name}
                                             fill
-                                            loading="eager"
                                             className="object-cover"
-                                            unoptimized
+                                            loading="lazy"
+                                            decoding="async"
+                                            sizes="64px"
                                         />
+
                                     </div>
 
                                     <div className="flex flex-col flex-1">
@@ -751,7 +753,10 @@ export default function CheckoutPage() {
                     </div>
 
                     <button
-                        onClick={handlePlaceOrder}
+                        onClick={() => {
+                            // handlePlaceOrder()
+                            toast.error("We will start taking orders soon, please visit again after 1st Nov, 2025.");
+                        }}
                         disabled={loading}
                         className="mt-6 w-full bg-gray-900 text-white py-2 rounded font-semibold hover:scale-[1.02] active:scale-[0.98] transition-transform"
                     >

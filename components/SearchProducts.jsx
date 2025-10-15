@@ -273,16 +273,17 @@ const SearchProducts = () => {
 
       {/* Results */}
       {(!loadingRef.current && !hasMoreRef.current && (filterApplied ? filteredProducts : products)?.length === 0) ? (
-        <div className="flex justify-center items-center h-[60vh]">
-          <Image
-            src="/no_product.png"
-            alt="No Product"
-            width={300}
-            height={300}
-            className="object-contain"
-            loading="eager"
-            priority
-          />
+        <div className='flex w-full px-2 sm:px-8 lg:px-24 items-center justify-center py-4'>
+          <div className="relative w-full h-[50vh] rounded-lg overflow-hidden">
+            <Image
+              src="/no_product.png"
+              alt="No Product Available"
+              fill
+              className="object-contain"
+              decoding="async"
+              sizes="100vw"
+            />
+          </div>
         </div>
       ) : (gridMenu ?
         <div
@@ -303,14 +304,16 @@ const SearchProducts = () => {
                   }}
                 >
                   <div className="relative w-full aspect-square mb-2 overflow-hidden">
+
                     <Image
                       src={product.images[0].imgUrl}
                       alt={product.name}
                       fill
-                      className="object-cover rounded-md object-center transition-transform duration-500 hover:scale-110"
+                      className="object-cover object-center transition-transform duration-500 hover:scale-110"
                       loading="lazy"
-                      unoptimized
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
+
                     {!product.isActive || product.stock === 0 ? (
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center text-white font-bold">
                         OUT OF STOCK
@@ -386,7 +389,7 @@ const SearchProducts = () => {
                     fill
                     className="object-contain object-center transition-transform duration-500 hover:scale-110"
                     loading="lazy"
-                    unoptimized
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
 
                   {!product.isActive || product.stock === 0 ? (

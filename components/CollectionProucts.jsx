@@ -280,12 +280,12 @@ const CollectionProducts = () => {
 
             <div className={`fixed inset-0 bg-[rgba(0,0,0,0.7)] flex items-start justify-end z-999 transition-all duration-500 ${openSortBy ? "-translate-x-0" : "translate-x-[100%]"}`} onClick={() => setOpenSortBy(false)}>
                 <div className='flex w-full max-w-sm h-screen bg-white overflow-y-auto'>
-                <SortList
-                    openSortBy={openSortBy}
-                    setOpenSortBy={setOpenSortBy}
-                    value={sortValue}
-                    onChange={handleSort}
-                />    
+                    <SortList
+                        openSortBy={openSortBy}
+                        setOpenSortBy={setOpenSortBy}
+                        value={sortValue}
+                        onChange={handleSort}
+                    />
                 </div>
             </div>
 
@@ -297,8 +297,8 @@ const CollectionProducts = () => {
                             alt="No Product Available"
                             fill
                             className="object-contain"
-                            loading="eager"
-                            unoptimized
+                            decoding="async"
+                            sizes="100vw"
                         />
                     </div>
                 </div>}
@@ -327,7 +327,7 @@ const CollectionProducts = () => {
                                         fill
                                         className="object-cover object-center transition-transform duration-500 hover:scale-110"
                                         loading="lazy"
-                                        unoptimized
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     />
 
                                     {product.isActive &&
@@ -429,8 +429,9 @@ const CollectionProducts = () => {
                                         fill
                                         className="object-contain object-center transition-transform duration-500 hover:scale-110"
                                         loading="lazy"
-                                        unoptimized
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     />
+                                    
                                     {product.isActive &&
                                         product.stock > 0 &&
                                         product.sizes[0]?.discount > 0 && (

@@ -7,6 +7,7 @@ const nextConfig = {
         "iglffttwjxwuvrpnwgks.supabase.co",
         "https://iglffttwjxwuvrpnwgks.supabase.co"
     ],
+  productionBrowserSourceMaps: true,
   },
 };
 export default nextConfig;

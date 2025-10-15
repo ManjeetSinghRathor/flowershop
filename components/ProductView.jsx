@@ -68,9 +68,9 @@ const ProductView = () => {
     const [quantity, setQuantity] = useState(1);
     const pathname = usePathname();
 
-    useEffect(()=>{
-        window.scrollTo(0,0);
-    },[pathname])
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname])
 
 
     const handleAddToCart = async (id) => {
@@ -145,14 +145,23 @@ const ProductView = () => {
     const [isShareOpen, setIsShareOpen] = useState(true);
     //   const [productsImgloaded, setProductsImgLoaded] = useState({});
 
-    if (loading) return (<div className="flex flex-col justify-center gap-4 pt-2 px-2 sm:px-8 lg:px-24">
+    if (loading) return (<div className="flex flex-col justify-center gap-4 py-4 px-4 sm:px-8 lg:px-24">
         {/* Skeleton slides */}
-        {[...Array(2)].map((_, idx) => (
+        <div
+            className="w-full h-[80px] bg-gray-300 animate-pulse rounded-md"
+        />
+
+        <div
+            className="w-full aspect-[1] bg-gray-300 animate-pulse rounded-md"
+        />
+
+        {[...Array(4)].map((_, idx) => (
             <div
                 key={idx}
-                className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
+                className="w-full h-[80px] bg-gray-300 animate-pulse rounded-md"
             />
         ))}
+
     </div>);
 
     return (
@@ -314,7 +323,7 @@ const ProductView = () => {
                         </div>
 
                         {/* Add to Cart button */}
-                        <button disabled = {(!productDetails.isActive || productDetails.stock === 0)} onClick={() => handleAddToCart(productDetails._id)} className={`border border-gray-400 py-2 rounded-lg ${(!productDetails.isActive || productDetails.stock === 0) ? "text-gray-400":"hover:bg-gray-100"}`}>
+                        <button disabled={(!productDetails.isActive || productDetails.stock === 0)} onClick={() => handleAddToCart(productDetails._id)} className={`border border-gray-400 py-2 rounded-lg ${(!productDetails.isActive || productDetails.stock === 0) ? "text-gray-400" : "hover:bg-gray-100"}`}>
                             + Add to Cart
                         </button>
                     </div>
@@ -324,8 +333,8 @@ const ProductView = () => {
                         onClick={() => {
                             router.push(`/cart_products/checkout_?product_id=${productDetails._id}&delivery_time=${encodeURIComponent(delivery_time)}`)
                         }}
-                        disabled = {(!productDetails.isActive || productDetails.stock === 0)}
-                        className={`w-full text-white py-3 rounded-lg transform duration-100 ${(!productDetails.isActive || productDetails.stock === 0) ? "bg-gray-500":"bg-gray-800 hover:bg-gray-700 active:bg-white active:text-gray-800"}`}
+                        disabled={(!productDetails.isActive || productDetails.stock === 0)}
+                        className={`w-full text-white py-3 rounded-lg transform duration-100 ${(!productDetails.isActive || productDetails.stock === 0) ? "bg-gray-500" : "bg-gray-800 hover:bg-gray-700 active:bg-white active:text-gray-800"}`}
                     >
                         Buy Now
                     </button>

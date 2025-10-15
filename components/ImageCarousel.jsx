@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import Image from "next/image";
 
 export default function ImageCarousel({ images }) {
   const [current, setCurrent] = useState(0);
@@ -72,13 +73,22 @@ export default function ImageCarousel({ images }) {
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
           {images.map((img, idx) => (
-            <div key={idx} className="flex items-center justify-center w-full max-h-[50vh] lg:max-h-[55vh] flex-shrink-0 aspect-[1]">
-              <img
-                src={img.imgUrl}
-                alt={`Image ${idx + 1}`}
-                className="w-full h-full object-contain rounded-xl"
-              />
+            <div
+              key={idx}
+              className="flex items-center justify-center w-full max-h-[50vh] lg:max-h-[55vh] flex-shrink-0 aspect-[1]"
+            >
+              <div className="relative w-full h-full rounded-xl overflow-hidden">
+                <Image
+                  src={img.imgUrl}
+                  alt={`Image ${idx + 1}`}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority={idx === 0} // optional: prioritize first image load
+                />
+              </div>
             </div>
+
           ))}
         </div>
 
@@ -109,13 +119,18 @@ export default function ImageCarousel({ images }) {
               className={`flex-shrink-0 h-16 w-16 rounded-lg overflow-hidden border-2 ${current === idx ? "border-gray-600" : "border-transparent"
                 }`}
             >
-              <img
-                src={img.imgUrl}
-                alt={`Thumb ${idx + 1}`}
-                className="w-full h-full object-contain"
-              />
+              <div className="relative w-full h-full">
+                <Image
+                  src={img.imgUrl}
+                  alt={`Thumbnail ${idx + 1}`}
+                  fill
+                  className="object-contain"
+                  sizes="64px" // exact pixel size for thumbnails
+                  loading="lazy" // default, but explicit for clarity
+                />
+              </div>
             </button>
-          ))} 
+          ))}
         </div>
 
         {/* Right gradient to indicate more items */}

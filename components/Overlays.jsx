@@ -158,7 +158,7 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
     const handleSwipe = () => {
         const diff = touchStartX.current - touchEndX.current;
 
-        if (diff > 50) {
+        if (diff > 120) {
             // Swipe left detected
             setIsOpen(false);
         }
@@ -235,9 +235,11 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                                 <Image
                                     src={user?.profile?.avatarUrl || "/cat.png"} // fallback image from public/
                                     alt="User Avatar"
-                                    width={64} // matches Tailwind's w-16
+                                    width={64}
                                     height={64}
-                                    className={`rounded-full border object-cover`}
+                                    className="rounded-full border object-cover"
+                                    loading="lazy"
+                                    priority={false}
                                 />
                             </div>
                             <p className="flex text-black text-center items-center justify-center gap-2 p-1 rounded-sm bg-white">
@@ -296,9 +298,10 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                                                     <Image
                                                         src={item.image}
                                                         alt={item.collection}
-                                                        width={64} // corresponds to w-16
-                                                        height={64} // corresponds to h-16
+                                                        width={64} // matches Tailwind w-16
+                                                        height={64} // matches Tailwind h-16
                                                         className="rounded-full border object-cover"
+                                                        loading="lazy"
                                                     />
                                                 </div>
                                                 <span className="mt-1 text-sm text-gray-700">
