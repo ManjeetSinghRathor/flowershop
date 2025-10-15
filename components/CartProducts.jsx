@@ -184,7 +184,7 @@ const CartProducts = () => {
     };
 
     return (
-        <div className='flex flex-col gap-2 min-h-[50vh] w-full pt-4'>
+        <div className='flex flex-col gap-2 min-h-screen w-full pt-4'>
             <div className='flex w-full items-center justify-between border-t border-b border-gray-300 py-2 sticky top-14 z-[45] bg-white px-2 sm:px-8 lg:px-24'>
                 <div className='flex flex-col'>
                     <h1 className='font-serif text-2xl font-bold leading-tight'>YOUR CART</h1>

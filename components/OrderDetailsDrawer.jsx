@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
-import { Truck, Download, Printer } from "lucide-react";
+import { Truck, Download } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
 
 

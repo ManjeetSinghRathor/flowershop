@@ -68,6 +68,15 @@ const ProductView = () => {
     const [quantity, setQuantity] = useState(1);
     const pathname = usePathname();
 
+    // 🌐 Your domain
+    const baseUrl = "https://bloomsheaven.in";
+
+    // 🧭 Get current page URL dynamically
+    const fullUrl = `${baseUrl}${pathname}?${searchParams.toString()}`;
+
+    // 📝 Encoded version for safe sharing
+    const encodedUrl = encodeURIComponent(fullUrl);
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [pathname])
@@ -145,7 +154,7 @@ const ProductView = () => {
     const [isShareOpen, setIsShareOpen] = useState(true);
     //   const [productsImgloaded, setProductsImgLoaded] = useState({});
 
-    if (loading) return (<div className="flex flex-col justify-center gap-4 py-4 px-4 sm:px-8 lg:px-24">
+    if (loading) return (<div className="flex flex-col min-h-screen justify-center gap-4 py-4 px-4 sm:px-8 lg:px-24">
         {/* Skeleton slides */}
         <div
             className="w-full h-[80px] bg-gray-300 animate-pulse rounded-md"
@@ -165,7 +174,7 @@ const ProductView = () => {
     </div>);
 
     return (
-        <div className="w-full min-h-[50vh]">
+        <div className="w-full min-h-screen">
             <div className='flex flex-col w-full sm:px-8 lg:px-24'>
                 <h1 className="flex flex-col w-full justify-center items-start font-mono sm:text-lg px-2 py-4">
                     <Link href="/" className="hover:underline font-light">
@@ -487,25 +496,37 @@ const ProductView = () => {
 
                             {/* Content */}
                             {isShareOpen && (
-                                <div className="flex px-4 mt-4 space-x-4">
-                                    <a
-                                        href="https://www.instagram.com/graduate.mentors/?igsh=bjgxczU1Y2M2M3px#"
-                                        className="text-pink-500 hover:text-pink-600 transition-colors text-3xl"
-                                    >
-                                        <FaInstagram />
-                                    </a>
-                                    <a
-                                        href="https://www.instagram.com/graduate.mentors/?igsh=bjgxczU1Y2M2M3px#"
-                                        className="text-green-500 hover:text-green-600 transition-colors text-3xl"
-                                    >
-                                        <FaWhatsapp />
-                                    </a>
-                                    <a
-                                        href="#"
-                                        className="text-blue-600 hover:text-blue-700 transition-colors text-3xl"
-                                    >
-                                        <FaFacebook />
-                                    </a>
+                                <div className="flex mt-4 px-4 space-x-4">
+                                    <div className="flex gap-4 text-3xl justify-center">
+                                        {/* 📸 Instagram (no direct link share, opens Instagram home) */}
+                                        <a
+                                            href={`https://www.instagram.com/?url=${encodedUrl}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-pink-500 hover:text-pink-600 transition-colors"
+                                        >
+                                            <FaInstagram title="Share on Instagram" />
+                                        </a>
+                                        {/* 💬 WhatsApp Share */}
+                                        <a
+                                            href={`https://wa.me/?text=Check%20out%20this%20beautiful%20bouquet%20from%20Bloom's%20Heaven!%20${encodedUrl}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-green-500 hover:text-green-600 transition-colors"
+                                        >
+                                            <FaWhatsapp title="Share on WhatsApp" />
+                                        </a>
+
+                                        {/* 📘 Facebook Share */}
+                                        <a
+                                            href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:text-blue-700 transition-colors"
+                                        >
+                                            <FaFacebook title="Share on Facebook" />
+                                        </a>
+                                    </div>
                                 </div>
                             )}
                         </div>

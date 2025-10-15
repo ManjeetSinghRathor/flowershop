@@ -30,20 +30,32 @@ const Profile = () => {
 
     if (!user || user === null) {
         return (
-            <div className="flex flex-col justify-center gap-4 pt-2 px-2 sm:px-8 lg:px-24">
+            <div className="min-h-screen flex flex-col gap-4 py-4 px-4 sm:px-8 lg:px-24">
                 {/* Skeleton slides */}
-                {[...Array(2)].map((_, idx) => (
+                <div
+                    className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
+                />
+
+                <div className='grid grid-cols-2 gap-6'>
+                    <div
+                        className="w-full h-12 bg-gray-300 animate-pulse rounded-md"
+                    />
+                </div>
+
+                <div className='grid grid-cols-2 gap-6'>
+                    {[...Array(2)].map((_, idx) => (
                     <div
                         key={idx}
-                        className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
+                        className="w-full h-[100px] bg-gray-300 animate-pulse rounded-md"
                     />
                 ))}
+                </div>
             </div>
         )
     }
 
     return (
-        <div className='min-h-[60vh] flex flex-col gap-4 px-2 sm:px-8 lg:px-24 py-4 py-4'>
+        <div className='min-h-screen flex flex-col gap-4 px-2 sm:px-8 lg:px-24 py-4 py-4'>
 
             {/* User Details Card */}
             <div className="relative flex flex-col gap-4 rounded-lg p-6 bg-gradient-to-r from-[#f6f6f6] to-[#fafafa]">
@@ -114,7 +126,7 @@ const Profile = () => {
                             />
                             Handle <br />Collections
                         </Link>
-                        
+
                         <Link href={"/handle_categories"} className='flex flex-col items-center text-center gap-1 p-2 rounded-lg bg-gradient-to-r from-[#f6f6f6] to-[#fafafa] min-w-30'>
                             <Image
                                 src={"/application_9710836.png"}

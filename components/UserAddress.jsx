@@ -325,7 +325,7 @@ const UserAddress = () => {
   };
 
   return (
-    <div className='min-h-[50vh] flex flex-col w-full'>
+    <div className='min-h-screen flex flex-col w-full'>
       <div
         className="flex justify-between items-center cursor-pointer py-4 px-4 sm:px-8 lg:px-24 border-t border-b border-gray-400 bg-white"
         onClick={() => {

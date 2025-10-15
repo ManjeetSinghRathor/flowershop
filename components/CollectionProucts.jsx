@@ -190,7 +190,7 @@ const CollectionProducts = () => {
     // }, [filteredProducts])
 
     return (
-        <div className="min-h-[80vh]">
+        <div className="min-h-screen">
 
             <div className='flex flex-col w-full bg-white sticky top-14 z-[45] shadow-md sm:px-8 lg:px-24'>
                 <h1 className="flex w-full justify-start items-center font-mono sm:text-lg px-2 py-4">
@@ -431,7 +431,7 @@ const CollectionProducts = () => {
                                         loading="lazy"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     />
-                                    
+
                                     {product.isActive &&
                                         product.stock > 0 &&
                                         product.sizes[0]?.discount > 0 && (

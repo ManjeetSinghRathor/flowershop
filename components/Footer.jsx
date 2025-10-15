@@ -21,7 +21,7 @@ const Footer = () => {
   return (
     <div className="list-layout flex flex-col w-full items-center gap-6">
       <footer className="w-full bg-primary pt-2 pb-4 px-4">
-        <hr className='w-full h-[1px] bg-gray-600 px-4 mb-6'/>
+        <hr className='w-full h-[1px] bg-gray-600 px-4 mb-6' />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {/* Brand Info */}
           <div className="flex flex-col items-start gap-2">
@@ -46,45 +46,51 @@ const Footer = () => {
           {/* Contact Info */}
           <div className='flex flex-col items-center sm:items-start'>
             <h4 className="text-lg font-semibold mb-2">Get in Touch</h4>
-            <p className="text-sm text-gray-800 break-words text-center">
-              Email:{" "}
+            <p className="grid grid-cols-[2fr_5fr] text-sm text-gray-800 break-words text-start max-w-xs">
+              <span>
+                ✉️ Email:{" "}
+              </span>
               <a
                 href="mailto:bloomsheaven.ltd@gmail.com"
                 className="anchor-tag text-gray-700"
               >
                 bloomsheaven.ltd@gmail.com
               </a>
-            </p>
 
-            <p className="text-sm text-gray-800">
-              Phone:{" "}
+              <span>
+                📞 Phone:{" "}
+              </span>
               <a
                 href="tel:+916361132722"
                 className="anchor-tag text-gray-700"
               >
                 +916361132722
               </a>
-            </p>
 
-            <p className="text-sm text-gray-800">
-              Location:{" "}
+              <span>
+                📍 Location:{" "}
+              </span>
               <a
-                href="https://www.google.com/maps/place/Your+Location"
+                href="https://www.google.com/maps?q=12.9474117,77.5995856"
+                target='_blank'
                 className="anchor-tag text-gray-700"
               >
-                Your Address Here
+                7th Cross Rd, Chinnayanpalya, Wilson Garden, 
+                Bengaluru, Karnataka 560030
               </a>
             </p>
 
             <div className="flex mt-4 space-x-4">
               <a
-                href="https://www.instagram.com/graduate.mentors/?igsh=bjgxczU1Y2M2M3px#"
+                href="https://www.instagram.com/blooms_heaven_?utm_source=qr&igsh=MXRva3g1eGRuOXp4MQ=="
                 className="text-pink-500 hover:text-pink-600 transition-colors text-3xl"
               >
                 <FaInstagram />
               </a>
               <a
-                href="https://www.instagram.com/graduate.mentors/?igsh=bjgxczU1Y2M2M3px#"
+                href="https://wa.me/916361132722"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-green-500 hover:text-green-600 transition-colors text-3xl"
               >
                 <FaWhatsapp />
@@ -101,7 +107,7 @@ const Footer = () => {
 
         <div className="text-center text-sm text-gray-500 mt-10 border-t border-gray-700 pt-4">
           © {new Date().getFullYear()} FLOWERSHOP.COM. All rights
-          reserved. | <span className='a cursor-default'>Privacy Policy</span> | <span className='a cursor-default'>Terms of Service</span> | <span className='a cursor-default'>Return & Refund Policy</span>
+          reserved. | <Link href="/privacy-policy" className="anchor-tag a">Privacy Policy</Link> | <Link href="/terms-and-conditions" className='a cursor-default'>Terms of Service</Link> | <Link href="/return-refund-policy" className='a cursor-default'>Return & Refund Policy</Link>
         </div>
       </footer>
     </div>

@@ -445,7 +445,7 @@ export default function CheckoutPage() {
 
 
     return (
-        <div className="min-h-[80vh] bg-gray-50 pb-16 relative">
+        <div className="min-h-screen bg-gray-50 pb-16 relative">
             {/* Breadcrumb */}
             <div className="flex flex-col w-full bg-white sticky top-14 z-[45] shadow-md sm:px-8 lg:px-24">
                 <h1 className="flex w-full justify-start items-center font-mono sm:text-lg px-2 py-4">
