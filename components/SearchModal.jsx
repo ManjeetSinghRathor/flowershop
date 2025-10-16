@@ -191,7 +191,7 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
                                 ))}
 
                                 {/* View All */}
-                                {totalCount > 4 && (
+                                {totalCount > 0 && (
                                     <Link
                                         href={`/search_products?query=${query}`}
                                         onClick={() => setIsSearchOpen(false)}

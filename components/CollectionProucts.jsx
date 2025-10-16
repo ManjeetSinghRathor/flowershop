@@ -303,13 +303,13 @@ const CollectionProducts = () => {
                     </div>
                 </div>}
 
-            {gridMenu ? <div className="px-2 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 py-4 sm:py-6">
+            {gridMenu ? <div className="px-4 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 py-4 sm:py-6">
                 {(filterApplied ? filteredProducts : collection_products)?.map((product, index) => {
                     const isLast = index === (filterApplied ? filteredProducts : collection_products)?.length - 1;
                     return (<div
                         key={product._id}
                         ref={isLast ? lastProductRef : null}
-                        className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full hover:scale-102 transition duration-500"
+                        className="flex flex-col bg-white shadow-md rounded-lg h-full hover:scale-102 transition duration-500"
                     >
 
                         <Link
@@ -320,7 +320,7 @@ const CollectionProducts = () => {
                         >
                             <div className="w-full aspect-[1] mb-2 relative">
 
-                                <div className="relative w-full h-full rounded-lg overflow-hidden">
+                                <div className="relative w-full h-full overflow-hidden">
                                     <Image
                                         src={product.images[0].imgUrl}
                                         alt={product.name}
@@ -352,8 +352,9 @@ const CollectionProducts = () => {
                                 </div>
                             </div>
 
-                            {/* Product Info */}
-                            <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+                            <div className='px-2'>
+                                {/* Product Info */}
+                            <h3 className="font-semibold sm:text-lg mb-1">{product.name}</h3>
                             <p className="text-sm text-gray-600 flex-1 line-clamp-3">
                                 {product.description}
                             </p>
@@ -367,10 +368,12 @@ const CollectionProducts = () => {
                                 )}
                                 <span className="font-bold text-lg">{product.sizes[0].finalPrice}₹</span>
                             </div>
+                            </div>
+                            
                         </Link>
 
                         {/* Buttons at bottom */}
-                        <div className={`mt-auto flex gap-2 pt-3 ${(!product.isActive || product.stock === 0) ? "text-gray-400" : "text-black"}`}>
+                        <div className={`mt-auto flex gap-2 p-2 ${(!product.isActive || product.stock === 0) ? "text-gray-400" : "text-black"}`}>
                             <button
                                 onClick={() => {
                                     router.push(
@@ -406,7 +409,7 @@ const CollectionProducts = () => {
                     </div>);
                 })}
             </div> :
-                <div className="grid grid-cols-1 md:grid-cols-2 px-2 sm:px-8 lg:px-24 gap-4 sm:gap-6 py-4 sm:py-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 px-4 sm:px-8 lg:px-24 gap-4 sm:gap-6 py-4 sm:py-6">
                     {(filterApplied ? filteredProducts : collection_products)?.map((product, index) => {
                         const isLast = index === (filterApplied ? filteredProducts : collection_products)?.length - 1;
                         return (
@@ -462,17 +465,17 @@ const CollectionProducts = () => {
                                                 query: { id: product._id },
                                             }}
                                         >
-                                            <h3 className="font-semibold text-lg sm:text-xl line-clamp-2">
+                                            <h3 className="font-semibold sm:text-lg">
                                                 {product.name}
                                             </h3>
                                         </Link>
 
-                                        <p className="text-sm text-gray-600 line-clamp-2 sm:line-clamp-3 my-[1px]">
+                                        <p className="text-sm text-gray-600 line-clamp-2 my-[1px]">
                                             {product.description}
                                         </p>
 
                                         {/* Price */}
-                                        <div>
+                                        <div className='py-1 sm:py-2'>
                                             {product.sizes[0].discount > 0 && (
                                                 <span className="text-gray-400 line-through mr-2">
                                                     {product.sizes[0].price}₹

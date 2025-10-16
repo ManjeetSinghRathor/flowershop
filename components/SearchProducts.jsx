@@ -287,7 +287,7 @@ const SearchProducts = () => {
         </div>
       ) : (gridMenu ?
         <div
-          className={`px-2 sm:px-8 lg:px-24 py-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4`}
+          className={`px-4 sm:px-8 lg:px-24 py-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4`}
         >
           {(filterApplied ? filteredProducts : products).map((product, i) => {
             const isLast = i === (filterApplied ? filteredProducts : products).length - 1;
@@ -295,7 +295,7 @@ const SearchProducts = () => {
               <div
                 key={product._id}
                 ref={isLast ? lastProductRef : null}
-                className="flex flex-col bg-white shadow-md rounded-lg p-3 h-full hover:scale-102 transition duration-500"
+                className="flex flex-col bg-white shadow-md rounded-lg h-full hover:scale-102 transition duration-500"
               >
                 <Link
                   href={{
@@ -320,18 +320,23 @@ const SearchProducts = () => {
                       </div>
                     ) : null}
                   </div>
-                  <h3 className="font-semibold">{product.name}</h3>
-                  <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>
-                  <div className="mt-1">
-                    {product.sizes[0].discount > 0 && (
-                      <span className="text-gray-400 line-through mr-2">
-                        {product.sizes[0].price}₹
-                      </span>
-                    )}
-                    <span className="font-semibold">{product.sizes[0].finalPrice}₹</span>
+
+                  <div className="px-2">
+                    <h3 className="font-semibold sm:text-lg">{product.name}</h3>
+                    <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>
+                    <div className="mt-1">
+                      {product.sizes[0].discount > 0 && (
+                        <span className="text-gray-400 line-through mr-2">
+                          {product.sizes[0].price}₹
+                        </span>
+                      )}
+                      <span className="font-semibold">{product.sizes[0].finalPrice}₹</span>
+                    </div>
                   </div>
+
                 </Link>
-                <div className="flex gap-2 mt-auto pt-2">
+
+                <div className="flex gap-2 p-2">
                   <button
                     disabled={!product.isActive || product.stock === 0}
                     onClick={() =>
@@ -365,23 +370,22 @@ const SearchProducts = () => {
             );
           })}
         </div> :
-        <div
-          className={`grid grid-cols-1 md:grid-cols-2 px-2 sm:px-8 lg:px-24 gap-4 sm:gap-6 py-4 sm:py-6`}
-        >
-          {(filterApplied ? filteredProducts : products).map((product, i) => {
-            const isLast = i === (filterApplied ? filteredProducts : products).length - 1;
+        <div className="grid grid-cols-1 md:grid-cols-2 px-4 sm:px-8 lg:px-24 gap-4 sm:gap-6 py-4 sm:py-6">
+          {(filterApplied ? filteredProducts : products)?.map((product, index) => {
+            const isLast = index === (filterApplied ? filteredProducts : products)?.length - 1;
             return (
               <div
                 key={product._id}
                 ref={isLast ? lastProductRef : null}
-                className="flex flex-row overflow-hidden bg-white rounded-md p-2 hover:scale-[1.02] transition-transform duration-500"
+                className="flex flex-row overflow-hidden bg-white rounded-lg p-2 sm:p-3 shadow-sm transition duration-500 hover:scale-102"
               >
+                {/* Image Section */}
                 <Link
                   href={{
                     pathname: "/product_view",
                     query: { id: product._id },
                   }}
-                  className="relative w-28 h-full aspect-[1] oerflow-hidden"
+                  className="relative w-28 h-full aspect-[1] overflow-hidden"
                 >
                   <Image
                     src={product.images[0].imgUrl}
@@ -392,12 +396,6 @@ const SearchProducts = () => {
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
 
-                  {!product.isActive || product.stock === 0 ? (
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center text-white font-bold">
-                      OUT OF STOCK
-                    </div>
-                  ) : null}
-
                   {product.isActive &&
                     product.stock > 0 &&
                     product.sizes[0]?.discount > 0 && (
@@ -407,6 +405,16 @@ const SearchProducts = () => {
                         </p>
                       </div>
                     )}
+
+                  {(!product.isActive || product.stock === 0) && (
+                    <div className="flex items-center justify-center absolute inset-0 z-[30] bg-[rgba(0,0,0,0.3)] rounded-lg transition">
+                      <p className="text-center font-extrabold text-xl bg-gradient-to-br from-red-200 via-red-100 to-white bg-clip-text text-transparent drop-shadow-md">
+                        <span>OUT</span>
+                        <br />
+                        <span>OF STOCK</span>
+                      </p>
+                    </div>
+                  )}
                 </Link>
 
                 {/* Details Section */}
@@ -418,23 +426,23 @@ const SearchProducts = () => {
                         query: { id: product._id },
                       }}
                     >
-                      <h3 className="font-semibold text-lg sm:text-xl line-clamp-2 leading-tight">
+                      <h3 className="font-semibold sm:text-lg">
                         {product.name}
                       </h3>
                     </Link>
 
-                    <p className="text-sm text-gray-600 line-clamp-2 sm:line-clamp-3 my-[1px]">
+                    <p className="text-sm text-gray-600 line-clamp-2 my-[1px]">
                       {product.description}
                     </p>
 
                     {/* Price */}
-                    <div>
+                    <div className='py-1 sm:py-2'>
                       {product.sizes[0].discount > 0 && (
                         <span className="text-gray-400 line-through mr-2">
                           {product.sizes[0].price}₹
                         </span>
                       )}
-                      <span className="font-semibold">
+                      <span className="font-bold text-lg">
                         {product.sizes[0].finalPrice}₹
                       </span>
                     </div>

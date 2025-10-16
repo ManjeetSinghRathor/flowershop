@@ -5,6 +5,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import ImageCarousel from "@/components/ImageCarousel";
 import Link from "next/link";
 import {
+    FaLink,
     FaInstagram,
     FaFacebook,
     FaWhatsapp,
@@ -265,9 +266,9 @@ const ProductView = () => {
 
     if (loading) return (<div className="flex flex-col min-h-screen justify-center gap-4 py-4 px-4 sm:px-8 lg:px-24">
         {/* Skeleton slides */}
-        <div
+        {/* <div
             className="w-full h-[80px] bg-gray-300 animate-pulse rounded-md"
-        />
+        /> */}
 
         <div
             className="w-full aspect-[1] bg-gray-300 animate-pulse rounded-md"
@@ -283,15 +284,15 @@ const ProductView = () => {
     </div>);
 
     return (
-        <div className="w-full min-h-screen">
-            <div className='flex flex-col w-full sm:px-8 lg:px-24'>
+        <div className="w-full min-h-screen py-2">
+            {/* <div className='flex flex-col w-full sm:px-8 lg:px-24'>
                 <h1 className="flex flex-col w-full justify-center items-start font-mono sm:text-lg px-2 py-4">
                     <Link href="/" className="hover:underline font-light">
                         Home{" "}{">"}
                     </Link>
                     <span>{productDetails.name}</span>
                 </h1>
-            </div>
+            </div> */}
 
             <div className="flex flex-col lg:flex-row px-2 gap-2 sm:gap-4 lg:gap-12 sm:px-8 lg:px-24">
                 <div className="lg:min-w-xl">
@@ -691,15 +692,16 @@ const ProductView = () => {
                             {isShareOpen && (
                                 <div className="flex mt-4 px-4 space-x-4">
                                     <div className="flex gap-4 text-3xl justify-center">
-                                        {/* 📸 Instagram (no direct link share, opens Instagram home) */}
-                                        <a
-                                            href={`https://www.instagram.com/?url=${encodedUrl}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-pink-500 hover:text-pink-600 transition-colors"
+                                        {/* 📋 Copy Link Button */}
+                                        <button
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(window.location.href);
+                                                toast.success("Link copied to clipboard!");
+                                            }}
+                                            className="text-2xl text-gray-600 hover:text-gray-800 transition-colors"
                                         >
-                                            <FaInstagram title="Share on Instagram" />
-                                        </a>
+                                            <FaLink title="Copy Product Link" />
+                                        </button>
                                         {/* 💬 WhatsApp Share */}
                                         <a
                                             href={`https://wa.me/?text=Check%20out%20this%20beautiful%20bouquet%20from%20Bloom's%20Heaven!%20${encodedUrl}`}
@@ -708,6 +710,16 @@ const ProductView = () => {
                                             className="text-green-500 hover:text-green-600 transition-colors"
                                         >
                                             <FaWhatsapp title="Share on WhatsApp" />
+                                        </a>
+                                        <a
+                                            href={`https://www.instagram.com/direct/new/?text=${encodeURIComponent(
+                                                `Check out this product from Bloom's Heaven 🌸 — ${window.location.href}`
+                                            )}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-pink-500 hover:text-pink-600 transition-colors"
+                                        >
+                                            <FaInstagram title="Share on Instagram" />
                                         </a>
 
                                         {/* 📘 Facebook Share */}
