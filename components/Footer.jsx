@@ -13,8 +13,7 @@ const Footer = () => {
     { title: "Home", href: "/" },
     { title: "About Us", href: "/about" },
     { title: "Contact Us", href: "/contact" },
-    { title: "Privacy Policy", href: "/privacy-policy" },
-    { title: "Terms and Conditions", href: "/terms-and-conditions" },
+    { title: "Shipping and Delivery", href: "/shipping-and-delivery" },
     { title: "Return & Refund Policy", href: "/return-refund-policy" },
   ];
 
@@ -107,7 +106,7 @@ const Footer = () => {
 
         <div className="text-center text-sm text-gray-500 mt-10 border-t border-gray-700 pt-4">
           © {new Date().getFullYear()} FLOWERSHOP.COM. All rights
-          reserved. | <Link href="/privacy-policy" className="anchor-tag a">Privacy Policy</Link> | <Link href="/terms-and-conditions" className='a cursor-default'>Terms of Service</Link> | <Link href="/return-refund-policy" className='a cursor-default'>Return & Refund Policy</Link>
+          reserved. | <Link href="/privacy-policy" className="anchor-tag a">Privacy Policy</Link> | <Link href="/terms-and-conditions" className='a cursor-default'>Terms of Service</Link>
         </div>
       </footer>
     </div>

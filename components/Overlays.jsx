@@ -9,15 +9,12 @@ import { setCart } from "@/app/store/CartProductsSlice";
 import Link from "next/link";
 import { FaChevronDown, FaChevronUp, FaChevronRight } from "react-icons/fa"; // ✅ react-icons
 import axios from "axios";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
 
 
 export default function Overlays({ setIsOpen, isOpen = false }) {
     const dispatch = useDispatch();
-    const router = useRouter();
     const menuRef = useRef(null);
     const swipeRef = useRef(null);
     const [openLoginPopup, setOpenLoginPopup] = useState(false);

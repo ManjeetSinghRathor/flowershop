@@ -15,6 +15,10 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { AddProduct } from "@/app/store/CartProductsSlice";
 import toast from "react-hot-toast";
+import { GoogleLogin } from '@react-oauth/google';
+import { Loader2 } from "lucide-react";
+import { setUser } from "@/app/store/userSlice";
+import { setCart } from "@/app/store/CartProductsSlice";
 
 
 // const trendingProductsID = ["F001", "F002", "F003", "F004", "F005", "F006"];
@@ -67,9 +71,96 @@ const ProductView = () => {
     const [delivery_time, setDelivery_time] = useState("");
     const [quantity, setQuantity] = useState(1);
     const pathname = usePathname();
+    const [googleLoading, setGoogleLoading] = useState(false);
+    const cartProducts = useSelector((state) => state.CartProducts);
+
+
+    // Helper function for merging
+    function mergeCarts(localCart, backendCart) {
+        const map = new Map();
+
+        // Add backend cart first
+        backendCart.forEach(item => {
+            map.set(item.productId, {
+                id: item.productId,
+                q: item.quantity,
+                sizeIdx: item.sizeIdx,
+                deliveryTime: item.deliveryTime,
+            });
+        });
+
+        // Merge local cart
+        localCart.forEach(item => {
+            const key = item.id;
+            if (map.has(key)) {
+                map.get(key).q += item.q; // combine quantity
+            } else {
+                map.set(key, item);
+            }
+        });
+
+        return Array.from(map.values());
+    }
+
+    const handleGoogleLogin = async (response) => {
+        setGoogleLoading(true);
+        try {
+            const { credential } = response;
+
+            // Step 1: Login with Google
+            const res = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google-login`,
+                { token: credential },
+                { withCredentials: true }
+            );
+
+            if (res.data.success) {
+                // Step 2: Get user data (including backend cart)
+                const userRes = await axios.get(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`,
+                    { withCredentials: true }
+                );
+
+                if (userRes?.data?.success) {
+                    const userData = userRes.data.data;
+                    const backendCart = userData?.cart || [];
+
+                    // Step 3: Get local cart (saved in localStorage or from Redux)
+                    const localCart = cartProducts || [];
+                    // Step 4: Merge both carts
+                    const mergedCart = mergeCarts(localCart, backendCart);
+
+                    // Step 5: Save merged cart to backend
+                    const syncRes = await axios.post(
+                        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/cart/sync`,
+                        {
+                            cart: mergedCart.map((item) => ({
+                                productId: item.id,
+                                quantity: item.q,
+                                sizeIdx: item.sizeIdx,
+                                deliveryTime: item.deliveryTime,
+                            })),
+                        },
+                        { withCredentials: true }
+                    );
+
+                    if (syncRes.data.success) {
+                        // Step 6: Update Redux and clear local cart
+                        dispatch(setUser(userRes?.data)); // keep user info from /me
+                        dispatch(setCart(mergedCart));
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Google login failed", err);
+        } finally {
+            setGoogleLoading(false);
+        }
+    };
+
 
     // 🌐 Your domain
-    const baseUrl = "https://bloomsheaven.in";
+    const baseUrl = "https://bloomsheaven.com";
 
     // 🧭 Get current page URL dynamically
     const fullUrl = `${baseUrl}${pathname}?${searchParams.toString()}`;
@@ -80,6 +171,24 @@ const ProductView = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [pathname])
+
+    const [userRating, setUserRating] = useState(0);
+    const [userReview, setUserReview] = useState("");
+
+    const handleSubmitReview = () => {
+        if (!userRating || !userReview.trim()) {
+            toast.error("Please provide both rating and review text.");
+            return;
+        }
+
+        // 🔹 Example: send to backend
+        // axios.post("/api/reviews", { productId, rating: userRating, review: userReview });
+
+        toast.success("Thank you for your feedback!");
+        setUserRating(0);
+        setUserReview("");
+    };
+
 
 
     const handleAddToCart = async (id) => {
@@ -236,7 +345,7 @@ const ProductView = () => {
                     </div>
 
                     <p className="text-center text-sm font-medium text-gray-600 max-w-xs mx-auto leading-tight">
-                        Order before <span className="font-semibold">8:00pm</span> to get{" "}
+                        Order before <span className="font-semibold">7:00pm</span> to get{" "}
                         <span className="font-semibold">Same Day Delivery</span>
                     </p>
 
@@ -343,7 +452,8 @@ const ProductView = () => {
                             router.push(`/cart_products/checkout_?product_id=${productDetails._id}&delivery_time=${encodeURIComponent(delivery_time)}`)
                         }}
                         disabled={(!productDetails.isActive || productDetails.stock === 0)}
-                        className={`w-full text-white py-3 rounded-lg transform duration-100 ${(!productDetails.isActive || productDetails.stock === 0) ? "bg-gray-500" : "bg-gray-800 hover:bg-gray-700 active:bg-white active:text-gray-800"}`}
+                        className={`w-full text-white py-3 rounded-lg transform duration-50 px-4 transition-colors
+                            ${(!productDetails.isActive || productDetails.stock === 0) ? "bg-gray-500" : "bg-pink-500 hover:bg-pink-600 active:bg-white active:text-gray-800"}`}
                     >
                         Buy Now
                     </button>
@@ -351,7 +461,7 @@ const ProductView = () => {
                     <div className="flex flex-col gap-2">
                         <div>
                             <h2 className="font-semibold mb-1">Description:</h2>
-                            <p className="text-gray-700 font-serif text-base leading-relaxed tracking-wide px-4 leading-tight">
+                            <p className="text-gray-700 text-sm leading-relaxed tracking-wide px-4">
                                 {productDetails.description}
                             </p>
                         </div>
@@ -425,19 +535,35 @@ const ProductView = () => {
                             {/* Content */}
                             {isOpen && (
                                 <div className="px-4 py-3 text-sm text-gray-700 space-y-4">
-                                    <div>
-                                        <p className="font-medium">
-                                            Can I get my order delivered earlier?
+                                    <div className="space-y-3">
+                                        <p>
+                                            <strong>Q. Do we offer same-day delivery?</strong><br />
+                                            Yes! We offer same-day delivery for most flower arrangements and gifts
+                                            if the order is placed before <strong>7:00 PM (local time)</strong>.
+                                            Orders received after that will be delivered the next day.
                                         </p>
-                                    </div>
-                                    <div>
-                                        <p className="font-medium">
-                                            What Payment methods are available?
+
+                                        <p>
+                                            <strong>Q. Are deliveries available on Sundays or holidays?</strong><br />
+                                            Yes, we deliver on Sundays and most public holidays to make your moments special.
                                         </p>
-                                    </div>
-                                    <div>
-                                        <p className="font-medium">
-                                            What if I receive the product damaged?
+
+                                        <p>
+                                            <strong>Q. How can I track my order?</strong><br />
+                                            Once your order is confirmed, you’ll receive a tracking id & link via email or WhatsApp
+                                            so you can monitor the delivery status in real time.
+                                        </p>
+
+                                        <p>
+                                            <strong>Q. What if the recipient is not available?</strong><br />
+                                            Our delivery partner will contact the recipient.
+                                            If delivery fails, we’ll reschedule it or leave the package with a neighbor or at reception (as per your consent).
+                                        </p>
+
+                                        <p>
+                                            <strong>Q. Do you charge for delivery?</strong><br />
+                                            Standard delivery within city limits is <strong>free</strong> for orders above ₹999.
+                                            For distant locations or urgent deliveries, minimal charges may apply.
                                         </p>
                                     </div>
                                 </div>
@@ -461,24 +587,91 @@ const ProductView = () => {
                             {/* Content */}
                             {isReviewsOpen && (
                                 <div className="px-4 py-3 text-sm text-gray-700 space-y-4">
-                                    <div>
-                                        <p className="font-medium">
-                                            Can I get my order delivered earlier?
-                                        </p>
+                                    {/* Existing Review Display */}
+                                    <div className="flex items-center gap-1 text-gray-500">
+                                        {Array.from({ length: 5 }).map((_, i) => {
+                                            let fill = 0;
+                                            if ((review?.rating || 0) >= i + 1) fill = 1;
+                                            else if ((review?.rating || 0) > i && (review?.rating || 0) < i + 1)
+                                                fill = 0.5;
+                                            return <Star key={i} filled={fill} className="w-4 h-4" />;
+                                        })}
                                     </div>
-                                    <div>
-                                        <p className="font-medium">
-                                            What Payment methods are available?
-                                        </p>
+
+                                    <p className="ml-1">
+                                        {review?.rating > 0 ? review.rating : "No Reviews"}
+                                    </p>
+
+                                    {/* --- Divider --- */}
+                                    <hr className="border-gray-300 my-3" />
+
+                                    <div className="p-2 relative text-sm text-gray-700 space-y-4">
+
+                                        {/* --- Add Review Section --- */}
+                                        <h3 className="font-semibold text-gray-800">Add Your Review</h3>
+
+                                        {/* Star Rating Input */}
+                                        <div className="flex items-center gap-1">
+                                            {Array.from({ length: 5 }).map((_, i) => (
+                                                <button
+                                                    key={i}
+                                                    type="button"
+                                                    onClick={() => setUserRating(i + 1)}
+                                                    className="focus:outline-none"
+                                                    disabled={!user} // Disable if not logged in
+                                                >
+                                                    <Star
+                                                        filled={userRating > i ? 1 : 0}
+                                                        className={`w-6 h-6 transition-colors ${userRating > i ? "text-yellow-400" : "text-gray-300"
+                                                            }`}
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* Review Input */}
+                                        <textarea
+                                            value={userReview}
+                                            onChange={(e) => setUserReview(e.target.value)}
+                                            placeholder="Write your review here..."
+                                            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-1 focus:ring-pink-400 focus:outline-none"
+                                            rows={3}
+                                            disabled={!user} // Disable if not logged in
+                                        ></textarea>
+
+                                        {/* Submit Button */}
+                                        <button
+                                            onClick={handleSubmitReview}
+                                            className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            disabled={!user}
+                                        >
+                                            Submit Review
+                                        </button>
+
+                                        {/* --- Overlay when user is not logged in --- */}
+                                        {!user && (
+                                            <div className="absolute inset-0 bg-[rgba(0,0,0,0.6)] flex flex-col items-center justify-center rounded-lg">
+                                                <p className="text-white mb-3 font-medium">Please login to add a review</p>
+                                                <div className="flex max-w-xs cursor-pointer">
+                                                    <GoogleLogin
+                                                        onSuccess={handleGoogleLogin}
+                                                        onError={() => setError("Google login failed")}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div>
-                                        <p className="font-medium">
-                                            What if I receive the product damaged?
-                                        </p>
-                                    </div>
+
                                 </div>
                             )}
+
                         </div>
+
+                        {googleLoading &&
+                            <div className="fixed inset-0 bg-none flex items-center justify-center">
+                                <Loader2 className="animate-spin text-purple-600" size={64} />
+                            </div>
+                        }
 
                         <div className="w-full">
                             {/* Header */}
