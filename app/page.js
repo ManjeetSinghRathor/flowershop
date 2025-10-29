@@ -258,9 +258,9 @@ export default function Home() {
           <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-[2px] bg-gradient-to-r from-pink-500 to-yellow-400 rounded-full animate-pulse"></span>
         </h2> */}
 
-        <div className="w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth px-2 sm:px-4">
+        <div className="w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth sm:px-4">
           {catLoaded ? (
-            <div className="flex flex-col gap-6 w-full py-4 items-start">
+            <div className="flex flex-col gap-6 w-full py-2 items-start">
               {/* Skeleton Rows */}
               {[...Array(2)].map((_, rowIdx) => (
                 <div key={rowIdx} className="flex w-full gap-2 sm:gap-4">
@@ -269,7 +269,10 @@ export default function Home() {
                       key={`row${rowIdx}-${idx}`}
                       className="min-w-[5rem] min-h-[5rem] sm:min-w-[7rem] sm:min-h-[7rem] lg:min-w-[8rem] lg:min-h-[8rem] flex items-center justify-center snap-center"
                     >
-                      <div className="w-16 h-16 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
+                      <div className="flex flex-col gap-[5px] items-center">
+                        <div className="w-16 h-16 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
+                      <div className="w-15 h-5 sm:w-24 sm:h-5 lg:w-28 lg:h-5 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
+                      </div>
                     </div>
                   ))}
                 </div>
