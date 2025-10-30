@@ -28,6 +28,9 @@ const CartProducts = () => {
     const [showUnavailable, setShowUnavailable] = useState(false);
     const [unavailableProducts, setUnavailableProducts] = useState([]);
 
+    const source = "cart_products";
+    const encrypted = btoa(source);
+
     const handleCheckout = () => {
         const unavailable = cart_products.filter(
             (p) => !p.isActive || p.stock === 0
@@ -37,7 +40,7 @@ const CartProducts = () => {
             setUnavailableProducts(unavailable);
             setShowUnavailable(true);
         } else {
-            router.push("/cart_products/checkout_");
+            router.push(`/cart_products/checkout_?src=${encrypted}`);
         }
     };
 
@@ -81,7 +84,7 @@ const CartProducts = () => {
         setUnavailableProducts([]);
 
         // Now continue to checkout
-        router.push("/cart_products/checkout_");
+        router.push(`/cart_products/checkout_?src=${encrypted}`);
     };
 
     const fetchLocalCart = async () => {
@@ -197,7 +200,7 @@ const CartProducts = () => {
                 {cart_products?.length > 0 && <button
                     disabled={cart_product_ids?.length === 0}
                     onClick={() => {
-                        router.push("/cart_products/checkout_");
+                        router.push(`/cart_products/checkout_?src=${encrypted}`);
                     }}
                     className='flex w-fit py-2 px-4 font-semibold bg-black text-white hover:bg-gray-900 hover:cursor-pointer'
                 >

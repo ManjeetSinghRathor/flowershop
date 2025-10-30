@@ -16,7 +16,8 @@ const Footer = () => {
   const customerLinks = [
     { title: "Home", href: "/" },
     { title: "About Us", href: "/about" },
-    { title: "Contact Us", href: "/contact" },
+    // { title: "Contact Us", href: "/contact" },
+    { title: "Custom Bouquet", href: "/custom_bouquet" },
     { title: "Shipping and Delivery", href: "/shipping-and-delivery" },
     { title: "Return & Refund Policy", href: "/return-refund-policy" },
   ];
@@ -30,13 +31,7 @@ const Footer = () => {
           {/* Brand Info */}
           <div className="flex flex-col items-center md:items-start md:pl-4 gap-2">
             <h1 className="flex justify-center w-full text-xl sm:text-2xl max-w-xs font-bold">
-              <Image
-                className="h-14 w-auto"
-                src="/favicon.png"
-                alt="Bloom's Heaven Logo"
-                width={56}
-                height={56}
-              />
+              <img className="h-14 w-auto" src="./favicon.png" alt="" />
             </h1>
             <p className="text-sm text-gray-500 text-center max-w-xs">
               Express love, gratitude, and happiness effortlessly with our
@@ -145,7 +140,7 @@ const Footer = () => {
         </div>
 
         {/* Footer bottom bar */}
-        <div className="text-center text-xs text-gray-500 mt-6 border-t border-gray-700 py-2">
+        <div className="text-center text-xs sm:text-sm text-gray-500 mt-6 border-t border-gray-700 py-2">
           © {new Date().getFullYear()} Bloom’s Heaven. All rights reserved. |{" "}
           <Link href="/privacy-policy" className="anchor-tag hover:underline">
             Privacy Policy

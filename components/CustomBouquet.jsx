@@ -73,9 +73,9 @@ const CustomBouquet = () => {
   };
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen w-full select-none">
       <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-2xl lg:text-3xl font-bold text-center text-pink-600 mb-6">
+        <h1 className="hidden sm:flex justify-center text-2xl lg:text-3xl font-bold text-center text-pink-600 mb-6">
           🌸 Create Your Own Bouquet
         </h1>
 
@@ -105,6 +105,7 @@ const CustomBouquet = () => {
                       src={flower.img}
                       alt={flower.name}
                       fill
+                      sizes="(max-width: 640px) 7rem, (max-width: 1024px) 8rem, 9rem"
                       className="object-cover rounded-lg"
                     />
 
@@ -126,14 +127,14 @@ const CustomBouquet = () => {
                     <div className="flex items-center justify-center gap-3 mt-2">
                       <button
                         onClick={() => decreaseFlower(flower)}
-                        className="bg-gray-200 px-2 rounded text-gray-600 font-bold"
+                        className="bg-gray-200 px-3 rounded text-gray-600 font-bold"
                       >
                         -
                       </button>
                       <span>{selected.count}</span>
                       <button
                         onClick={() => toggleFlower(flower)}
-                        className="bg-gray-200 px-2 rounded text-gray-600 font-bold"
+                        className="bg-gray-200 px-3 rounded text-gray-600 font-bold"
                       >
                         +
                       </button>
@@ -168,6 +169,7 @@ const CustomBouquet = () => {
                     src={wrap.img}
                     alt={wrap.name}
                     fill
+                    sizes="(max-width: 640px) 7rem, (max-width: 1024px) 8rem, 9rem"
                     className="object-cover rounded-lg"
                   />
 
@@ -213,6 +215,7 @@ const CustomBouquet = () => {
                     src={ribbon.img}
                     alt={ribbon.name}
                     fill
+                    sizes="(max-width: 640px) 7rem, (max-width: 1024px) 8rem, 9rem"
                     className="object-cover rounded-lg"
                   />
 
@@ -251,11 +254,12 @@ const CustomBouquet = () => {
                       key={f.name}
                       className="relative rounded-xl overflow-hidden border border-pink-200"
                     >
-                    <div className="relative w-full h-16 rounded-lg overflow-hidden border border-pink-200">
+                    <div className="relative w-full h-18 aspect-[1] rounded-lg overflow-hidden border border-pink-200">
                       <Image
                         src={f.img}
                         alt={f.name}
                         fill
+                        sizes="(max-width: 640px) 7rem, (max-width: 1024px) 8rem, 9rem"
                         className="object-cover"
                       />
                       <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-white text-xs sm:text-sm text-center py-1 font-medium">
@@ -285,6 +289,7 @@ const CustomBouquet = () => {
                       src={selectedWrap.img}
                       alt={selectedWrap.name}
                       fill
+                      sizes="(max-width: 640px) 7rem, (max-width: 1024px) 8rem, 9rem"
                       className="object-cover"
                     />
                   </div>
@@ -307,6 +312,7 @@ const CustomBouquet = () => {
                       src={selectedRibbon.img}
                       alt={selectedRibbon.name}
                       fill
+                      sizes="(max-width: 640px) 7rem, (max-width: 1024px) 8rem, 9rem"
                       className="object-cover"
                     />
                   </div>

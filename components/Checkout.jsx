@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setCart } from "@/app/store/CartProductsSlice";
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
 // deliveryOptions.js
 
 const deliveryOptions = {
@@ -70,6 +71,8 @@ export default function CheckoutPage() {
     const searchParam = useSearchParams();
     const productId = searchParam.get("product_id");
     const deliveryTime = searchParam.get("delivery_time");
+    const src = searchParam.get("src");
+
     const [collapsed, setCollapsed] = useState(true);
 
     const [userAdd, setUserAdd] = useState({});
@@ -312,6 +315,7 @@ export default function CheckoutPage() {
 
             // ------------------- IF PAYMENT METHOD = COD -------------------
             if (form.paymentMethod === "COD") {
+                setLoading(true);
                 const res = await axios.post(
                     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/add`,
                     payload,
@@ -320,11 +324,17 @@ export default function CheckoutPage() {
 
                 if (res.data.success) {
                     toast.success("Order placed successfully!");
-                    localStorage.removeItem("cart");
-                    dispatch(setCart([]));
+
+                    if (src) {
+                        localStorage.removeItem("cart");
+                        dispatch(setCart([]));
+                    }
+
                     router.replace("/user_orders");
+                    setLoading(false);
                 } else {
                     toast.error(res.data.message || "Failed to place order");
+                    setLoading(false);
                 }
 
                 return;
@@ -332,6 +342,7 @@ export default function CheckoutPage() {
 
             // ------------------- IF PAYMENT METHOD = ONLINE -------------------
             // 1️⃣ Create Razorpay order on backend
+            setLoading(true);
             const orderRes = await axios.post(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/create-razorpay-order`,
                 { totalAmount: total },
@@ -365,11 +376,15 @@ export default function CheckoutPage() {
 
                         if (verifyRes.data.success) {
                             toast.success("Payment successful! 🎉");
-                            localStorage.removeItem("cart");
-                            dispatch(setCart([]));
+                            if (src) {
+                                localStorage.removeItem("cart");
+                                dispatch(setCart([]));
+                            }
                             router.replace("/user_orders");
+                            setLoading(false);
                         } else {
                             toast.error("Payment verification failed!");
+                            setLoading(false);
                         }
                     } catch (err) {
                         console.error("Payment verification failed:", err);
@@ -389,8 +404,6 @@ export default function CheckoutPage() {
         } catch (err) {
             console.error("Error placing order:", err);
             toast.error("Something went wrong during checkout");
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -754,8 +767,8 @@ export default function CheckoutPage() {
 
                     <button
                         onClick={() => {
-                            // handlePlaceOrder()
-                            toast.error("We will start taking orders soon, please visit again after 1st Nov, 2025.");
+                            handlePlaceOrder()
+                            // toast.error("We will start taking orders soon, please visit again after 1st Nov, 2025.");
                         }}
                         disabled={loading}
                         className="mt-6 w-full bg-gray-900 text-white py-2 rounded font-semibold hover:scale-[1.02] active:scale-[0.98] transition-transform"
@@ -764,6 +777,13 @@ export default function CheckoutPage() {
                     </button>
                 </div>
             </div>
+
+            {loading && (
+                <div className="fixed inset-0 z-50 bg-black/20 flex items-center justify-center pointer-events-auto">
+                    <Loader2 className="animate-spin text-purple-600" size={64} />
+                </div>
+            )}
+
         </div>
     );
 }

@@ -85,7 +85,7 @@ const UserOrders = () => {
             <div className="flex justify-between items-center">
               <div>
                 <p className="font-semibold">
-                  Order #{order._id.slice(-6).toUpperCase()}
+                  Order #{order._id.slice(0, 6).toUpperCase()}...
                 </p>
                 <p className="text-sm text-gray-800">
                   {format(new Date(order.createdAt), "dd MMM yyyy, hh:mm a")}
@@ -226,6 +226,10 @@ const UserOrders = () => {
                   Total: ₹{selectedOrder.totalAmount}
                 </p>
               </div>
+
+              <p className="text-xs text-gray-400 mt-6 text-center">
+                        Thank you for shopping with <strong>Bloom’s Heaven</strong> 🌸
+                    </p>
             </div>
           </div>
         </div>

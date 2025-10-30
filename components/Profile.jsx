@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import Image from 'next/image';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 
 const Profile = () => {
@@ -11,6 +13,34 @@ const Profile = () => {
     const user = useSelector((state) => state.user?.data);
     const [userImg, setUserImg] = useState("/cat.png");
     const [loading, setLoading] = useState(true);
+
+    const [isOpen, setIsOpen] = useState(false);
+    const [newName, setNewName] = useState(user?.name || "");
+    const [updatedName, setUpdatedName] = useState(user?.name || "XOXO")
+    const [nameLoading, setNameLoading] = useState(false);
+
+    useEffect(()=>{
+        if(user?.name){
+            setUpdatedName(user.name);
+            setNewName(user.name);
+        }
+    },[user]);
+
+  const handleSubmit = async () => {
+    if (!newName.trim()) return toast.error("Name cannot be empty!");
+    try {
+      setNameLoading(true);
+      const res = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/updateName/${user._id}`, { name: newName }, { withCredentials: true });
+      toast.success("Profile name updated successfully!");
+      setUpdatedName(newName);
+      setIsOpen(false);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to update name");
+    } finally {
+      setNameLoading(false);
+    }
+  };
 
     function formatDate(isoString) {
         const date = new Date(isoString);
@@ -69,7 +99,7 @@ const Profile = () => {
                         className={`rounded-full border ${loading ? "hidden" : "block"} object-cover`}
                     />
                     <div>
-                        <h2 className="text-lg font-semibold">{user?.name || "XOXO"}</h2>
+                        <h2 className="text-lg font-semibold">{updatedName}</h2>
                         <p className="text-gray-700 text-sm sm:text-md flex flex-wrap">
                             <span>{user?.email.split("@")[0]}</span>
                             <span>@gmail.com</span>
@@ -81,9 +111,7 @@ const Profile = () => {
                 </div>
                 <div className="absolute -top-2 right-2">
                     <button
-                        onClick={() => {
-                            console.log("Click!")
-                        }}
+                        onClick={() => setIsOpen(true)}
                         className="mt-4 p-1 bg-indigo-600 text-sm text-white rounded hover:bg-indigo-700"
                     >
                         <svg className="w-4 h-4 text-white" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
@@ -92,6 +120,41 @@ const Profile = () => {
                     </button>
                 </div>
             </div>
+
+            {/* Modal */}
+      {isOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl w-[90%] sm:w-[400px] shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+              Change Profile Name
+            </h2>
+
+            <input
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              className="border w-full p-2 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-pink-400"
+              placeholder="Enter new name"
+            />
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={nameLoading}  
+                className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-60"
+              >
+                {nameLoading ? "Updating..." : "Update"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
             <div className='flex flex-col gap-4 sm:grid md:grid-cols-2'>
                 {(user?.role === "admin") && <div className="flex flex-col gap-4 px-2">

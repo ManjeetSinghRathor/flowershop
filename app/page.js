@@ -351,9 +351,9 @@ export default function Home() {
               src="/custom_bouquet_poster.jpg"
               alt="Make a Custom Bouquet Now!"
               fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
               className="object-cover object-center transition-transform duration-700 hover:scale-105"
               priority
-              sizes="100vw"
               decoding="async"
             />
           </div>
