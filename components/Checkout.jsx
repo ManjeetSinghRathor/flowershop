@@ -381,14 +381,14 @@ export default function CheckoutPage() {
                                 dispatch(setCart([]));
                             }
                             router.replace("/user_orders");
-                            setLoading(false);
                         } else {
                             toast.error("Payment verification failed!");
-                            setLoading(false);
                         }
                     } catch (err) {
                         console.error("Payment verification failed:", err);
                         toast.error("Error verifying payment");
+                    } finally {
+                        setLoading(false);
                     }
                 },
                 prefill: {
