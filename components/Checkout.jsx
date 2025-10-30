@@ -315,7 +315,6 @@ export default function CheckoutPage() {
 
             // ------------------- IF PAYMENT METHOD = COD -------------------
             if (form.paymentMethod === "COD") {
-                setLoading(true);
                 const res = await axios.post(
                     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/add`,
                     payload,
@@ -331,10 +330,8 @@ export default function CheckoutPage() {
                     }
 
                     router.replace("/user_orders");
-                    setLoading(false);
                 } else {
                     toast.error(res.data.message || "Failed to place order");
-                    setLoading(false);
                 }
 
                 return;
@@ -342,7 +339,7 @@ export default function CheckoutPage() {
 
             // ------------------- IF PAYMENT METHOD = ONLINE -------------------
             // 1️⃣ Create Razorpay order on backend
-            setLoading(true);
+
             const orderRes = await axios.post(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/create-razorpay-order`,
                 { totalAmount: total },
@@ -361,6 +358,7 @@ export default function CheckoutPage() {
                 image: "/favicon.png",
                 order_id: razorOrder.id,
                 handler: async function (response) {
+                    setLoading(true);
                     try {
                         // 3️⃣ Verify payment on backend
                         const verifyRes = await axios.post(
@@ -401,9 +399,12 @@ export default function CheckoutPage() {
 
             const rzp = new window.Razorpay(options);
             rzp.open();
+
         } catch (err) {
             console.error("Error placing order:", err);
             toast.error("Something went wrong during checkout");
+        } finally {
+            setLoading(false);
         }
     };
 
