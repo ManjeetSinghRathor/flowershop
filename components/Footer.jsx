@@ -7,7 +7,7 @@ import { FaInstagram, FaFacebook, FaWhatsapp } from "react-icons/fa";
 import { FiChevronDown } from "react-icons/fi";
 
 const Footer = () => {
-  const [openSection, setOpenSection] = useState(null);
+  const [openSection, setOpenSection] = useState('contact');
 
   const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
