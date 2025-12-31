@@ -66,7 +66,7 @@ const ProductView = () => {
     });
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user?.data);
-    const [productDetails, setProductDetails] = useState({});
+    const [productDetails, setProductDetails] = useState();
     const [loading, setLoading] = useState(true);
     const [currentSizeIdx, setCurrentSizeIdx] = useState(0);
     const [delivery_time, setDelivery_time] = useState("");
@@ -190,7 +190,12 @@ const ProductView = () => {
         setUserReview("");
     };
 
-
+    const toastStyle = {
+        background: "#161616ff",
+        color: "#fff",
+        borderRadius: "8px",
+        fontWeight: 500,
+    };
 
     const handleAddToCart = async (id) => {
         if (quantity > 0) {
@@ -202,12 +207,18 @@ const ProductView = () => {
                         { withCredentials: true }
                     );
                     if (res.data.success) {
-                        toast.success("Item added to your cart");
+                        toast.success("Item added to your cart", {
+                            style: toastStyle,
+                            icon: "🛒",
+                        });
                         dispatch(AddProduct({ id, q: quantity, sizeIdx: currentSizeIdx, deliveryTime: delivery_time }));
                         // Optional: update Redux state with res.data.cart
                     }
                 } catch (err) {
-                    toast.error("Failed to add item to cart");
+                    toast.error("Failed to add item to cart", {
+                        style: toastStyle,
+                        icon: "✖",
+                    });
                     console.error(err);
                 }
             } else {
@@ -264,27 +275,43 @@ const ProductView = () => {
     const [isShareOpen, setIsShareOpen] = useState(true);
     //   const [productsImgloaded, setProductsImgLoaded] = useState({});
 
-    if (loading) return (<div className="flex flex-col min-h-screen justify-center gap-4 py-4 px-4 sm:px-8 lg:px-24">
+    if (loading) return (
+    <div className="flex flex-col lg:flex-row min-h-screen justify-center gap-4 py-4 px-4 sm:px-8 lg:px-24">
+        
         {/* Skeleton slides */}
         {/* <div
             className="w-full h-[80px] bg-gray-300 animate-pulse rounded-md"
         /> */}
 
-        <div
-            className="w-full aspect-[1] bg-gray-300 animate-pulse rounded-md"
+        <div className="w-full flex justify-center">
+         <div
+            className="w-full max-w-2xl max-h-[60vh] aspect-[1] bg-gray-300 animate-pulse rounded-md"
         />
-
-        {[...Array(4)].map((_, idx) => (
+        </div>
+        
+        <div className="flex flex-col w-full gap-4">
+          {[...Array(5)].map((_, idx) => (
             <div
                 key={idx}
-                className="w-full h-[80px] bg-gray-300 animate-pulse rounded-md"
+                className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
             />
-        ))}
+        ))}  
+        </div>
 
+        <div className="flex flex-col w-full gap-3 pt-12 pb-4 px-4 sm:px-10 lg:px-26 ">
+                <h2 className="flex font-mono text-xl justify-center sm:text-3xl">
+                    You may also like
+                </h2>
+
+                <div className="flex flex-col gap-4 w-full overflow-hidden py-4">
+
+                </div>
+        </div>
+        
     </div>);
 
     return (
-        <div className="w-full min-h-screen py-2">
+        <div className="w-full min-h-screen py-2 px-1">
             {/* <div className='flex flex-col w-full sm:px-8 lg:px-24'>
                 <h1 className="flex flex-col w-full justify-center items-start font-mono sm:text-lg px-2 py-4">
                     <Link href="/" className="hover:underline font-light">
@@ -294,7 +321,7 @@ const ProductView = () => {
                 </h1>
             </div> */}
 
-            <div className="flex flex-col lg:flex-row px-2 gap-2 sm:gap-4 lg:gap-12 sm:px-8 lg:px-24">
+            <div className="flex flex-col lg:flex-row gap-2 sm:gap-4 lg:gap-12 px-2 sm:px-8 lg:px-24">
                 <div className="lg:min-w-xl">
                     <ImageCarousel images={productDetails?.images} />
                 </div>

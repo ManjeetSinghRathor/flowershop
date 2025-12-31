@@ -115,6 +115,13 @@ export default function Home() {
     ),
   };
 
+  const toastStyle = {
+  background: "#161616ff",
+  color: "#fff",
+  borderRadius: "8px",
+  fontWeight: 500,
+};
+
   const handleAddToCart = async (id, deliveryTime) => {
     if (user) {
       try {
@@ -124,12 +131,18 @@ export default function Home() {
           { withCredentials: true }
         );
         if (res.data.success) {
-          toast.success("Item added to your cart");
+          toast.success("Item added to your cart", {
+          style: toastStyle,
+          icon: "🛒",
+        });
           dispatch(AddProduct({ id, q: 1, deliveryTime }));
           // Optional: update Redux state with res.data.cart
         }
       } catch (err) {
-        toast.error("Failed to add item to cart");
+        toast.error("Failed to add item to cart", {
+        style: toastStyle,
+        icon: "✖",
+      });
         console.error(err);
       }
     } else {
@@ -220,7 +233,7 @@ export default function Home() {
                   return (
                     <div
                       key={slide._id}
-                      className="w-full aspect-[7/3] p-1"
+                      className="w-full aspect-[9/4] p-1"
                       onMouseDown={handleMouseDown}
                       onMouseMove={handleMouseMove}
                       onTouchStart={handleMouseDown}
@@ -260,7 +273,7 @@ export default function Home() {
 
         <div className="w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth sm:px-4">
           {catLoaded ? (
-            <div className="flex flex-col gap-6 w-full py-2 items-start">
+            <div className="flex flex-col gap-6 w-full py-4 items-start">
               {/* Skeleton Rows */}
               {[...Array(2)].map((_, rowIdx) => (
                 <div key={rowIdx} className="flex w-full gap-2 sm:gap-4">
@@ -310,10 +323,10 @@ export default function Home() {
                             id: item.collectionId,
                           },
                         }}
-                        className="flex flex-col items-center gap-1 cursor-pointer"
+                        className="flex flex-col items-center gap-1 space-x-1 cursor-pointer"
                       >
                         {/* Image Container */}
-                        <div className="relative w-18 h-18 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-xl border border-gray-300 overflow-hidden bg-white">
+                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-xl border border-gray-300 overflow-hidden bg-white">
                           <Image
                             src={item.image}
                             alt={item.collection}
@@ -326,7 +339,7 @@ export default function Home() {
                         </div>
 
                         {/* Text */}
-                        <div className="flex justify-center text-center text-gray-600 font-[300] text-xs sm:text-[14px] lg:text-[18px] lg:mt-1 text-gray-800 leading-tight max-w-[4.8rem] sm:max-w-[5.4rem] lg:max-w-[6.5rem]">
+                        <div className="flex justify-center text-center text-gray-600 font-[400] text-[12px] sm:text-[14px] lg:text-[18px] lg:mt-1 text-gray-800 leading-tight max-w-[4.8rem] sm:max-w-[5.4rem] lg:max-w-[6.5rem]">
                           {item.collection}
                         </div>
                       </Link>
@@ -339,16 +352,23 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="w-full aspect-[9/2] mt-5 mb-2 px-2 relative max-w-lg sm:hidden">
+      {catLoaded ? (
+            <div className="flex w-full justify-center">
+      <div className="w-full aspect-[3] mt-5 mb-2 px-2 relative max-w-lg sm:hidden">
+              <div className="absolute inset-0 mx-2 rounded-md bg-gray-300 animate-pulse" />
+            </div>
+          </div>
+          ) : (
+      <div className="w-full aspect-[3] mt-5 mb-2 px-2 relative max-w-lg sm:hidden">
         {/* Actual image */}
         <Link href={"/custom_bouquet"}>
           <div className="relative w-full h-full rounded-lg overflow-hidden">
             {/* Skeleton placeholder */}
-            <div className="absolute inset-0 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
+            {/* <div className="absolute inset-0 rounded-xl bg-gray-300 animate-pulse shadow-sm" /> */}
 
             {/* Optimized image */}
             <Image
-              src="/custom_bouquet_poster.jpg"
+              src="/custom_bouquet_.png"
               alt="Make a Custom Bouquet Now!"
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
@@ -359,11 +379,12 @@ export default function Home() {
           </div>
         </Link>
       </div>
+          )}
 
       {colLoading ? (
         <div className="flex flex-col gap-6 w-full overflow-hidden py-4">
           <div className="flex w-full justify-center">
-            <div className="flex w-[120px] sm:w-[160px] h-[42px] sm:h-[48px] relative">
+            <div className="flex w-[160px] h-[42px] sm:h-[48px] relative">
               <div className="absolute inset-0 rounded-md bg-gray-300 animate-pulse" />
             </div>
           </div>
@@ -376,7 +397,7 @@ export default function Home() {
                 className="min-w-[7rem] min-h-[7rem] flex items-center justify-center snap-start"
               >
                 {/* Skeleton */}
-                <div className="w-full h-56 sm:h-84 lg:h-104 bg-gray-300 animate-pulse" />
+                <div className="w-full h-56 sm:h-84 lg:h-104 bg-gray-300 animate-pulse rounded-md" />
               </div>
             ))}
           </div>
@@ -507,7 +528,7 @@ export default function Home() {
                         className={`flex gap-[2px] items-center justify-center flex-1 transform duration-500 text-white py-1 rounded ${
                           !product.isActive || product.stock === 0
                             ? "bg-gray-500"
-                            : "bg-gray-800 hover:scale-102 active:scale-98"
+                            : "bg-gray-800 hover:scale-101 active:scale-98"
                         }`}
                       >
                         <span className="text-lg">+</span>{" "}
