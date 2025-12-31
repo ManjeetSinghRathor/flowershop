@@ -10,7 +10,7 @@ import NextTopLoader from "nextjs-toploader";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "react-hot-toast";
 import Footer from "@/components/Footer";
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -73,6 +73,8 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <SpeedInsights/>
+        
         <NextTopLoader
           color="#f3002dff"
           initialPosition={0.1}
