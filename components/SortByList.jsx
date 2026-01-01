@@ -23,6 +23,25 @@ const SortList = ({ openSortBy, setOpenSortBy , value, onChange }) => {
             };
         }, [openSortBy]);
 
+    useEffect(() => {
+            const handlePopState = () => {
+                // Just close on back button
+                if (openSortBy) {
+                    setOpenSortBy(false);
+                }
+            };
+
+            if (openSortBy) {
+                // Add history entry when modal opens
+                window.history.pushState({ modalOpen: true }, "");
+                window.addEventListener("popstate", handlePopState);
+            }
+    
+            return () => {
+                window.removeEventListener("popstate", handlePopState);
+            };
+        }, [openSortBy]);
+
     return (
         <div className="flex flex-col gap-2 items-start p-4 bg-white shadow-sm w-full max-w-xl">
             

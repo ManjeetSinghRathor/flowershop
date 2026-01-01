@@ -10,6 +10,31 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import FloatingButton from "@/components/FloatingButton";
 import Image from "next/image";
+import AnimatedFakeInput from "@/components/AnimatedInput";
+import SearchModal from "@/components/SearchModal";
+
+const categories = [
+  {
+    name: "BOUQUET",
+    href: "/bouquet",
+    image: "/bouquets-min.png",
+  },
+  {
+    name: "CAKE",
+    href: "/cake",
+    image: "/cakes-min.png",
+  },
+  {
+    name: "PLANTS",
+    href: "/plants",
+    image: "/plants-min.png",
+  },
+  {
+    name: "SUBSCRIPTION",
+    href: "/subscription",
+    image: "/subscription-min.png",
+  },
+];
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -17,24 +42,26 @@ export default function Home() {
   const user = useSelector((state) => state.user?.data);
   const colList = useSelector((state) => state.collectionList.data);
   const isDragging = useRef(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const [collectionList, setCollection_List] = useState({});
   const [catLoaded, setCatLoaded] = useState(true);
 
   useEffect(() => {
-    if (colList && Object.keys(colList).length > 0) {
-      const filtered = {};
+  if (colList && Object.keys(colList).length > 0) {
+    const filtered = {};
 
-      Object.entries(colList).forEach(([categoryName, collections]) => {
-        if (categoryName !== "All Products") {
-          filtered[categoryName] = collections;
-        }
-      });
+    Object.entries(colList).forEach(([categoryName, collections]) => {
+      if (categoryName !== "All Products") {
+        filtered[categoryName] = [...collections].reverse(); // 🔁 reverse per category
+      }
+    });
 
-      setCollection_List(filtered);
-      setCatLoaded(false);
-    }
-  }, [colList]);
+    setCollection_List(filtered);
+    setCatLoaded(false);
+  }
+}, [colList]);
+
 
   const [slides, setSlides] = useState([]);
   const [slidesToShow, setSlidesToShow] = useState(1);
@@ -116,11 +143,11 @@ export default function Home() {
   };
 
   const toastStyle = {
-  background: "#161616ff",
-  color: "#fff",
-  borderRadius: "8px",
-  fontWeight: 500,
-};
+    background: "#161616ff",
+    color: "#fff",
+    borderRadius: "8px",
+    fontWeight: 500,
+  };
 
   const handleAddToCart = async (id, deliveryTime) => {
     if (user) {
@@ -132,17 +159,17 @@ export default function Home() {
         );
         if (res.data.success) {
           toast.success("Item added to your cart", {
-          style: toastStyle,
-          icon: "🛒",
-        });
+            style: toastStyle,
+            icon: "🛒",
+          });
           dispatch(AddProduct({ id, q: 1, deliveryTime }));
           // Optional: update Redux state with res.data.cart
         }
       } catch (err) {
         toast.error("Failed to add item to cart", {
-        style: toastStyle,
-        icon: "✖",
-      });
+          style: toastStyle,
+          icon: "✖",
+        });
         console.error(err);
       }
     } else {
@@ -199,6 +226,111 @@ export default function Home() {
           <FaWhatsapp />
         </button>
       </div> */}
+
+      <div className="flex justify-center pt-4 px-2">
+        <div className="w-full mx-auto">
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="w-full"
+            aria-label="Open search"
+          >
+            <div className="flex items-center gap-2 bg-white border border-black/20 rounded-md px-3 py-2 shadow-sm cursor-text">
+              {/* Search Icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 sm:w-6 sm:h-6 text-black/70"
+                fill="currentColor"
+                viewBox="0 0 640 640"
+              >
+                <path d="M480 272C480 317.9 465.1 360.3 440 394.7L566.6 521.4C579.1 533.9 579.1 554.2 566.6 566.7C554.1 579.2 533.8 579.2 521.3 566.7L394.7 440C360.3 465.1 317.9 480 272 480C157.1 480 64 386.9 64 272C64 157.1 157.1 64 272 64C386.9 64 480 157.1 480 272zM272 416C351.5 416 416 351.5 416 272C416 192.5 351.5 128 272 128C192.5 128 128 192.5 128 272C128 351.5 192.5 416 272 416z" />
+              </svg>
+
+              {/* Fake Input */}
+              <div className="flex-1 text-left text-black/50 select-none sm:pl-1">
+                <AnimatedFakeInput />
+              </div>
+
+              {/* Mic Icon (visual only) */}
+              <div className="flex items-center rounded-full text-black/70">
+                <svg
+                  className="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect x="9" y="2" width="6" height="12" rx="3" />
+
+                  <rect x="11" y="14" width="2" height="4" />
+
+                  <rect x="8" y="18" width="8" height="2" rx="1" />
+
+                  <path
+                    d="M6 11a6 6 0 0 0 12 0"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <SearchModal
+        setIsSearchOpen={setIsSearchOpen}
+        isSearchOpen={isSearchOpen}
+      />
+
+      {catLoaded ? (
+        <section className="w-full px-4 sm:px-6 lg:px-16 pt-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {[...Array(4)].map((_, idx) => (
+              <div
+                key={idx}
+                className="relative overflow-hidden rounded-2xl aspect-square"
+              >
+                {/* Image Skeleton */}
+                <div className="absolute inset-0 bg-gray-300 animate-pulse" />
+
+                {/* Glass Label Skeleton */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-24 h-6 sm:w-32 sm:h-7 rounded-lg bg-gray-200 animate-pulse shadow-sm" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <section className="w-full px-4 sm:px-6 lg:px-16 pt-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {categories.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="group relative overflow-hidden rounded-2xl aspect-square"
+              >
+                {/* Background Image */}
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+
+                {/* Glass Overlay */}
+                <div className="absolute inset-0 border border-white/30 flex items-center justify-center transition-all duration-300">
+                  <div className="flex items-center justify-center px-1 rounded-xl bg-black/20 group-hover:bg-black/30 group-hover:py-1 group-hover:px-2 transition-all duration-300">
+                    <span className="text-white text-md sm:text-xl font-semibold tracking-widest drop-shadow-lg">
+                      {item.name}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="flex w-full justify-center">
         <div className="relative w-full overflow-hidden py-4">
@@ -265,7 +397,7 @@ export default function Home() {
       </div>
 
       {/* Collection List */}
-      <div className="flex flex-col w-full gap-4 sm:gap-6 px-2 mt-3">
+      <div className="flex flex-col w-full gap-4 sm:gap-6 px-2 mt-2">
         {/* <h2 className="flex justify-center font-mono text-2xl sm:text-3xl mt-4 mb-1 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 relative">
           Collection List
           <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-[2px] bg-gradient-to-r from-pink-500 to-yellow-400 rounded-full animate-pulse"></span>
@@ -284,7 +416,7 @@ export default function Home() {
                     >
                       <div className="flex flex-col gap-[5px] items-center">
                         <div className="w-16 h-16 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
-                      <div className="w-15 h-5 sm:w-24 sm:h-5 lg:w-28 lg:h-5 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
+                        <div className="w-15 h-5 sm:w-24 sm:h-5 lg:w-28 lg:h-5 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
                       </div>
                     </div>
                   ))}
@@ -353,33 +485,33 @@ export default function Home() {
       </div>
 
       {catLoaded ? (
-            <div className="flex w-full justify-center">
-      <div className="w-full aspect-[3] mt-5 mb-2 px-2 relative max-w-lg sm:hidden">
-              <div className="absolute inset-0 mx-2 rounded-md bg-gray-300 animate-pulse" />
-            </div>
+        <div className="flex w-full justify-center">
+          <div className="w-full aspect-[3] mt-2 mb-2 px-2 relative max-w-lg sm:hidden">
+            <div className="absolute inset-0 mx-2 rounded-md bg-gray-300 animate-pulse" />
           </div>
-          ) : (
-      <div className="w-full aspect-[3] mt-5 mb-2 px-2 relative max-w-lg sm:hidden">
-        {/* Actual image */}
-        <Link href={"/custom_bouquet"}>
-          <div className="relative w-full h-full rounded-lg overflow-hidden">
-            {/* Skeleton placeholder */}
-            {/* <div className="absolute inset-0 rounded-xl bg-gray-300 animate-pulse shadow-sm" /> */}
+        </div>
+      ) : (
+        <div className="w-full aspect-[3] mt-5 mb-2 px-2 relative max-w-lg sm:hidden">
+          {/* Actual image */}
+          <Link href={"/custom_bouquet"}>
+            <div className="relative w-full h-full rounded-lg overflow-hidden">
+              {/* Skeleton placeholder */}
+              {/* <div className="absolute inset-0 rounded-xl bg-gray-300 animate-pulse shadow-sm" /> */}
 
-            {/* Optimized image */}
-            <Image
-              src="/custom_bouquet_.png"
-              alt="Make a Custom Bouquet Now!"
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
-              className="object-cover object-center transition-transform duration-700 hover:scale-105"
-              priority
-              decoding="async"
-            />
-          </div>
-        </Link>
-      </div>
-          )}
+              {/* Optimized image */}
+              <Image
+                src="/custom_bouquet_-min.png"
+                alt="Make a Custom Bouquet Now!"
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                className="object-cover object-center transition-transform duration-700 hover:scale-105"
+                priority
+                decoding="async"
+              />
+            </div>
+          </Link>
+        </div>
+      )}
 
       {colLoading ? (
         <div className="flex flex-col gap-6 w-full overflow-hidden py-4">
@@ -469,28 +601,27 @@ export default function Home() {
                         )}
                       </div>
 
-                    <div className="px-2">
-                      {/* Product Info */}
-                      <h3 className="font-semibold sm:text-lg mb-1">
-                        {product.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 flex-1 line-clamp-3">
-                        {product.description}
-                      </p>
+                      <div className="px-2">
+                        {/* Product Info */}
+                        <h3 className="font-semibold sm:text-lg mb-1">
+                          {product.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 flex-1 line-clamp-3">
+                          {product.description}
+                        </p>
 
-                      {/* Price */}
-                      <div className="mt-2">
-                        {product.sizes[0].discount > 0 && (
-                          <span className="text-gray-400 line-through mr-2">
-                            {product.sizes[0].price}₹
+                        {/* Price */}
+                        <div className="mt-2">
+                          {product.sizes[0].discount > 0 && (
+                            <span className="text-gray-400 line-through mr-2">
+                              {product.sizes[0].price}₹
+                            </span>
+                          )}
+                          <span className="font-bold text-lg">
+                            {product.sizes[0].finalPrice}₹
                           </span>
-                        )}
-                        <span className="font-bold text-lg">
-                          {product.sizes[0].finalPrice}₹
-                        </span>
+                        </div>
                       </div>
-                    </div>
-                      
                     </Link>
 
                     {/* Buttons at bottom */}

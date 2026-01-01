@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from "next/link";
 import axios from 'axios';
 
@@ -10,6 +10,17 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
     const [totalCount, setTotalCount] = useState(0);
     const [loading, setLoading] = useState(false);
     const [dots, setDots] = useState("");
+    const searchInputRef = useRef(null);
+
+    useEffect(() => {
+  if (isSearchOpen) {
+    // slight delay to ensure modal animation + DOM render
+    setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 150);
+  }
+}, [isSearchOpen]);
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -116,6 +127,7 @@ const SearchModal = ({ setIsSearchOpen, isSearchOpen = false }) => {
                         <input
                             id="searchBox"
                             type="text"
+                            ref={searchInputRef}
                             placeholder="Search products..."
                             className="p-2 w-full text-black outline-none"
                             value={query}

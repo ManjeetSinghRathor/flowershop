@@ -91,6 +91,25 @@ const FiltersSection = ({ collection_products = [], openFilters, setOpenFilters,
             };
         }, [openFilters]);
 
+      useEffect(() => {
+                  const handlePopState = () => {
+                      // Just close on back button
+                      if (openFilters) {
+                          setOpenFilters(false);
+                      }
+                  };
+      
+                  if (openFilters) {
+                      // Add history entry when modal opens
+                      window.history.pushState({ modalOpen: true }, "");
+                      window.addEventListener("popstate", handlePopState);
+                  }
+          
+                  return () => {
+                      window.removeEventListener("popstate", handlePopState);
+                  };
+              }, [openFilters]);
+
   return (
     <div className="p-4 bg-white shadow-sm w-full max-w-xl" onClick={(e)=>e.stopPropagation()}>
       <div className="flex items-center justify-between gap-6">

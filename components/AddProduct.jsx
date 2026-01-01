@@ -57,6 +57,8 @@ const AddProduct = () => {
                 preview: URL.createObjectURL(file),
                 isDefault: false,
                 imgUrl: null,
+                uploading: true,
+                removing: false,
             };
 
             // Add preview immediately to state
@@ -65,30 +67,40 @@ const AddProduct = () => {
                 images: [...prev.images, newImage],
             }));
 
-            // 2. Upload file to Supabase storage
-            const fileName = `products/${tempId}`;
-            const { error } = await supabase.storage.from("products").upload(fileName, file);
+            try {
+                // 2. Upload file to Supabase storage
+                const fileName = `products/${tempId}`;
+                const { error } = await supabase.storage.from("products").upload(fileName, file);
 
-            if (error) {
-                console.error("Supabase upload error:", error);
-                continue;
+                if (error) {
+                    console.error("Supabase upload error:", error);
+                    continue;
+                }
+
+                // 3. Get public URL
+                const { data: publicData } = supabase.storage
+                    .from("products")
+                    .getPublicUrl(fileName);
+
+                // 4. Update state with uploaded image URL
+                setProduct((prev) => ({
+                    ...prev,
+                    images: prev.images.map((img) =>
+                        img.tempId === tempId ? { ...img, imgUrl: publicData.publicUrl, uploading: false } : img
+                    ),
+                }));
+
+                // Track uploaded URLs for potential cleanup
+                setUploadedImageUrls((prev) => [...prev, publicData.publicUrl]);
+            } catch (err) {
+                console.error("Supabase upload error:", err);
+
+                // Remove failed image
+                setProduct((prev) => ({
+                    ...prev,
+                    images: prev.images.filter((img) => img.tempId !== tempId),
+                }));
             }
-
-            // 3. Get public URL
-            const { data: publicData } = supabase.storage
-                .from("products")
-                .getPublicUrl(fileName);
-
-            // 4. Update state with uploaded image URL
-            setProduct((prev) => ({
-                ...prev,
-                images: prev.images.map((img) =>
-                    img.tempId === tempId ? { ...img, imgUrl: publicData.publicUrl } : img
-                ),
-            }));
-
-            // Track uploaded URLs for potential cleanup
-            setUploadedImageUrls((prev) => [...prev, publicData.publicUrl]);
         }
     };
 
@@ -154,28 +166,48 @@ const AddProduct = () => {
     const removeImage = async (index) => {
         const imgToRemove = product.images[index];
 
-        if (imgToRemove?.imgUrl) {
-            try {
-                const urlParts = imgToRemove.imgUrl.split("/object/public/");
-                if (urlParts.length < 2) throw new Error("Invalid Supabase URL");
-
-                let filePath = decodeURIComponent(urlParts[1]);
-                if (filePath.startsWith("products/")) {
-                    filePath = filePath.replace(/^products\//, "");
-                }
-
-                const { error } = await supabase.storage.from("products").remove([filePath]);
-                if (error) throw error;
-                console.log("Deleted from Supabase:", filePath);
-            } catch (err) {
-                console.error("Supabase delete error:", err.message || err);
-            }
-        }
-
+        // Mark removing
         setProduct((prev) => ({
             ...prev,
-            images: prev.images.filter((_, i) => i !== index),
+            images: prev.images.map((img, i) =>
+                i === index ? { ...img, removing: true } : img
+            ),
         }));
+
+        try {
+            if (imgToRemove?.imgUrl) {
+                try {
+                    const urlParts = imgToRemove.imgUrl.split("/object/public/");
+                    if (urlParts.length < 2) throw new Error("Invalid Supabase URL");
+
+                    let filePath = decodeURIComponent(urlParts[1]);
+                    if (filePath.startsWith("products/")) {
+                        filePath = filePath.replace(/^products\//, "");
+                    }
+
+                    const { error } = await supabase.storage.from("products").remove([filePath]);
+                    if (error) throw error;
+                    console.log("Deleted from Supabase:", filePath);
+                } catch (err) {
+                    console.error("Supabase delete error:", err.message || err);
+                }
+            }
+
+            setProduct((prev) => ({
+                ...prev,
+                images: prev.images.filter((_, i) => i !== index),
+            }));
+        } catch (err) {
+            console.error("Supabase delete error:", err.message || err);
+
+            // Restore state if failed
+            setProduct((prev) => ({
+                ...prev,
+                images: prev.images.map((img, i) =>
+                    i === index ? { ...img, removing: false } : img
+                ),
+            }));
+        }
     };
 
     // -------------------------
@@ -474,21 +506,42 @@ const AddProduct = () => {
                                     alt="preview"
                                     className="w-28 h-28 object-contain object-center rounded-md border border-gray-300"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => handleMainImage(index)}
-                                    className={`absolute bottom-1 left-1 px-2 py-1 text-xs rounded ${img.isDefault ? "bg-green-500 text-white" : "bg-gray-200"}`}
-                                >
-                                    {img.isDefault ? "Main" : "Set Main"}
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => removeImage(index)}
-                                    className="absolute top-1 right-1 text-red-500 font-bold bg-white rounded-full"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-6 sm:h-6' viewBox="0 0 640 640">
-                                        <path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg>
-                                </button>
+                                {/* Loader Overlay */}
+                                {(img.uploading || img.removing) && (
+                                    <div className="absolute inset-0 bg-black/50 rounded-md flex items-center justify-center">
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    </div>
+                                )}
+
+                                {/* Main Image Button */}
+                                {!img.uploading && !img.removing && (
+                                    <button
+                                        type="button"
+                                        onClick={() => handleMainImage(index)}
+                                        className={`absolute bottom-1 left-1 px-2 py-1 text-xs rounded ${img.isDefault ? "bg-green-500 text-white" : "bg-gray-200"
+                                            }`}
+                                    >
+                                        {img.isDefault ? "Main" : "Set Main"}
+                                    </button>
+                                )}
+
+                                {/* Remove Button */}
+                                {!img.uploading && !img.removing && (
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImage(index)}
+                                        className="absolute top-1 right-1 text-red-500 font-bold bg-white rounded-full"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="currentColor"
+                                            className="w-4 h-4 sm:w-6 sm:h-6"
+                                            viewBox="0 0 640 640"
+                                        >
+                                            <path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" />
+                                        </svg>
+                                    </button>
+                                )}
                             </div>
                         ))}
 

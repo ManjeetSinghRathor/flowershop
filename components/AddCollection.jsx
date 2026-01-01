@@ -40,6 +40,10 @@ const AddCollection = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    const [imageUploading, setImageUploading] = useState(false);
+    const [imageRemoving, setImageRemoving] = useState(false);
+
+
     // 🔍 Search functionality
     useEffect(() => {
         const fetchProducts = async () => {
@@ -105,30 +109,33 @@ const AddCollection = () => {
             image: newImage,
         }));
 
-        // Upload to Supabase (bucket: "collections")
-        const fileName = `collections/${tempId}`;
-        const { error } = await supabase.storage
-            .from("collections")
-            .upload(fileName, file, {
-                cacheControl: "public, max-age=31536000", // 1 year cache
-                upsert: true,
-            });;
+        try {
+            setImageUploading(true);
 
-        if (error) {
-            console.error("Supabase upload error:", error.message);
-            return;
+            const fileName = `collections/${tempId}`;
+            const { error } = await supabase.storage
+                .from("collections")
+                .upload(fileName, file, {
+                    cacheControl: "public, max-age=31536000",
+                    upsert: true,
+                });
+
+            if (error) throw error;
+
+            const { data: publicData } = supabase.storage
+                .from("collections")
+                .getPublicUrl(fileName);
+
+            setCollection((prev) => ({
+                ...prev,
+                image: { ...newImage, imgUrl: publicData.publicUrl },
+            }));
+        } catch (err) {
+            console.error("Supabase upload error:", err.message);
+        } finally {
+            setImageUploading(false);
         }
 
-        // Get Public URL
-        const { data: publicData } = supabase.storage
-            .from("collections")
-            .getPublicUrl(fileName);
-
-        // Update state with Supabase URL
-        setCollection((prev) => ({
-            ...prev,
-            image: { ...newImage, imgUrl: publicData.publicUrl },
-        }));
     };
 
     // Open file picker
@@ -138,8 +145,10 @@ const AddCollection = () => {
 
     // Remove Image (and delete from Supabase if uploaded)
     const removeImage = async () => {
-        if (collection.image?.imgUrl) {
-            try {
+        try {
+            setImageRemoving(true);
+
+            if (collection.image?.imgUrl) {
                 const urlParts = collection.image.imgUrl.split("/object/public/");
                 if (urlParts.length < 2) throw new Error("Invalid Supabase URL");
 
@@ -148,20 +157,22 @@ const AddCollection = () => {
                     filePath = filePath.replace(/^collections\//, "");
                 }
 
-                const { error } = await supabase.storage.from("collections").remove([filePath]);
+                const { error } = await supabase.storage
+                    .from("collections")
+                    .remove([filePath]);
+
                 if (error) throw error;
-
-                console.log("Deleted from Supabase:", filePath);
-            } catch (err) {
-                console.error("Supabase delete error:", err.message || err);
             }
-        }
 
-        // Clear image from state
-        setCollection((prev) => ({
-            ...prev,
-            image: "",
-        }));
+            setCollection((prev) => ({
+                ...prev,
+                image: "",
+            }));
+        } catch (err) {
+            console.error("Supabase delete error:", err.message || err);
+        } finally {
+            setImageRemoving(false);
+        }
     };
 
 
@@ -230,13 +241,25 @@ const AddCollection = () => {
                                     alt="preview"
                                     className="w-32 h-32 object-cover object-center rounded-full border border-gray-300"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={removeImage}
-                                    className="absolute top-[-4] right-[-4] text-red-500 font-bold rounded-full p-[2px] bg-white"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-5 h-5 sm:w-6 sm:h-6' viewBox="0 0 640 640"><path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg>
-                                </button>
+                                {/* Uploading Overlay */}
+                                {(imageUploading || imageRemoving) && (
+                                    <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                                        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    </div>
+                                )}
+
+                                {/* Remove Button */}
+                                {!imageUploading && !imageRemoving && (
+                                    <button
+                                        type="button"
+                                        onClick={removeImage}
+                                        className="absolute top-[-4] right-[-4] text-red-500 font-bold rounded-full p-[2px] bg-white"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 640 640">
+                                            <path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" />
+                                        </svg>
+                                    </button>
+                                )}
                             </div>
                         ) : (
                             <div
@@ -351,6 +374,7 @@ const AddCollection = () => {
                 {/* Submit */}
                 <button
                     type="submit"
+                    disabled={imageUploading || imageRemoving}
                     className="bg-blue-600 text-white px-4 py-2 rounded w-fit"
                 >
                     Save Collection

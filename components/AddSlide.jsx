@@ -12,6 +12,10 @@ const AddSlide = () => {
         link: "",
     });
 
+    const [imageUploading, setImageUploading] = useState(false);
+    const [imageRemoving, setImageRemoving] = useState(false);
+
+
     const fileInputRef = useRef();
 
     // Upload Single Slide Image to Supabase
@@ -33,23 +37,33 @@ const AddSlide = () => {
             image: newImage,
         }));
 
-        // Upload to Supabase (bucket: "slides")
-        const fileName = `slides/${tempId}`;
-        const { error } = await supabase.storage.from("slides").upload(fileName, file);
+        try {
+            setImageUploading(true);
 
-        if (error) {
-            console.error("Supabase upload error:", error.message);
-            return;
+            const fileName = `slides/${tempId}`;
+            const { error } = await supabase.storage
+                .from("slides")
+                .upload(fileName, file, {
+                    cacheControl: "public, max-age=31536000",
+                    upsert: true,
+                });
+
+            if (error) throw error;
+
+            const { data: publicData } = supabase.storage
+                .from("slides")
+                .getPublicUrl(fileName);
+
+            setSlide((prev) => ({
+                ...prev,
+                image: { ...newImage, imgUrl: publicData.publicUrl },
+            }));
+        } catch (err) {
+            console.error("Supabase upload error:", err.message);
+            toast.error("Image upload failed");
+        } finally {
+            setImageUploading(false);
         }
-
-        // Get Public URL
-        const { data: publicData } = supabase.storage.from("slides").getPublicUrl(fileName);
-
-        // Update state with Supabase URL
-        setSlide((prev) => ({
-            ...prev,
-            image: { ...newImage, imgUrl: publicData.publicUrl },
-        }));
     };
 
     // Trigger file picker
@@ -59,8 +73,10 @@ const AddSlide = () => {
 
     // Remove Slide Image (and delete from Supabase if uploaded)
     const removeImage = async () => {
-        if (slide.image?.imgUrl) {
-            try {
+        try {
+            setImageRemoving(true);
+
+            if (slide.image?.imgUrl) {
                 const urlParts = slide.image.imgUrl.split("/object/public/");
                 if (urlParts.length < 2) throw new Error("Invalid Supabase URL");
 
@@ -69,21 +85,25 @@ const AddSlide = () => {
                     filePath = filePath.replace(/^slides\//, "");
                 }
 
-                const { error } = await supabase.storage.from("slides").remove([filePath]);
+                const { error } = await supabase.storage
+                    .from("slides")
+                    .remove([filePath]);
+
                 if (error) throw error;
-
-                console.log("Deleted from Supabase:", filePath);
-            } catch (err) {
-                console.error("Supabase delete error:", err.message || err);
             }
-        }
 
-        // Clear image from state
-        setSlide((prev) => ({
-            ...prev,
-            image: "",
-        }));
+            setSlide((prev) => ({
+                ...prev,
+                image: null,
+            }));
+        } catch (err) {
+            console.error("Supabase delete error:", err.message || err);
+            toast.error("Failed to remove image");
+        } finally {
+            setImageRemoving(false);
+        }
     };
+
 
 
     const handleSubmit = async (e) => {
@@ -132,21 +152,30 @@ const AddSlide = () => {
                                 alt="preview"
                                 className="w-full min-w-[290px] h-[160px] object-cover object-center rounded-md border"
                             />
-                            {/* Remove button */}
-                            <button
-                                type="button"
-                                onClick={removeImage}
-                                className="absolute top-[-8px] right-[-8px] text-red-500 font-bold rounded-full p-[2px] bg-white"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="currentColor"
-                                    className="w-5 h-5 sm:w-6 sm:h-6"
-                                    viewBox="0 0 640 640"
+                            {/* Loader Overlay */}
+                            {(imageUploading || imageRemoving) && (
+                                <div className="absolute inset-0 bg-black/50 rounded-md flex items-center justify-center">
+                                    <div className="w-7 h-7 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                </div>
+                            )}
+
+                            {/* Remove Button */}
+                            {!imageUploading && !imageRemoving && (
+                                <button
+                                    type="button"
+                                    onClick={removeImage}
+                                    className="absolute top-[-8px] right-[-8px] text-red-500 font-bold rounded-full p-[2px] bg-white"
                                 >
-                                    <path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" />
-                                </svg>
-                            </button>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="currentColor"
+                                        className="w-5 h-5 sm:w-6 sm:h-6"
+                                        viewBox="0 0 640 640"
+                                    >
+                                        <path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" />
+                                    </svg>
+                                </button>
+                            )}
                         </div>
                     ) : (
                         <div
@@ -186,6 +215,7 @@ const AddSlide = () => {
 
                 <button
                     type="submit"
+                    disabled={imageUploading || imageRemoving}
                     className="bg-blue-600 text-white px-4 py-2 rounded w-full"
                 >
                     Add Slide
