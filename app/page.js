@@ -48,20 +48,19 @@ export default function Home() {
   const [catLoaded, setCatLoaded] = useState(true);
 
   useEffect(() => {
-  if (colList && Object.keys(colList).length > 0) {
-    const filtered = {};
+    if (colList && Object.keys(colList).length > 0) {
+      const filtered = {};
 
-    Object.entries(colList).forEach(([categoryName, collections]) => {
-      if (categoryName !== "All Products") {
-        filtered[categoryName] = [...collections].reverse(); // 🔁 reverse per category
-      }
-    });
+      Object.entries(colList).forEach(([categoryName, collections]) => {
+        if (categoryName !== "All Products") {
+          filtered[categoryName] = [...collections].reverse(); // 🔁 reverse per category
+        }
+      });
 
-    setCollection_List(filtered);
-    setCatLoaded(false);
-  }
-}, [colList]);
-
+      setCollection_List(filtered);
+      setCatLoaded(false);
+    }
+  }, [colList]);
 
   const [slides, setSlides] = useState([]);
   const [slidesToShow, setSlidesToShow] = useState(1);
@@ -289,7 +288,7 @@ export default function Home() {
             {[...Array(4)].map((_, idx) => (
               <div
                 key={idx}
-                className="relative overflow-hidden rounded-2xl aspect-square"
+                className="relative overflow-hidden rounded-2xl aspect-[3/2]"
               >
                 {/* Image Skeleton */}
                 <div className="absolute inset-0 bg-gray-300 animate-pulse" />
@@ -309,13 +308,16 @@ export default function Home() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="group relative overflow-hidden rounded-2xl aspect-square"
+                className="group relative overflow-hidden rounded-2xl aspect-[3/2]"
               >
                 {/* Background Image */}
-                <img
+                <Image
                   src={item.image}
                   alt={item.name}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  priority={false}
                 />
 
                 {/* Glass Overlay */}
@@ -398,10 +400,10 @@ export default function Home() {
 
       {/* Collection List */}
       <div className="flex flex-col w-full gap-4 sm:gap-6 px-2 mt-2">
-        {/* <h2 className="flex justify-center font-mono text-2xl sm:text-3xl mt-4 mb-1 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 relative">
-          Collection List
+        <h2 className="flex justify-center font-mono text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 relative">
+            Bouquet Collection
           <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-[2px] bg-gradient-to-r from-pink-500 to-yellow-400 rounded-full animate-pulse"></span>
-        </h2> */}
+        </h2>
 
         <div className="w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth sm:px-4">
           {catLoaded ? (
@@ -504,7 +506,7 @@ export default function Home() {
                 alt="Make a Custom Bouquet Now!"
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
-                className="object-cover object-center transition-transform duration-700 hover:scale-105"
+                className="object-cover object-center scale-120"
                 priority
                 decoding="async"
               />

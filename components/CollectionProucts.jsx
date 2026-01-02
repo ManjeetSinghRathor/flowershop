@@ -193,49 +193,37 @@ const CollectionProducts = () => {
         <div className="min-h-screen">
 
             <div className='flex flex-col w-full bg-white sticky top-14 z-[45] shadow-md sm:px-8 lg:px-24'>
-                <h1 className="flex w-full justify-start items-center font-mono sm:text-lg px-2 py-4">
-                    <Link href="/" className="hover:underline font-light">
-                        Home
-                    </Link>
-                    {category && (
-                        <>
-                            <span className="mx-1">{">"}</span>
-                            <span className="font-medium">{category}</span>
-                        </>
-                    )}
-                </h1>
-
-                <div className='grid grid-cols-2 px-2 pb-4 font-mono sm:text-lg'>
-                    <div className='flex justify-start gap-3 sm:gap-4'>
-                        {
-                            filterApplied ?
-                                <p className='flex gap-1 items-center cursor-pointer bg-gray-200 rounded-full px-[2px] '>
-                                    <span className="flex w-full items-center gap-1" onClick={() => setOpenFilters(true)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-5 sm:h-5' viewBox="0 0 640 640"><path d="M96 128C78.3 128 64 142.3 64 160C64 177.7 78.3 192 96 192L182.7 192C195 220.3 223.2 240 256 240C288.8 240 317 220.3 329.3 192L544 192C561.7 192 576 177.7 576 160C576 142.3 561.7 128 544 128L329.3 128C317 99.7 288.8 80 256 80C223.2 80 195 99.7 182.7 128L96 128zM96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L342.7 352C355 380.3 383.2 400 416 400C448.8 400 477 380.3 489.3 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L489.3 288C477 259.7 448.8 240 416 240C383.2 240 355 259.7 342.7 288L96 288zM96 448C78.3 448 64 462.3 64 480C64 497.7 78.3 512 96 512L150.7 512C163 540.3 191.2 560 224 560C256.8 560 285 540.3 297.3 512L544 512C561.7 512 576 497.7 576 480C576 462.3 561.7 448 544 448L297.3 448C285 419.7 256.8 400 224 400C191.2 400 163 419.7 150.7 448L96 448z" /></svg>
-                                        Filters
-                                    </span>
-
-                                    <button
-                                        onClick={() => {
-                                            setFilteredProducts([]);
-                                            setFilterApplied(false);
-                                        }}
-                                        className='border-[1px] border-gray-300 p-1 rounded-full'
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4' viewBox="0 0 640 640"><path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg>
-                                    </button>
-                                </p> :
-                                <span className='flex gap-1 items-center cursor-pointer' onClick={() => setOpenFilters(true)}>
+                <div className='flex justify-around items-center gap-6 px-2 py-2 font-mono sm:text-lg'>
+                    {/* <div className='flex justify-around gap-3 sm:gap-4'> */}
+                    {
+                        filterApplied ?
+                            <p className='flex gap-1 items-center cursor-pointer bg-gray-200 rounded-full px-[2px]'>
+                                <span className="flex w-full items-center gap-1" onClick={() => setOpenFilters(true)}>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-5 sm:h-5' viewBox="0 0 640 640"><path d="M96 128C78.3 128 64 142.3 64 160C64 177.7 78.3 192 96 192L182.7 192C195 220.3 223.2 240 256 240C288.8 240 317 220.3 329.3 192L544 192C561.7 192 576 177.7 576 160C576 142.3 561.7 128 544 128L329.3 128C317 99.7 288.8 80 256 80C223.2 80 195 99.7 182.7 128L96 128zM96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L342.7 352C355 380.3 383.2 400 416 400C448.8 400 477 380.3 489.3 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L489.3 288C477 259.7 448.8 240 416 240C383.2 240 355 259.7 342.7 288L96 288zM96 448C78.3 448 64 462.3 64 480C64 497.7 78.3 512 96 512L150.7 512C163 540.3 191.2 560 224 560C256.8 560 285 540.3 297.3 512L544 512C561.7 512 576 497.7 576 480C576 462.3 561.7 448 544 448L297.3 448C285 419.7 256.8 400 224 400C191.2 400 163 419.7 150.7 448L96 448z" /></svg>
                                     Filters
                                 </span>
-                        }
-                        <span className='flex gap-1 items-center whitespace-nowrap cursor-pointer' onClick={() => setOpenSortBy(true)}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-5 sm:h-5 text-black' viewBox="0 0 640 640"><path d="M470.6 566.6L566.6 470.6C575.8 461.4 578.5 447.7 573.5 435.7C568.5 423.7 556.9 416 544 416L480 416L480 96C480 78.3 465.7 64 448 64C430.3 64 416 78.3 416 96L416 416L352 416C339.1 416 327.4 423.8 322.4 435.8C317.4 447.8 320.2 461.5 329.3 470.7L425.3 566.7C437.8 579.2 458.1 579.2 470.6 566.7zM214.6 73.4C202.1 60.9 181.8 60.9 169.3 73.4L73.3 169.4C64.1 178.6 61.4 192.3 66.4 204.3C71.4 216.3 83.1 224 96 224L160 224L160 544C160 561.7 174.3 576 192 576C209.7 576 224 561.7 224 544L224 224L288 224C300.9 224 312.6 216.2 317.6 204.2C322.6 192.2 319.8 178.5 310.7 169.3L214.7 73.3z" /></svg>
-                            Sort By
-                        </span>
-                    </div>
-                    <div className='flex justify-end gap-3 sm:gap-4'>
+
+                                <button
+                                    onClick={() => {
+                                        setFilteredProducts([]);
+                                        setFilterApplied(false);
+                                    }}
+                                    className='border-[1px] border-gray-400 p-1 rounded-full'
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4' viewBox="0 0 640 640"><path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z" /></svg>
+                                </button>
+                            </p> :
+                            <span className='flex gap-1 items-center cursor-pointer' onClick={() => setOpenFilters(true)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-5 sm:h-5' viewBox="0 0 640 640"><path d="M96 128C78.3 128 64 142.3 64 160C64 177.7 78.3 192 96 192L182.7 192C195 220.3 223.2 240 256 240C288.8 240 317 220.3 329.3 192L544 192C561.7 192 576 177.7 576 160C576 142.3 561.7 128 544 128L329.3 128C317 99.7 288.8 80 256 80C223.2 80 195 99.7 182.7 128L96 128zM96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L342.7 352C355 380.3 383.2 400 416 400C448.8 400 477 380.3 489.3 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L489.3 288C477 259.7 448.8 240 416 240C383.2 240 355 259.7 342.7 288L96 288zM96 448C78.3 448 64 462.3 64 480C64 497.7 78.3 512 96 512L150.7 512C163 540.3 191.2 560 224 560C256.8 560 285 540.3 297.3 512L544 512C561.7 512 576 497.7 576 480C576 462.3 561.7 448 544 448L297.3 448C285 419.7 256.8 400 224 400C191.2 400 163 419.7 150.7 448L96 448z" /></svg>
+                                Filters
+                            </span>
+                    }
+                    <span className='flex gap-1 items-center whitespace-nowrap cursor-pointer' onClick={() => setOpenSortBy(true)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill='currentColor' className='w-4 h-4 sm:w-5 sm:h-5 text-black' viewBox="0 0 640 640"><path d="M470.6 566.6L566.6 470.6C575.8 461.4 578.5 447.7 573.5 435.7C568.5 423.7 556.9 416 544 416L480 416L480 96C480 78.3 465.7 64 448 64C430.3 64 416 78.3 416 96L416 416L352 416C339.1 416 327.4 423.8 322.4 435.8C317.4 447.8 320.2 461.5 329.3 470.7L425.3 566.7C437.8 579.2 458.1 579.2 470.6 566.7zM214.6 73.4C202.1 60.9 181.8 60.9 169.3 73.4L73.3 169.4C64.1 178.6 61.4 192.3 66.4 204.3C71.4 216.3 83.1 224 96 224L160 224L160 544C160 561.7 174.3 576 192 576C209.7 576 224 561.7 224 544L224 224L288 224C300.9 224 312.6 216.2 317.6 204.2C322.6 192.2 319.8 178.5 310.7 169.3L214.7 73.3z" /></svg>
+                        Sort By
+                    </span>
+                    {/* </div> */}
+                    {/* <div className='flex justify-end gap-3 sm:gap-4'>
                         <span className={`flex gap-1 items-center justify-center ${gridMenu ? "bg-black p-[2px] rounded-sm" : ""}`}>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -259,6 +247,7 @@ const CollectionProducts = () => {
                             <svg xmlns="http://www.w3.org/2000/svg" onClick={() => setGridMenu(false)} fill='currentColor' className={`w-6 h-6 sm:w-7 sm:h-7 ${gridMenu ? "" : "text-white"}`} viewBox="0 0 640 640"><path d="M104 112C90.7 112 80 122.7 80 136L80 184C80 197.3 90.7 208 104 208L152 208C165.3 208 176 197.3 176 184L176 136C176 122.7 165.3 112 152 112L104 112zM256 128C238.3 128 224 142.3 224 160C224 177.7 238.3 192 256 192L544 192C561.7 192 576 177.7 576 160C576 142.3 561.7 128 544 128L256 128zM256 288C238.3 288 224 302.3 224 320C224 337.7 238.3 352 256 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L256 288zM256 448C238.3 448 224 462.3 224 480C224 497.7 238.3 512 256 512L544 512C561.7 512 576 497.7 576 480C576 462.3 561.7 448 544 448L256 448zM80 296L80 344C80 357.3 90.7 368 104 368L152 368C165.3 368 176 357.3 176 344L176 296C176 282.7 165.3 272 152 272L104 272C90.7 272 80 282.7 80 296zM104 432C90.7 432 80 442.7 80 456L80 504C80 517.3 90.7 528 104 528L152 528C165.3 528 176 517.3 176 504L176 456C176 442.7 165.3 432 152 432L104 432z" /></svg>
                         </span>
                     </div>
+                    */}
                 </div>
 
             </div>
@@ -303,7 +292,24 @@ const CollectionProducts = () => {
                     </div>
                 </div>}
 
-            {gridMenu ? <div className="px-4 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 py-4 sm:py-6">
+            <h1 className="flex w-full justify-start items-center font-mono sm:text-lg px-2 sm:px-8 lg:px-24 pt-4">
+                    <Link href="/" className="hover:underline font-light">
+                        Home
+                    </Link>
+                    {category && (
+                        <>
+                            <span className="mx-1">{">"}</span>
+                            <span className="font-medium">{category}</span>
+                            { (filterApplied ? filteredProducts : collection_products).length > 0 &&
+                            <span className="font-light">{"("}{(filterApplied ? filteredProducts : collection_products).length}{")"}</span>
+                            }
+                        </>
+                    )}
+                </h1>
+
+            {/* {gridMenu ?  */}
+            <div className="px-4 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 py-4 sm:py-6">
+                
                 {(filterApplied ? filteredProducts : collection_products)?.map((product, index) => {
                     const isLast = index === (filterApplied ? filteredProducts : collection_products)?.length - 1;
                     return (<div
@@ -354,22 +360,22 @@ const CollectionProducts = () => {
 
                             <div className='px-2'>
                                 {/* Product Info */}
-                            <h3 className="font-semibold sm:text-lg mb-1">{product.name}</h3>
-                            <p className="text-sm text-gray-600 flex-1 line-clamp-3">
-                                {product.description}
-                            </p>
+                                <h3 className="font-semibold sm:text-lg mb-1">{product.name}</h3>
+                                <p className="text-sm text-gray-600 flex-1 line-clamp-3">
+                                    {product.description}
+                                </p>
 
-                            {/* Price */}
-                            <div className="mt-2">
-                                {product.sizes[0].discount > 0 && (
-                                    <span className="text-gray-400 line-through mr-2">
-                                        {product.sizes[0].price}₹
-                                    </span>
-                                )}
-                                <span className="font-bold text-lg">{product.sizes[0].finalPrice}₹</span>
+                                {/* Price */}
+                                <div className="mt-2">
+                                    {product.sizes[0].discount > 0 && (
+                                        <span className="text-gray-400 line-through mr-2">
+                                            {product.sizes[0].price}₹
+                                        </span>
+                                    )}
+                                    <span className="font-bold text-lg">{product.sizes[0].finalPrice}₹</span>
+                                </div>
                             </div>
-                            </div>
-                            
+
                         </Link>
 
                         {/* Buttons at bottom */}
@@ -408,8 +414,9 @@ const CollectionProducts = () => {
                         </div>
                     </div>);
                 })}
-            </div> :
-                <div className="grid grid-cols-1 md:grid-cols-2 px-4 sm:px-8 lg:px-24 gap-4 sm:gap-6 py-4 sm:py-6">
+            </div>
+            {/* 
+                : <div className="grid grid-cols-1 md:grid-cols-2 px-4 sm:px-8 lg:px-24 gap-4 sm:gap-6 py-4 sm:py-6">
                     {(filterApplied ? filteredProducts : collection_products)?.map((product, index) => {
                         const isLast = index === (filterApplied ? filteredProducts : collection_products)?.length - 1;
                         return (
@@ -418,7 +425,6 @@ const CollectionProducts = () => {
                                 ref={isLast ? lastProductRef : null}
                                 className="flex flex-row overflow-hidden bg-white rounded-lg p-2 sm:p-3 shadow-sm transition duration-500 hover:scale-102"
                             >
-                                {/* Image Section */}
                                 <Link
                                     href={{
                                         pathname: "/product_view",
@@ -456,7 +462,6 @@ const CollectionProducts = () => {
                                     )}
                                 </Link>
 
-                                {/* Details Section */}
                                 <div className="flex flex-col justify-between pl-2 sm:pl-6 flex-1">
                                     <div>
                                         <Link
@@ -474,7 +479,6 @@ const CollectionProducts = () => {
                                             {product.description}
                                         </p>
 
-                                        {/* Price */}
                                         <div className='py-1 sm:py-2'>
                                             {product.sizes[0].discount > 0 && (
                                                 <span className="text-gray-400 line-through mr-2">
@@ -487,7 +491,6 @@ const CollectionProducts = () => {
                                         </div>
                                     </div>
 
-                                    {/* Buttons */}
                                     <div className={`mt-1 flex gap-2 ${(!product.isActive || product.stock === 0) ? "text-gray-400" : "text-black"}`}>
                                         <button
                                             onClick={() => {
@@ -521,7 +524,8 @@ const CollectionProducts = () => {
                             </div>
                         );
                     })}
-                </div>}
+                </div>} 
+            */}
 
             {(loadingRef.current && hasMoreRef.current) &&
                 <div className="flex flex-col gap-6 w-full overflow-hidden py-4 px-2 sm:px-8 lg:px-24">
