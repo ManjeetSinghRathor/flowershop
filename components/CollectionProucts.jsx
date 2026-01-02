@@ -97,6 +97,13 @@ const CollectionProducts = () => {
         }
     };
 
+    const toastStyle = {
+        background: "#161616ff",
+        color: "#fff",
+        borderRadius: "8px",
+        fontWeight: 500,
+    };
+
     const handleAddToCart = async (id, deliveryTime) => {
         if (user) {
             try {
@@ -116,7 +123,10 @@ const CollectionProducts = () => {
             }
         } else {
             dispatch(AddProduct({ id, q: 1, deliveryTime })); // guest cart in redux
-            toast.success("Item added to cart (guest)");
+            toast.success("Item added to your cart", {
+        style: toastStyle,
+        icon: "🛒",
+      });
         }
     };
 
@@ -190,7 +200,7 @@ const CollectionProducts = () => {
     // }, [filteredProducts])
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-[90vh]">
 
             <div className='flex flex-col w-full bg-white sticky top-14 z-[45] shadow-md sm:px-8 lg:px-24'>
                 <div className='flex justify-around items-center gap-6 px-2 py-2 font-mono sm:text-lg'>
@@ -308,7 +318,7 @@ const CollectionProducts = () => {
                 </h1>
 
             {/* {gridMenu ?  */}
-            <div className="px-4 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 py-4 sm:py-6">
+            <div className="px-4 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 py-4">
                 
                 {(filterApplied ? filteredProducts : collection_products)?.map((product, index) => {
                     const isLast = index === (filterApplied ? filteredProducts : collection_products)?.length - 1;
@@ -361,7 +371,7 @@ const CollectionProducts = () => {
                             <div className='px-2'>
                                 {/* Product Info */}
                                 <h3 className="font-semibold sm:text-lg mb-1">{product.name}</h3>
-                                <p className="text-sm text-gray-600 flex-1 line-clamp-3">
+                                <p className="text-sm text-gray-600 flex-1 line-clamp-2">
                                     {product.description}
                                 </p>
 

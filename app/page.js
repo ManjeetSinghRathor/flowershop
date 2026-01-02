@@ -16,22 +16,22 @@ import SearchModal from "@/components/SearchModal";
 const categories = [
   {
     name: "BOUQUET",
-    href: "/bouquet",
+    href: "/bouquet_world_blmshvn",
     image: "/bouquets-min.png",
   },
   {
     name: "CAKE",
-    href: "/cake",
+    href: "/cake_world_blmshvn",
     image: "/cakes-min.png",
   },
   {
     name: "PLANTS",
-    href: "/plants",
+    href: "/plants_world_blmshvn",
     image: "/plants-min.png",
   },
   {
     name: "SUBSCRIPTION",
-    href: "/subscription",
+    href: "/subscription_world_blmshvn",
     image: "/subscription-min.png",
   },
 ];
@@ -173,7 +173,10 @@ export default function Home() {
       }
     } else {
       dispatch(AddProduct({ id, q: 1, deliveryTime })); // guest cart in redux
-      toast.success("Item added to cart (guest)");
+      toast.success("Item added to your cart", {
+        style: toastStyle,
+        icon: "🛒",
+      });
     }
   };
 
@@ -608,7 +611,7 @@ export default function Home() {
                         <h3 className="font-semibold sm:text-lg mb-1">
                           {product.name}
                         </h3>
-                        <p className="text-sm text-gray-600 flex-1 line-clamp-3">
+                        <p className="text-sm text-gray-600 flex-1 line-clamp-2">
                           {product.description}
                         </p>
 

@@ -60,7 +60,7 @@ const Profile = () => {
 
     if (!user || user === null) {
         return (
-            <div className="min-h-screen flex flex-col gap-4 py-4 px-4 sm:px-8 lg:px-24">
+            <div className="min-h-[90vh] flex flex-col gap-4 py-4 px-4 sm:px-8 lg:px-24">
                 {/* Skeleton slides */}
                 <div
                     className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
@@ -85,7 +85,7 @@ const Profile = () => {
     }
 
     return (
-        <div className='min-h-screen flex flex-col gap-4 px-2 sm:px-8 lg:px-24 py-4 py-4'>
+        <div className='min-h-[90vh] flex flex-col gap-4 px-2 sm:px-8 lg:px-24 py-4 py-4'>
 
             {/* User Details Card */}
             <div className="relative flex flex-col gap-4 rounded-lg p-6 bg-gradient-to-r from-[#f6f6f6] to-[#fafafa]">

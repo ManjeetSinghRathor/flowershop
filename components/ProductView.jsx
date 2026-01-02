@@ -223,7 +223,10 @@ const ProductView = () => {
                 }
             } else {
                 dispatch(AddProduct({ id, q: quantity, sizeIdx: currentSizeIdx, deliveryTime: delivery_time })); // guest cart in redux
-                toast.success("Item added to cart (guest)");
+                toast.success("Item added to your cart", {
+                    style: toastStyle,
+                    icon: "🛒",
+                });
             }
         } else {
             toast("⚠️ Please increase the quantity!", {
@@ -276,29 +279,29 @@ const ProductView = () => {
     //   const [productsImgloaded, setProductsImgLoaded] = useState({});
 
     if (loading) return (
-    <div className="flex flex-col lg:flex-row min-h-screen justify-center gap-4 py-4 px-4 sm:px-8 lg:px-24">
-        
-        {/* Skeleton slides */}
-        {/* <div
+        <div className="flex flex-col lg:flex-row min-h-screen justify-center gap-4 py-4 px-4 sm:px-8 lg:px-24">
+
+            {/* Skeleton slides */}
+            {/* <div
             className="w-full h-[80px] bg-gray-300 animate-pulse rounded-md"
         /> */}
 
-        <div className="w-full flex justify-center">
-         <div
-            className="w-full max-w-2xl max-h-[60vh] aspect-[1] bg-gray-300 animate-pulse rounded-md"
-        />
-        </div>
-        
-        <div className="flex flex-col w-full gap-4">
-          {[...Array(5)].map((_, idx) => (
-            <div
-                key={idx}
-                className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
-            />
-        ))}  
-        </div>
+            <div className="w-full flex justify-center">
+                <div
+                    className="w-full max-w-2xl max-h-[60vh] aspect-[1] bg-gray-300 animate-pulse rounded-md"
+                />
+            </div>
 
-        <div className="flex flex-col w-full gap-3 pt-12 pb-4 px-4 sm:px-10 lg:px-26 ">
+            <div className="flex flex-col w-full gap-4">
+                {[...Array(5)].map((_, idx) => (
+                    <div
+                        key={idx}
+                        className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
+                    />
+                ))}
+            </div>
+
+            <div className="flex flex-col w-full gap-3 pt-12 pb-4 px-4 sm:px-10 lg:px-26 ">
                 <h2 className="flex font-mono text-xl justify-center sm:text-3xl">
                     You may also like
                 </h2>
@@ -306,9 +309,9 @@ const ProductView = () => {
                 <div className="flex flex-col gap-4 w-full overflow-hidden py-4">
 
                 </div>
-        </div>
-        
-    </div>);
+            </div>
+
+        </div>);
 
     return (
         <div className="w-full min-h-screen py-2 px-1">

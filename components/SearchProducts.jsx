@@ -100,6 +100,13 @@ const SearchProducts = () => {
   const loadingRef = useRef(false);
   const observer = useRef();
 
+  const toastStyle = {
+    background: "#161616ff",
+    color: "#fff",
+    borderRadius: "8px",
+    fontWeight: 500,
+  };
+
   const handleAddToCart = async (id, deliveryTime) => {
     if (user) {
       try {
@@ -109,7 +116,10 @@ const SearchProducts = () => {
           { withCredentials: true }
         );
         if (res.data.success) {
-          toast.success("Item added to your cart");
+          toast.success("Item added to your cart", {
+            style: toastStyle,
+            icon: "🛒",
+          });
           dispatch(AddProduct({ id, q: 1, deliveryTime }));
         }
       } catch {
@@ -117,7 +127,10 @@ const SearchProducts = () => {
       }
     } else {
       dispatch(AddProduct({ id, q: 1, deliveryTime }));
-      toast.success("Item added to cart (guest)");
+      toast.success("Item added to your cart", {
+            style: toastStyle,
+            icon: "🛒",
+          });
     }
   };
 
@@ -180,7 +193,7 @@ const SearchProducts = () => {
   }, [products, filteredProducts]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-[90vh]">
       <div className='flex flex-col w-full bg-white sticky top-14 z-[45] shadow-md sm:px-8 lg:px-24'>
 
          <div className='flex justify-around items-center gap-6 px-2 py-2 font-mono sm:text-lg'>
@@ -309,13 +322,13 @@ const SearchProducts = () => {
                 <div className="px-2">
                   <h3 className="font-semibold sm:text-lg">{product.name}</h3>
                   <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>
-                  <div className="mt-1">
+                  <div className="mt-2">
                     {product.sizes[0].discount > 0 && (
                       <span className="text-gray-400 line-through mr-2">
                         {product.sizes[0].price}₹
                       </span>
                     )}
-                    <span className="font-semibold">{product.sizes[0].finalPrice}₹</span>
+                    <span className="font-bold text-lg">{product.sizes[0].finalPrice}₹</span>
                   </div>
                 </div>
 
