@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { FaShoppingCart } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 
 const flowers = [
@@ -333,7 +332,7 @@ const CustomBouquet = () => {
                   onClick={handleAddToCart}
                   className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm sm:text-base shadow-md"
                 >
-                  <FaShoppingCart /> Add to Cart
+                  🛒 Add to Cart
                 </button>
                 <button
                   onClick={() => toast.success('Proceeding to order...')}

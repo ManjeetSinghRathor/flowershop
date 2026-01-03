@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState, useRef, useLayoutEffect } from "react";
-import { FaWhatsapp } from "react-icons/fa";
-import Slider from "react-slick";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { AddProduct, setCart } from "./store/CartProductsSlice";
@@ -37,6 +36,13 @@ const categories = [
 ];
 
 export default function Home() {
+  const Slider = dynamic(() => import("react-slick"), {
+    ssr: false,
+    loading: () => (
+    <div className="w-full h-[144px] sm:h-[184px] bg-gray-300 animate-pulse" />
+  ),
+  });
+
   const dispatch = useDispatch();
   const router = useRouter();
   const user = useSelector((state) => state.user?.data);
@@ -64,7 +70,6 @@ export default function Home() {
 
   const [slides, setSlides] = useState([]);
   const [slidesToShow, setSlidesToShow] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [homepageCollections, setHomepageCollections] = useState([]);
   const [colLoading, setColLoading] = useState(true);
 
@@ -91,11 +96,11 @@ export default function Home() {
   const settings = {
     dots: true,
     infinite: true,
-    speed: 800,
+    speed: 1000,
     fade: false,
     cssEase: "linear",
     autoplay: true,
-    autoplaySpeed: 4000,
+    autoplaySpeed: 5000,
     swipe: true,
     arrows: true,
     slidesToShow,
@@ -195,8 +200,6 @@ export default function Home() {
     } catch (err) {
       console.error("Error fetching slides:", err);
       toast.error("Error fetching slides");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -320,7 +323,7 @@ export default function Home() {
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  priority={false}
+                  priority
                 />
 
                 {/* Glass Overlay */}
@@ -340,17 +343,6 @@ export default function Home() {
       <div className="flex w-full justify-center">
         <div className="relative w-full overflow-hidden py-4">
           <div className="w-full">
-            {loading ? (
-              <div className="flex justify-center gap-4">
-                {/* Skeleton slides */}
-                {[...Array(1)].map((_, idx) => (
-                  <div
-                    key={idx}
-                    className="w-full h-[144px] sm:h-[184px] bg-gray-300 animate-pulse"
-                  />
-                ))}
-              </div>
-            ) : (
               <Slider {...settings}>
                 {slides.map((slide, idx) => {
                   const handleMouseDown = () => {
@@ -385,18 +377,16 @@ export default function Home() {
                           alt={`Offer ${idx + 1}`}
                           fill
                           className="object-cover object-center sm:rounded-xs"
-                          loading={idx === 0 ? "eager" : "lazy"} // first image preloads
-                          fetchPriority={idx === 0 ? "high" : "auto"} // prioritize only first
+                          priority={idx === 0} // 🔥 LCP image
+                          fetchPriority={idx === 0 ? "high" : "auto"}
                           decoding="async"
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                          priority={idx === 0} // ensures first is optimized early
                         />
                       </div>
                     </div>
                   );
                 })}
               </Slider>
-            )}
           </div>
         </div>
       </div>
@@ -404,7 +394,7 @@ export default function Home() {
       {/* Collection List */}
       <div className="flex flex-col w-full gap-4 sm:gap-6 px-2 mt-2">
         <h2 className="flex justify-center font-mono text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 relative">
-            Bouquet Collection
+          Bouquet Collection
           <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-[2px] bg-gradient-to-r from-pink-500 to-yellow-400 rounded-full animate-pulse"></span>
         </h2>
 

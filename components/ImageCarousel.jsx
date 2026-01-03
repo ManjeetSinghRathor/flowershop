@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Image from "next/image";
 
 export default function ImageCarousel({ images }) {
@@ -97,13 +96,38 @@ export default function ImageCarousel({ images }) {
           onClick={prevImage}
           className="absolute top-1/2 left-2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full z-10"
         >
-          <FaChevronLeft size={18} />
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-4 h-4"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+
         </button>
         <button
           onClick={nextImage}
           className="absolute top-1/2 right-2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full z-10"
         >
-          <FaChevronRight size={18} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-4 h-4"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+
         </button>
       </div>
 

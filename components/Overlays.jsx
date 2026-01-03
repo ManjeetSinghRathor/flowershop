@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { setUser, logout } from "@/app/store/userSlice";
 import { setCart } from "@/app/store/CartProductsSlice";
 import Link from "next/link";
-import { FaChevronDown, FaChevronUp, FaChevronRight } from "react-icons/fa"; // ✅ react-icons
 import axios from "axios";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
@@ -212,7 +211,7 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
     return (
         <aside
             className={`
-          fixed top-0 left-0 z-[100] w-full h-full bg-[rgba(0,0,0,0.95)] text-white shadow-lg
+          fixed top-0 left-0 z-[100] w-full h-full bg-[rgba(0,0,0,0.7)] text-white shadow-lg
           transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"} overflow-y-auto overscroll-contain
         `}
@@ -224,8 +223,8 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                 </div>
             }
 
-            <div className="flex flex-col h-full grow justify-between w-60 sm:w-64 bg-white" ref={menuRef}>
-                <div className="flex flex-col w-60 sm:w-64 bg-white overflow-y-auto">
+            <div className="flex flex-col h-full grow justify-between w-60 sm:w-64 bg-[#fff9eb]" ref={menuRef}>
+                <div className="flex flex-col w-60 sm:w-64 bg-[#fff9eb] overflow-y-auto">
                     {user != null &&
                         <div className="flex flex-col p-2">
                             <div className="flex w-full p-1 items-center justify-center">
@@ -239,7 +238,7 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                                     priority={false}
                                 />
                             </div>
-                            <p className="flex text-black text-center items-center justify-center gap-2 p-1 rounded-sm bg-white">
+                            <p className="flex text-black text-center items-center justify-center gap-2 pb-1 rounded-sm">
                                 Hello, {user?.name.split(" ")[0]}!
                             </p>
 
@@ -250,7 +249,7 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                                         setIsOpen(false);
                                     }, 300)
                                 }}
-                                className="w-full flex justify-center items-center px-2 gap-2 text-blue-600 hover:text-blue-700 hover:underline"
+                                className="w-full flex justify-center items-center px-2 gap-2 text-blue-600 hover:text-blue-700 hover:underline bg-white py-1"
                             >
                                 <svg
                                     className="w-5 h-5"
@@ -281,7 +280,20 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                                         strokeLinecap="round"
                                     />
                                 </svg>
-                                <span>Account</span><span><FaChevronRight className="w-[14px] h-[14px] text-blue-600" /></span>
+                                <span>Account</span><span>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="3"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="w-4 h-4 text-blue-600"
+                                    >
+                                        <polyline points="9 18 15 12 9 6" />
+                                    </svg>
+                                </span>
                             </Link>
                         </div>}
 
@@ -294,15 +306,23 @@ export default function Overlays({ setIsOpen, isOpen = false }) {
                             <div key={category} className="mb-2 border rounded-lg overflow-hidden">
                                 {/* Category header */}
                                 <button
-                                    className="w-full flex justify-between items-center py-3 px-2 bg-gray-100 hover:bg-gray-200"
+                                    className="w-full flex justify-between items-center py-3 px-2 bg-[#fff6eb]"
                                     onClick={() => toggleCategory(category)}
                                 >
                                     <span className="font-serif text-gray-800 text-[15px] sm:text-[16px] pr-2">{category}</span>
-                                    {openCategory === category ? (
-                                        <FaChevronUp className="w-5 h-5 text-gray-600" />
-                                    ) : (
-                                        <FaChevronDown className="w-5 h-5 text-gray-600" />
-                                    )}
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className={`w-5 h-5 text-gray-600 md:hidden transition-transform duration-300 ${openCategory === category ? "rotate-180" : ""
+                                            }`}
+                                    >
+                                        <polyline points="6 9 12 15 18 9" />
+                                    </svg>
                                 </button>
 
                                 {/* Collapsible content */}

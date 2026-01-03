@@ -288,20 +288,6 @@ const CollectionProducts = () => {
                 </div>
             </div>
 
-            {(!loadingRef.current && !hasMoreRef.current && (filterApplied ? filteredProducts : collection_products)?.length === 0) &&
-                <div className='flex w-full px-2 sm:px-8 lg:px-24 items-center justify-center py-4'>
-                    <div className="relative w-full h-[50vh] rounded-lg overflow-hidden">
-                        <Image
-                            src="/no_product.png"
-                            alt="No Product Available"
-                            fill
-                            className="object-contain"
-                            decoding="async"
-                            sizes="100vw"
-                        />
-                    </div>
-                </div>}
-
             <h1 className="flex w-full justify-start items-center font-mono sm:text-lg px-2 sm:px-8 lg:px-24 pt-4">
                     <Link href="/" className="hover:underline font-light">
                         Home
@@ -316,6 +302,20 @@ const CollectionProducts = () => {
                         </>
                     )}
                 </h1>
+
+            {(!loadingRef.current && !hasMoreRef.current && (filterApplied ? filteredProducts : collection_products)?.length === 0) &&
+                <div className='flex w-full px-2 sm:px-8 lg:px-24 items-center justify-center py-4'>
+                    <div className="relative w-full h-[50vh] rounded-lg overflow-hidden">
+                        <Image
+                            src="/no_product.png"
+                            alt="No Product Available"
+                            fill
+                            className="object-contain"
+                            decoding="async"
+                            sizes="100vw"
+                        />
+                    </div>
+                </div>}
 
             {/* {gridMenu ?  */}
             <div className="px-4 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 py-4">

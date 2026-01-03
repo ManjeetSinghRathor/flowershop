@@ -2,9 +2,6 @@
 
 import Link from "next/link";
 import React, { useState } from "react";
-import Image from "next/image";
-import { FaInstagram, FaFacebook, FaWhatsapp } from "react-icons/fa";
-import { FiChevronDown } from "react-icons/fi";
 
 const Footer = () => {
   const [openSection, setOpenSection] = useState('contact');
@@ -46,16 +43,23 @@ const Footer = () => {
               className="flex justify-between items-center w-full md:cursor-default text-lg font-semibold mb-1 md:mb-3"
             >
               Customer Service
-              <FiChevronDown
-                className={`md:hidden transition-transform duration-300 ${
-                  openSection === "customer" ? "rotate-180" : ""
-                }`}
-              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`w-5 h-5 md:hidden transition-transform duration-300 ${openSection === "customer" ? "rotate-180" : ""
+                  }`}
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
             </button>
             <ul
-              className={`overflow-hidden transition-all duration-300 ease-in-out text-gray-700 text-sm text-center md:text-left ${
-                openSection === "customer" ? "max-h-64 opacity-100" : "max-h-0 opacity-0 md:max-h-none md:opacity-100"
-              }`}
+              className={`overflow-hidden transition-all duration-300 ease-in-out text-gray-700 text-sm text-center md:text-left ${openSection === "customer" ? "max-h-64 opacity-100" : "max-h-0 opacity-0 md:max-h-none md:opacity-100"
+                }`}
             >
               {customerLinks.map((link, index) => (
                 <li key={index} className="my-2">
@@ -74,17 +78,25 @@ const Footer = () => {
               className="flex justify-between items-center w-full md:cursor-default text-lg font-semibold mb-2 md:mb-3"
             >
               Get in Touch
-              <FiChevronDown
-                className={`md:hidden transition-transform duration-300 ${
-                  openSection === "contact" ? "rotate-180" : ""
-                }`}
-              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`w-5 h-5 md:hidden transition-transform duration-300 ${openSection === "contact" ? "rotate-180" : ""
+                  }`}
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+
             </button>
 
             <div
-              className={`overflow-hidden transition-all duration-300 ease-in-out text-sm text-gray-800 ${
-                openSection === "contact" ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0 md:max-h-none md:opacity-100"
-              }`}
+              className={`overflow-hidden transition-all duration-300 ease-in-out text-sm text-gray-800 ${openSection === "contact" ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0 md:max-h-none md:opacity-100"
+                }`}
             >
               <p className="grid grid-cols-[2fr_5fr] gap-y-1 break-words max-w-xs mb-2">
                 <span>✉️ Email:</span>
@@ -118,7 +130,15 @@ const Footer = () => {
                   href="https://www.instagram.com/blooms_heaven_?utm_source=qr&igsh=MXRva3g1eGRuOXp4MQ=="
                   className="text-pink-500 hover:text-pink-600 transition-colors text-3xl"
                 >
-                  <FaInstagram />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm10 2a3 3 0 013 3v10a3 3 0 01-3 3H7a3 3 0 01-3-3V7a3 3 0 013-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.75-.75a1.25 1.25 0 100 2.5 1.25 1.25 0 000-2.5z" />
+                  </svg>
+
                 </a>
                 <a
                   href="https://wa.me/916361132722"
@@ -126,13 +146,29 @@ const Footer = () => {
                   rel="noopener noreferrer"
                   className="text-green-500 hover:text-green-600 transition-colors text-3xl"
                 >
-                  <FaWhatsapp />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path d="M12.04 2C6.514 2 2 6.49 2 12.02c0 2.123.553 4.196 1.602 6.03L2 22l4.07-1.566A9.964 9.964 0 0012.04 22c5.526 0 10.04-4.49 10.04-9.98C22.08 6.49 17.566 2 12.04 2zm0 18a8.03 8.03 0 01-4.104-1.128l-.294-.176-2.414.93.78-2.351-.192-.303A8.018 8.018 0 014.02 12.02C4.02 7.58 7.61 4 12.04 4c4.428 0 8.02 3.58 8.02 8.02 0 4.42-3.592 7.98-8.02 7.98zm4.434-5.826c-.244-.122-1.444-.712-1.667-.793-.223-.081-.385-.122-.547.122-.162.244-.63.793-.772.956-.142.162-.284.182-.528.061-.244-.122-1.03-.38-1.962-1.213-.726-.648-1.217-1.448-1.36-1.692-.142-.244-.015-.376.107-.498.11-.109.244-.284.366-.426.122-.142.162-.244.244-.406.081-.162.04-.304-.02-.426-.061-.122-.547-1.32-.75-1.808-.197-.473-.397-.409-.547-.416-.142-.007-.304-.01-.466-.01-.162 0-.426.061-.65.304-.223.244-.852.832-.852 2.03 0 1.198.873 2.356.995 2.518.122.162 1.72 2.627 4.166 3.684.582.251 1.037.401 1.39.513.584.186 1.116.16 1.536.097.468-.07 1.444-.59 1.647-1.162.203-.572.203-1.063.142-1.162-.061-.098-.223-.162-.466-.284z" />
+                  </svg>
+
                 </a>
                 <a
                   href="#"
                   className="text-blue-600 hover:text-blue-700 transition-colors text-3xl"
                 >
-                  <FaFacebook />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path d="M13 3h4a1 1 0 011 1v3h-3c-.552 0-1 .448-1 1v3h4l-1 4h-3v8h-4v-8H8v-4h2V8c0-2.757 2.243-5 5-5z" />
+                  </svg>
+
                 </a>
               </div>
             </div>
