@@ -11,6 +11,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "react-hot-toast";
 import Footer from "@/components/Footer";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import HomeOnlyBanner from "@/components/HomeOnlyBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -118,15 +119,7 @@ export default function RootLayout({ children }) {
           }}
         />
 
-        <p className="font-serif flex flex-col w-full justify-center items-center text-center text-xs sm:text-sm px-4 py-3">
-          {/* <span>
-            *Use Code <strong>Welcome5</strong> to avail 5% discount on a
-            minimum purchase of Rs 2,000/-
-          </span> */}
-          <span className="text-red-600 font-semibold">
-            🚚 We currently deliver only across Bangalore 🌸
-          </span>
-        </p>
+        <HomeOnlyBanner />
 
         <ReduxProvider>
         <GoogleOAuthProvider

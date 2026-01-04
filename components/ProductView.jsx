@@ -271,61 +271,61 @@ const ProductView = () => {
     if (loading) {
         return (
             <>
-            <div className="flex flex-col min-h-screen gap-4 py-2 px-4 sm:px-8 lg:px-24">
-            
-            <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex flex-col min-h-screen gap-4 py-2 px-4 sm:px-8 lg:px-24">
 
-                {/* Image Skeleton (matches final aspect) */}
-                <div className="w-full flex flex-col gap-4">
-                    <div className="w-full flex justify-center max-h-[50vh] lg:max-h-[55vh] flex-shrink-0 aspect-[1]">
-                        <div className="relative w-full max-w-2xl aspect-square bg-gray-300 animate-pulse rounded-md" />
-                    </div>
+                    <div className="flex flex-col lg:flex-row gap-4">
 
-                    <div className="w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth sm:px-4">
-                        <div className="flex flex-col w-full items-start">
-                            {/* Skeleton Rows */}
-                            {[...Array(1)].map((_, rowIdx) => (
-                                <div key={rowIdx} className="flex w-full gap-4">
-                                    {[...Array(8)].map((_, idx) => (
-                                        <div
-                                            key={`row${rowIdx}-${idx}`}
-                                            className="min-w-[4rem] min-h-[4rem] flex items-center justify-center snap-center"
-                                        >
-                                            <div className="flex flex-col gap-2 items-center">
-                                                <div className="w-16 h-16 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
-                                            </div>
+                        {/* Image Skeleton (matches final aspect) */}
+                        <div className="w-full flex flex-col gap-4">
+                            <div className="w-full flex justify-center max-h-[50vh] lg:max-h-[55vh] flex-shrink-0 aspect-[1]">
+                                <div className="relative w-full max-w-2xl aspect-square bg-gray-300 animate-pulse rounded-md" />
+                            </div>
+
+                            <div className="w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth sm:px-4">
+                                <div className="flex flex-col w-full items-start">
+                                    {/* Skeleton Rows */}
+                                    {[...Array(1)].map((_, rowIdx) => (
+                                        <div key={rowIdx} className="flex w-full gap-4">
+                                            {[...Array(8)].map((_, idx) => (
+                                                <div
+                                                    key={`row${rowIdx}-${idx}`}
+                                                    className="min-w-[4rem] min-h-[4rem] flex items-center justify-center snap-center"
+                                                >
+                                                    <div className="flex flex-col gap-2 items-center">
+                                                        <div className="w-16 h-16 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     ))}
                                 </div>
+                            </div>
+                        </div>
+
+
+
+                        {/* Details Skeleton */}
+                        <div className="flex flex-col w-full gap-4">
+                            {[...Array(6)].map((_, idx) => (
+                                <div key={idx} className="w-full h-[60px] lg:h-[90px] xxl:h-[120px] bg-gray-300 animate-pulse rounded-md" />
                             ))}
                         </div>
+
                     </div>
+
+                    <div className="pt-8 pb-12">
+                        <h2 className="flex font-mono text-xl justify-center sm:text-3xl">
+                            You may also like
+                        </h2>
+                    </div>
+
                 </div>
-
-
-
-                {/* Details Skeleton */}
-                <div className="flex flex-col w-full gap-4">
-                    {[...Array(6)].map((_, idx) => (
-                        <div key={idx} className="w-full h-[60px] lg:h-[90px] xxl:h-[120px] bg-gray-300 animate-pulse rounded-md" />
-                    ))}
-                </div>
-
-            </div>
-
-            <div className="pt-8 pb-12">
-                <h2 className="flex font-mono text-xl justify-center sm:text-3xl">
-                    You may also like
-                </h2>
-            </div>
-            
-            </div>
             </>
         );
     }
 
     return (
-        <div className="w-full min-h-screen py-2 px-1">
+        <div className="w-full min-h-screen pb-2 px-1">
             {/* <div className='flex flex-col w-full sm:px-8 lg:px-24'>
                 <h1 className="flex flex-col w-full justify-center items-start font-mono sm:text-lg px-2 py-4">
                     <Link href="/" className="hover:underline font-light">
@@ -335,23 +335,61 @@ const ProductView = () => {
                 </h1>
             </div> */}
 
-            <div className="flex flex-col lg:flex-row gap-2 sm:gap-4 lg:gap-12 px-2 sm:px-8 lg:px-24">
+            <div className="flex flex-col lg:flex-row gap-2 sm:gap-4 lg:gap-12 sm:px-8 lg:px-24">
                 <div className="lg:min-w-xl">
                     <ImageCarousel images={productDetails?.images} />
                 </div>
 
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 px-2">
                     <div className="flex flex-col gap-2 py-2">
                         <p className="text-[20px] lg:text-2xl font-[530]">
                             {productDetails?.name}
                         </p>
                         {/* Stock */}
-                        <p
-                            className={`font-semibold font-serif ${(productDetails.isActive && productDetails.stock > 0) ? "text-green-600" : "text-red-600"
-                                }`}
-                        >
-                            {(productDetails.isActive && productDetails.stock > 0) ? `In Stock` : "Out of Stock"}
-                        </p>
+                        <div className="flex items-center justify-between pr-2">
+                            <p
+                                className={`font-semibold font-serif ${(productDetails.isActive && productDetails.stock > 0) ? "text-green-600" : "text-red-600"
+                                    }`}
+                            >
+                                {(productDetails.isActive && productDetails.stock > 0) ? `In Stock` : "Out of Stock"}
+                            </p>
+                            <button
+                                onClick={() => {
+                                    if (navigator.share) {
+                                        navigator.share({
+                                            title: document.title,
+                                            url: window.location.href,
+                                        });
+                                    } else {
+                                        navigator.clipboard.writeText(window.location.href);
+                                        toast.success("Link copied to clipboard!", {
+                                            style: toastStyle,
+                                            icon: "🗐",
+                                        });
+                                    }
+                                }}
+                                className="flex items-center gap-2 px-2 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition text-sm"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="w-5 h-5"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <circle cx="18" cy="5" r="3" />
+                                    <circle cx="6" cy="12" r="3" />
+                                    <circle cx="18" cy="19" r="3" />
+                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                                </svg>
+                            </button>
+
+
+                        </div>
 
                         {/* Reviews */}
                         <div className="flex items-center gap-1 text-gray-500">
@@ -762,7 +800,10 @@ const ProductView = () => {
                                         <button
                                             onClick={() => {
                                                 navigator.clipboard.writeText(window.location.href);
-                                                toast.success("Link copied to clipboard!");
+                                                toast.success("Link copied to clipboard!", {
+                                                    style: toastStyle,
+                                                    icon: "🗐",
+                                                });
                                             }}
                                             className="text-2xl text-gray-600 hover:text-gray-800 transition-colors"
                                         >

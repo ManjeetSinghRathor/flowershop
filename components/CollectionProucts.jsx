@@ -288,7 +288,7 @@ const CollectionProducts = () => {
                 </div>
             </div>
 
-            <h1 className="flex w-full justify-start items-center font-mono sm:text-lg px-2 sm:px-8 lg:px-24 pt-4">
+            <h1 className="flex w-full justify-start items-center font-mono sm:text-lg px-2 sm:px-8 lg:px-24 py-4">
                     <Link href="/" className="hover:underline font-light">
                         Home
                     </Link>
@@ -302,6 +302,22 @@ const CollectionProducts = () => {
                         </>
                     )}
                 </h1>
+
+            {(hasMoreRef.current) &&
+                <div className="flex flex-col gap-6 w-full overflow-hidden px-2 sm:px-8 lg:px-24">
+                    {/* Row 1 */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+                        {[...Array(4)].map((_, idx) => (
+                            <div
+                                key={`row1-${idx}`}
+                                className="min-w-[7rem] min-h-[7rem] flex items-center justify-center snap-start"
+                            >
+                                {/* Skeleton */}
+                                <div className="w-full h-70 sm:h-80 xl:h-120 bg-gray-300 animate-pulse rounded-lg" />
+                            </div>
+                        ))}
+                    </div>
+                </div>}
 
             {(!loadingRef.current && !hasMoreRef.current && (filterApplied ? filteredProducts : collection_products)?.length === 0) &&
                 <div className='flex w-full px-2 sm:px-8 lg:px-24 items-center justify-center py-4'>
@@ -318,7 +334,7 @@ const CollectionProducts = () => {
                 </div>}
 
             {/* {gridMenu ?  */}
-            <div className="px-4 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 py-4">
+            <div className="px-4 sm:px-8 lg:px-24 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 pb-4">
                 
                 {(filterApplied ? filteredProducts : collection_products)?.map((product, index) => {
                     const isLast = index === (filterApplied ? filteredProducts : collection_products)?.length - 1;
@@ -537,21 +553,6 @@ const CollectionProducts = () => {
                 </div>} 
             */}
 
-            {(loadingRef.current && hasMoreRef.current) &&
-                <div className="flex flex-col gap-6 w-full overflow-hidden py-4 px-2 sm:px-8 lg:px-24">
-                    {/* Row 1 */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 w-full px-2 gap-4">
-                        {[...Array(4)].map((_, idx) => (
-                            <div
-                                key={`row1-${idx}`}
-                                className="min-w-[7rem] min-h-[7rem] flex items-center justify-center snap-start"
-                            >
-                                {/* Skeleton */}
-                                <div className="w-full h-56 bg-gray-300 animate-pulse" />
-                            </div>
-                        ))}
-                    </div>
-                </div>}
         </div >
     );
 

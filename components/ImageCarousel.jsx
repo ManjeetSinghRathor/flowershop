@@ -51,7 +51,7 @@ export default function ImageCarousel({ images }) {
     <div className="w-full max-w-2xl mx-auto lg:sticky top-18 z-10">
       {/* MAIN IMAGE */}
       <div
-        className="relative w-full aspect-square overflow-hidden rounded-xl bg-gray-100"
+        className="relative w-full aspect-square overflow-hidden"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -62,19 +62,23 @@ export default function ImageCarousel({ images }) {
           style={{ transform: `translate3d(-${current * 100}%, 0, 0)` }}
         >
           {images.map((img, idx) => (
-            <div key={idx} className="relative w-full h-full flex-shrink-0">
-              <Image
-                src={img.imgUrl}
-                alt={`Product image ${idx + 1}`}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
-                quality={90}
+            <div
+              key={idx}
+              className="flex items-center justify-center w-full h-full flex-shrink-0"
+            >
+              <div className="relative w-full h-full overflow-hidden">
+                <Image
+                  src={img.imgUrl}
+                  alt={`Image ${idx + 1}`}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  quality={90}
                 priority={idx === 0}
                 placeholder="blur"
                 blurDataURL="/blur-placeholder.png"
-                decoding="async"
-              />
+                />
+              </div>
             </div>
           ))}
         </div>

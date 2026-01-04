@@ -78,8 +78,14 @@ const CustomBouquet = () => {
           🌸 Create Your Own Bouquet
         </h1>
 
-        {/* Flowers Section */}
-        <section className="mb-10">
+        <div className="text-center mb-8">
+          <p className="text-gray-600">
+            Hang tight! Our custom bouquet feature is blooming soon. Get ready to
+            craft your perfect floral arrangement! 🌷🌹
+          </p>
+        </div>
+
+        {/* <section className="mb-10">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
             Choose Your Flowers
           </h2>
@@ -107,8 +113,7 @@ const CustomBouquet = () => {
                       sizes="(max-width: 640px) 7rem, (max-width: 1024px) 8rem, 9rem"
                       className="object-cover rounded-lg"
                     />
-
-                    {/* Show quantity badge OR + overlay */}
+                    
                     {selected && selected.count > 0 ? (
                       <span className="absolute top-1 right-1 bg-pink-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md">
                         {selected.count}
@@ -145,7 +150,6 @@ const CustomBouquet = () => {
           </div>
         </section>
 
-        {/* Wrapping Section */}
         <section className="mb-10">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
             Select Wrapping Paper
@@ -172,7 +176,6 @@ const CustomBouquet = () => {
                     className="object-cover rounded-lg"
                   />
 
-                  {/* Show badge or + overlay */}
                   {selectedWrap === wrap ? (
                     <span className="absolute top-1 right-1 bg-pink-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md">
                       ✓
@@ -191,7 +194,6 @@ const CustomBouquet = () => {
           </div>
         </section>
 
-        {/* Ribbon Section */}
         <section className="mb-10">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
             Pick a Ribbon
@@ -218,7 +220,6 @@ const CustomBouquet = () => {
                     className="object-cover rounded-lg"
                   />
 
-                  {/* Show badge or + overlay */}
                   {selectedRibbon === ribbon ? (
                     <span className="absolute top-1 right-1 bg-pink-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md">
                       ✓
@@ -237,11 +238,9 @@ const CustomBouquet = () => {
           </div>
         </section>
 
-        {/* Summary */}
         <div className="border-t pt-8 mt-8">
 
           <div className="bg-pink-50/40 border border-pink-100 rounded-2xl p-5 shadow-sm">
-            {/* Flowers Summary */}
             <div className="mb-5">
               <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                 🌸 Flowers
@@ -276,7 +275,6 @@ const CustomBouquet = () => {
               )}
             </div>
 
-            {/* Wrapping Summary */}
             <div className="mb-5">
               <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                 🎁 Wrapping
@@ -299,7 +297,6 @@ const CustomBouquet = () => {
               )}
             </div>
 
-            {/* Ribbon Summary */}
             <div className="mb-6">
               <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                 🎀 Ribbon
@@ -322,7 +319,6 @@ const CustomBouquet = () => {
               )}
             </div>
 
-            {/* Total + Buttons */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t border-pink-100 pt-5 mt-3">
               <p className="text-2xl font-bold text-pink-600 text-center sm:text-left">
                 Total: ₹{total.toFixed(2)}
@@ -343,7 +339,7 @@ const CustomBouquet = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
       </div>
     </div>
