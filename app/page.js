@@ -39,8 +39,8 @@ export default function Home() {
   const Slider = dynamic(() => import("react-slick"), {
     ssr: false,
     loading: () => (
-    <div className="w-full h-[144px] sm:h-[184px] bg-gray-300 animate-pulse" />
-  ),
+      <div className="w-full h-[144px] sm:h-[184px] bg-gray-300 animate-pulse" />
+    ),
   });
 
   const dispatch = useDispatch();
@@ -112,29 +112,24 @@ export default function Home() {
 
       let visibleDots = [];
 
-      if (dots.length <= 3) {
+      // If 5 or fewer slides → show all dots
+      if (dots.length <= 5) {
         visibleDots = dots;
       } else {
-        if (activeIndex === 0) {
-          visibleDots = [dots[0], dots[1], dots[2]];
-        } else if (activeIndex === dots.length - 1) {
-          visibleDots = [
-            dots[dots.length - 3],
-            dots[dots.length - 2],
-            dots[dots.length - 1],
-          ];
+        // Start & end boundaries
+        if (activeIndex <= 1) {
+          visibleDots = dots.slice(0, 5);
+        } else if (activeIndex >= dots.length - 2) {
+          visibleDots = dots.slice(dots.length - 5);
         } else {
-          visibleDots = [
-            dots[activeIndex - 1],
-            dots[activeIndex],
-            dots[activeIndex + 1],
-          ];
+          // Center active dot
+          visibleDots = dots.slice(activeIndex - 2, activeIndex + 3);
         }
       }
 
       return (
         <div>
-          <ul className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex">
+          <ul className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-2">
             {visibleDots}
           </ul>
         </div>
@@ -328,6 +323,19 @@ export default function Home() {
 
                 {/* Glass Overlay */}
                 <div className="absolute inset-0 border border-white/30 flex items-center justify-center transition-all duration-300">
+                  {/* <div className="flex items-center justify-center px-1 rounded-xl group-hover:py-1 group-hover:px-2 transition-all duration-300">
+                    <span className="
+                     text-gray-800
+                     text-md sm:text-xl
+                     font-extrabold
+                     tracking-widest
+                     drop-shadow-lg
+                     [-webkit-text-stroke:0.6px_rgba(0,0,0,0.85)]
+                   ">
+                     {item.name}
+                   </span>
+
+                  </div> */}
                   <div className="flex items-center justify-center px-1 rounded-xl bg-black/20 group-hover:bg-black/30 group-hover:py-1 group-hover:px-2 transition-all duration-300">
                     <span className="text-white text-md sm:text-xl font-semibold tracking-widest drop-shadow-lg">
                       {item.name}
@@ -343,50 +351,50 @@ export default function Home() {
       <div className="flex w-full justify-center">
         <div className="relative w-full overflow-hidden py-4">
           <div className="w-full">
-              <Slider {...settings}>
-                {slides.map((slide, idx) => {
-                  const handleMouseDown = () => {
-                    isDragging.current = false;
-                  };
+            <Slider {...settings}>
+              {slides.map((slide, idx) => {
+                const handleMouseDown = () => {
+                  isDragging.current = false;
+                };
 
-                  const handleMouseMove = () => {
-                    isDragging.current = true;
-                  };
+                const handleMouseMove = () => {
+                  isDragging.current = true;
+                };
 
-                  const handleClick = (e) => {
-                    if (!isDragging.current) {
-                      router.push(slide.link);
-                    }
-                  };
+                const handleClick = (e) => {
+                  if (!isDragging.current) {
+                    router.push(slide.link);
+                  }
+                };
 
-                  return (
+                return (
+                  <div
+                    key={slide._id}
+                    className="w-full aspect-[9/4] p-1"
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onTouchStart={handleMouseDown}
+                    onTouchMove={handleMouseMove}
+                  >
                     <div
-                      key={slide._id}
-                      className="w-full aspect-[9/4] p-1"
-                      onMouseDown={handleMouseDown}
-                      onMouseMove={handleMouseMove}
-                      onTouchStart={handleMouseDown}
-                      onTouchMove={handleMouseMove}
+                      onClick={handleClick}
+                      className="relative w-full h-full cursor-pointer bg-white"
                     >
-                      <div
-                        onClick={handleClick}
-                        className="relative w-full h-full cursor-pointer bg-white"
-                      >
-                        <Image
-                          src={slide.image}
-                          alt={`Offer ${idx + 1}`}
-                          fill
-                          className="object-cover object-center sm:rounded-xs"
-                          priority={idx === 0} // 🔥 LCP image
-                          fetchPriority={idx === 0 ? "high" : "auto"}
-                          decoding="async"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                        />
-                      </div>
+                      <Image
+                        src={slide.image}
+                        alt={`Offer ${idx + 1}`}
+                        fill
+                        className="object-cover object-center sm:rounded-xs"
+                        priority={idx === 0} // 🔥 LCP image
+                        fetchPriority={idx === 0 ? "high" : "auto"}
+                        decoding="async"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                      />
                     </div>
-                  );
-                })}
-              </Slider>
+                  </div>
+                );
+              })}
+            </Slider>
           </div>
         </div>
       </div>
@@ -394,7 +402,7 @@ export default function Home() {
       {/* Collection List */}
       <div className="flex flex-col w-full gap-4 sm:gap-6 px-2 mt-2">
         <h2 className="flex justify-center font-mono text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 relative">
-          Bouquet Collection
+          Bouquet & Gifts
           <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-[2px] bg-gradient-to-r from-pink-500 to-yellow-400 rounded-full animate-pulse"></span>
         </h2>
 
@@ -466,7 +474,7 @@ export default function Home() {
                         </div>
 
                         {/* Text */}
-                        <div className="flex justify-center text-center text-gray-600 font-[400] text-[12px] sm:text-[14px] lg:text-[18px] lg:mt-1 text-gray-800 leading-tight max-w-[4.8rem] sm:max-w-[5.4rem] lg:max-w-[6.5rem]">
+                        <div className="font-semibold flex justify-center text-center text-gray-600 font-[400] text-[12px] sm:text-[14px] lg:text-[18px] lg:mt-1 text-gray-800 leading-tight max-w-[4.8rem] sm:max-w-[5.4rem] lg:max-w-[6.5rem]">
                           {item.collection}
                         </div>
                       </Link>
@@ -518,7 +526,7 @@ export default function Home() {
 
           {/* Row 1 */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 w-full px-2 gap-6">
-            {[...Array(6)].map((_, idx) => (
+            {[...Array(8)].map((_, idx) => (
               <div
                 key={`row1-${idx}`}
                 className="min-w-[7rem] min-h-[7rem] flex items-center justify-center snap-start"
@@ -678,9 +686,9 @@ export default function Home() {
                   pathname: "/collection_products",
                   query: { category: col.name, id: col._id }, // pass product ID as query param
                 }}
-                className="flex items-center gap-1 bg-white border border-gray-300 text-gray-700 text-sm font-medium py-1.5 px-4 rounded-lg shadow-sm hover:bg-gray-100 active:scale-95 transition-all duration-500"
+                className="flex items-center gap-1 bg-white border border-gray-300 text-gray-700 text-sm sm:text-lg font-medium py-1.5 px-4 rounded-md shadow-sm hover:bg-gray-100 active:scale-95 transition-all duration-500"
               >
-                <span>View All</span>
+                <span>View All {col.name}</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="currentColor"
@@ -694,6 +702,37 @@ export default function Home() {
           </div>
         ))
       )}
+      <div className="max-w-4xl mx-auto px-4 pt-4 pb-6 text-sm text-gray-700 leading-relaxed">
+        <h2 className="text-lg font-semibold mb-2">Bloom’s Heaven</h2>
+
+        <p className="mb-3">
+          Bloom’s Heaven is an online flower and gift shop dedicated to
+          delivering fresh flowers and thoughtful gifts to customers with speed
+          and care. We help people express their emotions through hand-crafted
+          bouquets, cakes, chocolates, and curated gift items.
+        </p>
+
+        <p className="mb-3">
+          Founded with a passion for floral design and meaningful gifting,
+          Bloom’s Heaven focuses on simplicity, quality, and reliability.
+          Whether it’s a birthday, anniversary, celebration, or a simple gesture
+          of love, we make gifting easy and dependable.
+        </p>
+
+        <p className="mb-3">
+          We use fresh, hand-picked blooms and ensure every arrangement is
+          crafted with attention to detail. Our goal is to deliver products that
+          arrive on time and reflect the care behind every order.
+        </p>
+
+        <p className="mb-3">
+          What began as a small love for flowers has grown into a trusted online
+          store serving customers who value freshness, timely delivery, and
+          honest service.
+        </p>
+
+        <p className="mt-4">© 2026 Bloom’s Heaven. All rights reserved.</p>
+      </div>
 
       {user?.role === "admin" && <FloatingButton />}
     </div>

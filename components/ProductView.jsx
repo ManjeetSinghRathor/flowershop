@@ -268,40 +268,61 @@ const ProductView = () => {
     const [isShareOpen, setIsShareOpen] = useState(true);
     //   const [productsImgloaded, setProductsImgLoaded] = useState({});
 
-    if (loading) return (
-        <div className="flex flex-col lg:flex-row min-h-screen justify-center gap-4 py-4 px-4 sm:px-8 lg:px-24">
+    if (loading) {
+        return (
+            <>
+            <div className="flex flex-col min-h-screen gap-4 py-2 px-4 sm:px-8 lg:px-24">
+            
+            <div className="flex flex-col lg:flex-row gap-4">
 
-            {/* Skeleton slides */}
-            {/* <div
-            className="w-full h-[80px] bg-gray-300 animate-pulse rounded-md"
-        /> */}
+                {/* Image Skeleton (matches final aspect) */}
+                <div className="w-full flex flex-col gap-4">
+                    <div className="w-full flex justify-center max-h-[50vh] lg:max-h-[55vh] flex-shrink-0 aspect-[1]">
+                        <div className="relative w-full max-w-2xl aspect-square bg-gray-300 animate-pulse rounded-md" />
+                    </div>
 
-            <div className="w-full flex justify-center">
-                <div
-                    className="w-full max-w-2xl max-h-[60vh] aspect-[1] bg-gray-300 animate-pulse rounded-md"
-                />
+                    <div className="w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth sm:px-4">
+                        <div className="flex flex-col w-full items-start">
+                            {/* Skeleton Rows */}
+                            {[...Array(1)].map((_, rowIdx) => (
+                                <div key={rowIdx} className="flex w-full gap-4">
+                                    {[...Array(8)].map((_, idx) => (
+                                        <div
+                                            key={`row${rowIdx}-${idx}`}
+                                            className="min-w-[4rem] min-h-[4rem] flex items-center justify-center snap-center"
+                                        >
+                                            <div className="flex flex-col gap-2 items-center">
+                                                <div className="w-16 h-16 rounded-xl bg-gray-300 animate-pulse shadow-sm" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+
+
+                {/* Details Skeleton */}
+                <div className="flex flex-col w-full gap-4">
+                    {[...Array(6)].map((_, idx) => (
+                        <div key={idx} className="w-full h-[60px] lg:h-[90px] xxl:h-[120px] bg-gray-300 animate-pulse rounded-md" />
+                    ))}
+                </div>
+
             </div>
 
-            <div className="flex flex-col w-full gap-4">
-                {[...Array(5)].map((_, idx) => (
-                    <div
-                        key={idx}
-                        className="w-full h-[120px] bg-gray-300 animate-pulse rounded-md"
-                    />
-                ))}
-            </div>
-
-            <div className="flex flex-col w-full gap-3 pt-12 pb-4 px-4 sm:px-10 lg:px-26 ">
+            <div className="pt-8 pb-12">
                 <h2 className="flex font-mono text-xl justify-center sm:text-3xl">
                     You may also like
                 </h2>
-
-                <div className="flex flex-col gap-4 w-full overflow-hidden py-4">
-
-                </div>
             </div>
-
-        </div>);
+            
+            </div>
+            </>
+        );
+    }
 
     return (
         <div className="w-full min-h-screen py-2 px-1">
@@ -546,20 +567,20 @@ const ProductView = () => {
                                 className="w-full flex justify-between items-center pt-1 text-left font-semibold text-black"
                             >
                                 <span>Shipping and Delivery:</span>
-                                
+
                                 <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="3"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        className={`w-5 h-5 text-gray-600 md:hidden transition-transform duration-300 ${isOpen ? "rotate-180" : ""
-                                            }`}
-                                    >
-                                        <polyline points="6 9 12 15 18 9" />
-                                    </svg>
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className={`w-5 h-5 text-gray-600 transition-transform duration-300 ${isOpen ? "rotate-180" : ""
+                                        }`}
+                                >
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
                             </button>
 
                             {/* Content */}
@@ -608,18 +629,18 @@ const ProductView = () => {
                             >
                                 <span>Customer Reviews:</span>
                                 <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="3"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        className={`w-5 h-5 text-gray-600 md:hidden transition-transform duration-300 ${isReviewsOpen ? "rotate-180" : ""
-                                            }`}
-                                    >
-                                        <polyline points="6 9 12 15 18 9" />
-                                    </svg>
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className={`w-5 h-5 text-gray-600 transition-transform duration-300 ${isReviewsOpen ? "rotate-180" : ""
+                                        }`}
+                                >
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
                             </button>
 
                             {/* Content */}
@@ -719,18 +740,18 @@ const ProductView = () => {
                             >
                                 <span>Share This Product On:</span>
                                 <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="3"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        className={`w-5 h-5 text-gray-600 md:hidden transition-transform duration-300 ${isShareOpen ? "rotate-180" : ""
-                                            }`}
-                                    >
-                                        <polyline points="6 9 12 15 18 9" />
-                                    </svg>
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className={`w-5 h-5 text-gray-600 transition-transform duration-300 ${isShareOpen ? "rotate-180" : ""
+                                        }`}
+                                >
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
                             </button>
 
                             {/* Content */}

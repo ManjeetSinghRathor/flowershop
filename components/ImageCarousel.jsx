@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import Image from "next/image";
 
 export default function ImageCarousel({ images }) {
@@ -12,36 +12,26 @@ export default function ImageCarousel({ images }) {
 
   const minSwipeDistance = 50;
 
-  const prevImage = () => {
-    if (isSliding) return;
-    slideTo(current === 0 ? images.length - 1 : current - 1);
-  };
-
-  const nextImage = () => {
-    if (isSliding) return;
-    slideTo(current === images.length - 1 ? 0 : current + 1);
-  };
-
-  const goToImage = (index) => {
-    if (isSliding || index === current) return;
-    slideTo(index);
-  };
-
   const slideTo = (index) => {
+    if (isSliding) return;
     setIsSliding(true);
-    const slider = sliderRef.current;
-    if (!slider) return;
 
-    slider.style.transition = "transform 0.3s ease-in-out";
-    slider.style.transform = `translateX(-${index * 100}%)`;
+    const slider = sliderRef.current;
+    slider.style.transition = "transform 0.35s ease";
+    slider.style.transform = `translate3d(-${index * 100}%, 0, 0)`;
 
     setTimeout(() => {
       setCurrent(index);
       slider.style.transition = "none";
-      slider.style.transform = `translateX(-${index * 100}%)`;
       setIsSliding(false);
-    }, 300); // match transition duration
+    }, 350);
   };
+
+  const prevImage = () =>
+    slideTo(current === 0 ? images.length - 1 : current - 1);
+
+  const nextImage = () =>
+    slideTo(current === images.length - 1 ? 0 : current + 1);
 
   const onTouchStart = (e) => {
     setTouchEnd(null);
@@ -59,109 +49,79 @@ export default function ImageCarousel({ images }) {
 
   return (
     <div className="w-full max-w-2xl mx-auto lg:sticky top-18 z-10">
-      {/* Main Carousel */}
+      {/* MAIN IMAGE */}
       <div
-        className="relative w-full overflow-hidden rounded-xl"
+        className="relative w-full aspect-square overflow-hidden rounded-xl bg-gray-100"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
         <div
           ref={sliderRef}
-          className="flex w-full"
-          style={{ transform: `translateX(-${current * 100}%)` }}
+          className="flex h-full will-change-transform"
+          style={{ transform: `translate3d(-${current * 100}%, 0, 0)` }}
         >
           {images.map((img, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-center w-full max-h-[50vh] lg:max-h-[55vh] flex-shrink-0 aspect-[1]"
-            >
-              <div className="relative w-full h-full rounded-xl overflow-hidden">
-                <Image
-                  src={img.imgUrl}
-                  alt={`Image ${idx + 1}`}
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  priority={idx === 0} // optional: prioritize first image load
-                />
-              </div>
+            <div key={idx} className="relative w-full h-full flex-shrink-0">
+              <Image
+                src={img.imgUrl}
+                alt={`Product image ${idx + 1}`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+                quality={90}
+                priority={idx === 0}
+                placeholder="blur"
+                blurDataURL="/blur-placeholder.png"
+                decoding="async"
+              />
             </div>
-
           ))}
         </div>
 
         {/* Arrows */}
         <button
           onClick={prevImage}
-          className="absolute top-1/2 left-2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full z-10"
+          className="absolute top-1/2 left-2 -translate-y-1/2 bg-black/20 hover:bg-black/30 text-white px-2 py-1 rounded-full"
         >
-
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-4 h-4"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-
+          ◀
         </button>
+
         <button
           onClick={nextImage}
-          className="absolute top-1/2 right-2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full z-10"
+          className="absolute top-1/2 right-2 -translate-y-1/2 bg-black/20 hover:bg-black/30 text-white px-2 py-1 rounded-full"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-4 h-4"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-
+          ▶
         </button>
       </div>
 
+      {/* THUMBNAILS */}
       <div className="relative mt-4">
-        {/* Horizontal scroll container */}
-        <div
-          className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 px-1"
-        >
+        <div className="flex gap-2 overflow-x-auto px-1">
           {images.map((img, idx) => (
             <button
               key={idx}
-              onClick={() => goToImage(idx)}
-              className={`flex-shrink-0 h-16 w-16 rounded-lg overflow-hidden border-2 ${current === idx ? "border-gray-600" : "border-transparent"
-                }`}
+              onClick={() => slideTo(idx)}
+              className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition
+                ${current === idx ? "border-gray-700" : "border-transparent"}`}
             >
-              <div className="relative w-full h-full">
-                <Image
-                  src={img.imgUrl}
-                  alt={`Thumbnail ${idx + 1}`}
-                  fill
-                  className="object-contain"
-                  sizes="64px" // exact pixel size for thumbnails
-                  loading="lazy" // default, but explicit for clarity
-                />
-              </div>
+              <Image
+                src={img.imgUrl}
+                alt={`Thumbnail ${idx + 1}`}
+                fill
+                className="object-cover"
+                sizes="64px"
+                quality={60}
+                loading="lazy"
+                decoding="async"
+              />
             </button>
           ))}
         </div>
 
-        {/* Right gradient to indicate more items */}
-        <div className="absolute top-0 right-0 h-full w-6 pointer-events-none bg-gradient-to-l from-white to-transparent"></div>
+        {/* Fade hint */}
+        <div className="absolute top-0 right-0 h-full w-6 bg-gradient-to-l from-white to-transparent pointer-events-none" />
       </div>
-
-
     </div>
   );
 }
